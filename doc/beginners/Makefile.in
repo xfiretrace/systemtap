@@ -149,6 +149,7 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DYNINST_CXXFLAGS = @DYNINST_CXXFLAGS@
 DYNINST_LDFLAGS = @DYNINST_LDFLAGS@
+DYNINST_LIBS = @DYNINST_LIBS@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
@@ -308,6 +309,7 @@ py3execdir = @py3execdir@
 pyexecdir = @pyexecdir@
 python3dir = @python3dir@
 pythondir = @pythondir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 selinux_CFLAGS = @selinux_CFLAGS@
 selinux_LIBS = @selinux_LIBS@
@@ -407,8 +409,8 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@INSTALL_PREBUILT_DOCS_FALSE@uninstall-local:
 @INSTALL_PREBUILT_DOCS_FALSE@clean-local:
+@INSTALL_PREBUILT_DOCS_FALSE@uninstall-local:
 @INSTALL_PREBUILT_DOCS_FALSE@install-data-hook:
 clean: clean-am
 

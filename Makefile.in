@@ -213,6 +213,7 @@ PROGRAMS = $(bin_PROGRAMS) $(pkglibexec_PROGRAMS)
 @BUILD_TRANSLATOR_TRUE@	stap-stapregex-dfa.$(OBJEXT) \
 @BUILD_TRANSLATOR_TRUE@	stap-stringtable.$(OBJEXT) \
 @BUILD_TRANSLATOR_TRUE@	stap-tapset-python.$(OBJEXT) \
+@BUILD_TRANSLATOR_TRUE@	stap-analysis.$(OBJEXT) \
 @BUILD_TRANSLATOR_TRUE@	$(am__objects_1) $(am__objects_2) \
 @BUILD_TRANSLATOR_TRUE@	$(am__objects_3) $(am__objects_4) \
 @BUILD_TRANSLATOR_TRUE@	$(am__objects_5)
@@ -322,13 +323,13 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/stap-bpf-base.Po \
-	./$(DEPDIR)/stap-bpf-bitset.Po ./$(DEPDIR)/stap-bpf-opt.Po \
-	./$(DEPDIR)/stap-bpf-translate.Po ./$(DEPDIR)/stap-buildrun.Po \
-	./$(DEPDIR)/stap-cache.Po ./$(DEPDIR)/stap-client-http.Po \
-	./$(DEPDIR)/stap-client-nss.Po ./$(DEPDIR)/stap-cmdline.Po \
-	./$(DEPDIR)/stap-coveragedb.Po ./$(DEPDIR)/stap-csclient.Po \
-	./$(DEPDIR)/stap-cscommon.Po \
+am__depfiles_remade = ./$(DEPDIR)/stap-analysis.Po \
+	./$(DEPDIR)/stap-bpf-base.Po ./$(DEPDIR)/stap-bpf-bitset.Po \
+	./$(DEPDIR)/stap-bpf-opt.Po ./$(DEPDIR)/stap-bpf-translate.Po \
+	./$(DEPDIR)/stap-buildrun.Po ./$(DEPDIR)/stap-cache.Po \
+	./$(DEPDIR)/stap-client-http.Po ./$(DEPDIR)/stap-client-nss.Po \
+	./$(DEPDIR)/stap-cmdline.Po ./$(DEPDIR)/stap-coveragedb.Po \
+	./$(DEPDIR)/stap-csclient.Po ./$(DEPDIR)/stap-cscommon.Po \
 	./$(DEPDIR)/stap-dwarf_wrappers.Po ./$(DEPDIR)/stap-dwflpp.Po \
 	./$(DEPDIR)/stap-elaborate.Po ./$(DEPDIR)/stap-hash.Po \
 	./$(DEPDIR)/stap-interactive.Po ./$(DEPDIR)/stap-loc2stap.Po \
@@ -473,6 +474,7 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DYNINST_CXXFLAGS = @DYNINST_CXXFLAGS@
 DYNINST_LDFLAGS = @DYNINST_LDFLAGS@
+DYNINST_LIBS = @DYNINST_LIBS@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
@@ -632,6 +634,7 @@ py3execdir = @py3execdir@
 pyexecdir = @pyexecdir@
 python3dir = @python3dir@
 pythondir = @pythondir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 selinux_CFLAGS = @selinux_CFLAGS@
 selinux_LIBS = @selinux_LIBS@
@@ -690,12 +693,14 @@ oldinclude_HEADERS = includes/sys/sdt.h includes/sys/sdt-config.h
 @BUILD_TRANSLATOR_TRUE@	translator-output.cxx stapregex.cxx \
 @BUILD_TRANSLATOR_TRUE@	stapregex-tree.cxx stapregex-parse.cxx \
 @BUILD_TRANSLATOR_TRUE@	stapregex-dfa.cxx stringtable.cxx \
-@BUILD_TRANSLATOR_TRUE@	tapset-python.cxx $(am__append_7) \
-@BUILD_TRANSLATOR_TRUE@	$(am__append_9) $(am__append_14) \
-@BUILD_TRANSLATOR_TRUE@	$(am__append_15) $(am__append_21)
+@BUILD_TRANSLATOR_TRUE@	tapset-python.cxx analysis.cxx \
+@BUILD_TRANSLATOR_TRUE@	$(am__append_7) $(am__append_9) \
+@BUILD_TRANSLATOR_TRUE@	$(am__append_14) $(am__append_15) \
+@BUILD_TRANSLATOR_TRUE@	$(am__append_21)
 @BUILD_TRANSLATOR_TRUE@noinst_HEADERS = sdt_types.h
 @BUILD_TRANSLATOR_TRUE@stap_LDADD = @stap_LIBS@ @sqlite3_LIBS@ \
 @BUILD_TRANSLATOR_TRUE@	@LIBINTL@ -lpthread @debuginfod_LIBS@ \
+@BUILD_TRANSLATOR_TRUE@	@DYNINST_LDFLAGS@ @DYNINST_LIBS@ \
 @BUILD_TRANSLATOR_TRUE@	$(am__append_8) $(am__append_13) \
 @BUILD_TRANSLATOR_TRUE@	$(am__append_19) $(am__append_22)
 @BUILD_TRANSLATOR_TRUE@stap_DEPENDENCIES = 
@@ -1053,6 +1058,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stap-analysis.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stap-bpf-base.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stap-bpf-bitset.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stap-bpf-opt.Po@am__quote@ # am--include-marker
@@ -1714,6 +1720,20 @@ stap-tapset-python.obj: tapset-python.cxx
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stap_CPPFLAGS) $(CPPFLAGS) $(stap_CXXFLAGS) $(CXXFLAGS) -c -o stap-tapset-python.obj `if test -f 'tapset-python.cxx'; then $(CYGPATH_W) 'tapset-python.cxx'; else $(CYGPATH_W) '$(srcdir)/tapset-python.cxx'; fi`
 
+stap-analysis.o: analysis.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stap_CPPFLAGS) $(CPPFLAGS) $(stap_CXXFLAGS) $(CXXFLAGS) -MT stap-analysis.o -MD -MP -MF $(DEPDIR)/stap-analysis.Tpo -c -o stap-analysis.o `test -f 'analysis.cxx' || echo '$(srcdir)/'`analysis.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/stap-analysis.Tpo $(DEPDIR)/stap-analysis.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='analysis.cxx' object='stap-analysis.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stap_CPPFLAGS) $(CPPFLAGS) $(stap_CXXFLAGS) $(CXXFLAGS) -c -o stap-analysis.o `test -f 'analysis.cxx' || echo '$(srcdir)/'`analysis.cxx
+
+stap-analysis.obj: analysis.cxx
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stap_CPPFLAGS) $(CPPFLAGS) $(stap_CXXFLAGS) $(CXXFLAGS) -MT stap-analysis.obj -MD -MP -MF $(DEPDIR)/stap-analysis.Tpo -c -o stap-analysis.obj `if test -f 'analysis.cxx'; then $(CYGPATH_W) 'analysis.cxx'; else $(CYGPATH_W) '$(srcdir)/analysis.cxx'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/stap-analysis.Tpo $(DEPDIR)/stap-analysis.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='analysis.cxx' object='stap-analysis.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stap_CPPFLAGS) $(CPPFLAGS) $(stap_CXXFLAGS) $(CXXFLAGS) -c -o stap-analysis.obj `if test -f 'analysis.cxx'; then $(CYGPATH_W) 'analysis.cxx'; else $(CYGPATH_W) '$(srcdir)/analysis.cxx'; fi`
+
 stap-interactive.o: interactive.cxx
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(stap_CPPFLAGS) $(CPPFLAGS) $(stap_CXXFLAGS) $(CXXFLAGS) -MT stap-interactive.o -MD -MP -MF $(DEPDIR)/stap-interactive.Tpo -c -o stap-interactive.o `test -f 'interactive.cxx' || echo '$(srcdir)/'`interactive.cxx
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/stap-interactive.Tpo $(DEPDIR)/stap-interactive.Po
@@ -2249,7 +2269,8 @@ clean-am: clean-binPROGRAMS clean-generic clean-local \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-		-rm -f ./$(DEPDIR)/stap-bpf-base.Po
+		-rm -f ./$(DEPDIR)/stap-analysis.Po
+	-rm -f ./$(DEPDIR)/stap-bpf-base.Po
 	-rm -f ./$(DEPDIR)/stap-bpf-bitset.Po
 	-rm -f ./$(DEPDIR)/stap-bpf-opt.Po
 	-rm -f ./$(DEPDIR)/stap-bpf-translate.Po
@@ -2364,7 +2385,8 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-		-rm -f ./$(DEPDIR)/stap-bpf-base.Po
+		-rm -f ./$(DEPDIR)/stap-analysis.Po
+	-rm -f ./$(DEPDIR)/stap-bpf-base.Po
 	-rm -f ./$(DEPDIR)/stap-bpf-bitset.Po
 	-rm -f ./$(DEPDIR)/stap-bpf-opt.Po
 	-rm -f ./$(DEPDIR)/stap-bpf-translate.Po

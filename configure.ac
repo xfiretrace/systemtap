@@ -608,15 +608,22 @@ AC_ARG_WITH([dyninst],
   AS_HELP_STRING([--with-dyninst=DIRECTORY],
     [find dyninst headers/libraries in DIRECTORY]))
 
+AM_CONDITIONAL([HAVE_DYNINST], [test "${have_dyninst}" = "yes"])
 case "$with_dyninst" in
 no) ;;
 ''|yes) # Try a simple-minded distro search
      DYNINST_CXXFLAGS="-I/usr/include/dyninst"
      DYNINST_LDFLAGS="-L/usr/lib64/dyninst -L/usr/lib/dyninst" # XXX both lib paths!?!
+     # Add Dyninst libraries only if they are available
+     if test -d "/usr/include/dyninst"; then
+       DYNINST_LIBS="-l parseAPI -l symtabAPI -l instructionAPI -ltbb -lcommon"
+     fi
      ;;
 *)  # Use paths in the user-specified prefix
     DYNINST_CXXFLAGS="-I$with_dyninst/include"
     DYNINST_LDFLAGS="-L$with_dyninst/lib/" # XXX need lib64 too?
+    # Will assume Dyninst libraries are available as the path is specified
+    DYNINST_LIBS="-l parseAPI -l symtabAPI -l instructionAPI -ltbb -lcommon"
     ;;
 esac
 if test "$with_dyninst" != "no"; then
@@ -627,6 +634,7 @@ if test "$with_dyninst" != "no"; then
   AC_CHECK_HEADERS([BPatch_object.h], [
       AC_SUBST(DYNINST_CXXFLAGS)
       AC_SUBST(DYNINST_LDFLAGS)
+      AC_SUBST(DYNINST_LIBS)
       AC_DEFINE([HAVE_DYNINST],[1],[Define to 1 if Dyninst is enabled])
       have_dyninst=yes
       AC_MSG_NOTICE([dyninst support available])])
@@ -636,7 +644,6 @@ if test "$with_dyninst" != "no"; then
   CPPFLAGS="$old_CPPFLAGS"
   AC_LANG_POP(C++)
 fi
-AM_CONDITIONAL([HAVE_DYNINST], [test "${have_dyninst}" = "yes"])
 
 
 dnl Check for the libvirt and libxml2 devel packages
