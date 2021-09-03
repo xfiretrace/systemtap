@@ -608,7 +608,6 @@ AC_ARG_WITH([dyninst],
   AS_HELP_STRING([--with-dyninst=DIRECTORY],
     [find dyninst headers/libraries in DIRECTORY]))
 
-AM_CONDITIONAL([HAVE_DYNINST], [test "${have_dyninst}" = "yes"])
 case "$with_dyninst" in
 no) ;;
 ''|yes) # Try a simple-minded distro search
@@ -644,6 +643,7 @@ if test "$with_dyninst" != "no"; then
   CPPFLAGS="$old_CPPFLAGS"
   AC_LANG_POP(C++)
 fi
+AM_CONDITIONAL([HAVE_DYNINST], [test "${have_dyninst}" = "yes"])
 
 
 dnl Check for the libvirt and libxml2 devel packages

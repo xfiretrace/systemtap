@@ -681,11 +681,11 @@ HAVE_LIBVIRT_FALSE
 HAVE_LIBVIRT_TRUE
 libvirt_LIBS
 libvirt_CFLAGS
+HAVE_DYNINST_FALSE
+HAVE_DYNINST_TRUE
 DYNINST_LIBS
 DYNINST_LDFLAGS
 DYNINST_CXXFLAGS
-HAVE_DYNINST_FALSE
-HAVE_DYNINST_TRUE
 BOOST_SYSTEM_LIB
 CXXCPP
 stapbpf_LIBS
@@ -12031,14 +12031,6 @@ if test "${with_dyninst+set}" = set; then :
 fi
 
 
- if test "${have_dyninst}" = "yes"; then
-  HAVE_DYNINST_TRUE=
-  HAVE_DYNINST_FALSE='#'
-else
-  HAVE_DYNINST_TRUE='#'
-  HAVE_DYNINST_FALSE=
-fi
-
 case "$with_dyninst" in
 no) ;;
 ''|yes) # Try a simple-minded distro search
@@ -12099,6 +12091,14 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 fi
+ if test "${have_dyninst}" = "yes"; then
+  HAVE_DYNINST_TRUE=
+  HAVE_DYNINST_FALSE='#'
+else
+  HAVE_DYNINST_TRUE='#'
+  HAVE_DYNINST_FALSE=
+fi
+
 
 
 
