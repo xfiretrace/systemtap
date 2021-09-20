@@ -23,6 +23,7 @@
 #include "dwflpp.h"
 #include "setupdwfl.h"
 #include "loc2stap.h"
+#include "analysis.h"
 #include <gelf.h>
 
 #include "sdt_types.h"
@@ -4719,6 +4720,13 @@ dwarf_var_expanding_visitor::visit_target_symbol (target_symbol *e)
       location_context ctx(e);
       ctx.pc = addr;
       ctx.userspace_p = userspace_p;
+
+      // Check if change to variable has any effect
+      if (lvalue) {
+	      if (liveness(q.dw.module_name.c_str(), addr, ctx) < 0) {
+		      // warn that the write has no effect
+	      }
+      }
 
       // NB: pass the ctx.e (copied/rewritten veraion e, not orig_e),
       // so [x] index expressions have their intra-synthetic-function names

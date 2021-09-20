@@ -17,7 +17,9 @@
 
 #ifdef HAVE_DYNINST
 
-extern int liveness(char *executable, Dwarf_Addr location __attribute__ ((unused)) /*, varaccess */);
+extern int liveness(const char *executable,
+		    Dwarf_Addr location,
+		    location_context ctx);
 
 #else
 
