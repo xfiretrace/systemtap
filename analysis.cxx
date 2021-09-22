@@ -45,7 +45,7 @@ analysis::analysis(char *name)
 	if(!co) return;
 }
 
-// FIXME: Currently only support x86_64 will need to set up for powerpc and aarch64
+#if defined(__i386__) || defined(__x86_64__)
 static const MachRegister dyninst_register_64[] = {
 	x86_64::rax,
 	x86_64::rdx,
@@ -74,8 +74,118 @@ static const MachRegister dyninst_register_32[] = {
 	x86::esi,
 	x86::edi,
 	x86::ebp,
-	x86::esp,
+	x86::esp
 };
+
+#elif defined(__aarch64__)
+static const MachRegister dyninst_register_64[] = {
+	aarch64::x0,
+	aarch64::x1,
+	aarch64::x2,
+	aarch64::x3,
+	aarch64::x4,
+	aarch64::x5,
+	aarch64::x6,
+	aarch64::x7,
+	aarch64::x8,
+	aarch64::x9,
+	aarch64::x10,
+	aarch64::x11,
+	aarch64::x12,
+	aarch64::x13,
+	aarch64::x14,
+	aarch64::x15,
+	aarch64::x16,
+	aarch64::x17,
+	aarch64::x18,
+	aarch64::x19,
+	aarch64::x20,
+	aarch64::x21,
+	aarch64::x22,
+	aarch64::x23,
+	aarch64::x24,
+	aarch64::x25,
+	aarch64::x26,
+	aarch64::x27,
+	aarch64::x28,
+	aarch64::x29,
+	aarch64::x30,
+	aarch64::sp
+};
+
+static const MachRegister dyninst_register_32[1]; // No 32-bit support
+
+#elif defined(__powerpc__)
+static const MachRegister dyninst_register_64[] = {
+    ppc64::r0,
+    ppc64::r1,
+    ppc64::r2,
+    ppc64::r3,
+    ppc64::r4,
+    ppc64::r5,
+    ppc64::r6,
+    ppc64::r7,
+    ppc64::r8,
+    ppc64::r9,
+    ppc64::r10,
+    ppc64::r11,
+    ppc64::r12,
+    ppc64::r13,
+    ppc64::r14,
+    ppc64::r15,
+    ppc64::r16,
+    ppc64::r17,
+    ppc64::r18,
+    ppc64::r19,
+    ppc64::r20,
+    ppc64::r21,
+    ppc64::r22,
+    ppc64::r23,
+    ppc64::r24,
+    ppc64::r25,
+    ppc64::r26,
+    ppc64::r27,
+    ppc64::r28,
+    ppc64::r29,
+    ppc64::r30,
+    ppc64::r31
+};
+
+static const MachRegister dyninst_register_32[] = {
+    ppc32::r0,
+    ppc32::r1,
+    ppc32::r2,
+    ppc32::r3,
+    ppc32::r4,
+    ppc32::r5,
+    ppc32::r6,
+    ppc32::r7,
+    ppc32::r8,
+    ppc32::r9,
+    ppc32::r10,
+    ppc32::r11,
+    ppc32::r12,
+    ppc32::r13,
+    ppc32::r14,
+    ppc32::r15,
+    ppc32::r16,
+    ppc32::r17,
+    ppc32::r18,
+    ppc32::r19,
+    ppc32::r20,
+    ppc32::r21,
+    ppc32::r22,
+    ppc32::r23,
+    ppc32::r24,
+    ppc32::r25,
+    ppc32::r26,
+    ppc32::r27,
+    ppc32::r28,
+    ppc32::r29,
+    ppc32::r30,
+    ppc32::r31
+};
+#endif
 
 int liveness(const char *executable,
 	     Dwarf_Addr addr,
