@@ -4721,13 +4721,6 @@ dwarf_var_expanding_visitor::visit_target_symbol (target_symbol *e)
       ctx.pc = addr;
       ctx.userspace_p = userspace_p;
 
-      // Check if change to variable has any effect
-      if (lvalue) {
-	      if (liveness(q.dw.module_name.c_str(), addr, ctx) < 0) {
-		      // warn that the write has no effect
-	      }
-      }
-
       // NB: pass the ctx.e (copied/rewritten veraion e, not orig_e),
       // so [x] index expressions have their intra-synthetic-function names
       Dwarf_Die endtype;
@@ -4736,6 +4729,13 @@ dwarf_var_expanding_visitor::visit_target_symbol (target_symbol *e)
       else
 	q.dw.literal_stmt_for_local (ctx, getscopes(e), e->sym_name(),
 				     ctx.e, lvalue, &endtype);
+
+      // Now that have location information check if change to variable has any effect
+      if (lvalue) {
+	      if (liveness(q.dw.module_name.c_str(), addr, ctx) < 0) {
+		      // FIXME: warn that the write has no effect
+	      }
+      }
 
       q.dw.sess.globals.insert(q.dw.sess.globals.end(),
                               ctx.globals.begin(),

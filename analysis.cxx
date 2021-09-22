@@ -199,7 +199,6 @@ int liveness(const char *executable,
 	// Determine whether 32-bit or 64-bit code as the register names are different in dyninst
 	int reg_width = func_to_analyze.co->cs()->getAddressWidth();
 
-	#if 0
 	// Find where the variable is located
 	location *loc = ctx.locations.back ();
 
@@ -207,10 +206,7 @@ int liveness(const char *executable,
 	if (loc->type != loc_register) return 0;
 
 	// Map dwarf number to dyninst register name, punt if out of range
-	unsigned int regno = loc->offset;
-	#else
-	unsigned int regno = 5; // Dummy up to arg1 of x86
-	#endif
+	unsigned int regno = loc->regno;
 	switch (reg_width){
 	case 4:
 		if (regno >= (sizeof(dyninst_register_32)/sizeof(MachRegister))) return 0;
@@ -248,7 +244,8 @@ int liveness(const char *executable,
 	// Query to see if whether the register is live at that point
 	bool used;
 	la.query(iloc, LivenessAnalyzer::Before, r, used);
-	cout << "liveness analysis " << executable << " " << hex << addr << endl;
+	cout << "liveness analysis " << executable << " " << func->name()
+	     << " " << hex << addr << endl;
 	cout << r.name() <<  (used ? " used"  : " unused") << endl;
 	return (used ? 1 : -1);
 }
