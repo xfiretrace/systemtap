@@ -220,9 +220,8 @@ int liveness(const char *executable,
 	}
 
 	// Find the function containing the probe point.
-	vector<CodeRegion *> rr = func_to_analyze.co->cs()->regions();
 	std::set<ParseAPI::Function*> ff_s;
-	if(func_to_analyze.co->findFuncs(rr[0], addr, ff_s) <= 0) return 0;
+	if(func_to_analyze.co->findFuncs(NULL, addr, ff_s) <= 0) return 0;
 	ParseAPI::Function *func = *ff_s.begin();
 
 	// FIXME Check to see if a previous liveness information exists for function to reuse
@@ -232,7 +231,7 @@ int liveness(const char *executable,
 
 	// Get the basic block and instruction containing the the probe point.
 	set<Block *> bb_s;
-	if (func_to_analyze.co->findBlocks(rr[0], addr, bb_s) != 1 )
+	if (func_to_analyze.co->findBlocks(NULL, addr, bb_s) != 1 )
 		return 0; // too many (or too few) basic blocks, punt
 	Block *bb = *bb_s.begin();
 	Instruction curInsn = bb->getInsn(addr);
