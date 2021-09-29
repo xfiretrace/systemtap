@@ -189,7 +189,7 @@ static const MachRegister dyninst_register_32[] = {
 
 int liveness(const char *executable,
 	     Dwarf_Addr addr,
-	     location_context ctx __attribute__ ((unused)))
+	     location_context ctx)
 {
 	// should cache the executable names like the other things
 	char *exe = strdup(executable);
