@@ -413,7 +413,7 @@ static void _stp_ctl_free_special_buffers(void)
 
 /* Get a buffer based on type, possibly a generic buffer, when all else
    fails returns NULL and there is nothing we can do.  */
-static struct _stp_buffer *_stp_ctl_get_buffer(int type, void *data,
+static struct _stp_buffer *_stp_ctl_get_buffer(int type, const char *data,
 					       unsigned len)
 {
 	unsigned long flags;
@@ -588,6 +588,55 @@ static int _stp_ctl_send(int type, void *data, unsigned len)
 	   timer at this point, but calling mod_timer() at this
 	   point would bring in more locking issues... */
 	return len + sizeof(bptr->type);
+}
+
+/* Logs a warning or error through the control channel. This function mimics
+   _stp_ctl_send() but directly uses an _stp_buffer to construct the warning or
+   error message. This is *only* for warnings and errors. The logtype string
+   should be either "WARNING: " or "ERROR: ", and logtype_len shouldn't include
+   a trailing NUL termination byte. The message type is always assumed to be
+   STP_OOB_DATA since this is only for warnings and errors. */
+static void _stp_ctl_log_werr(const char *logtype, size_t logtype_len,
+			      const char *fmt, va_list args)
+{
+	struct context *__restrict__ c;
+	struct _stp_buffer *bptr;
+	unsigned long flags;
+
+	c = _stp_runtime_entryfn_get_context();
+	bptr = _stp_ctl_get_buffer(STP_OOB_DATA, logtype, logtype_len);
+	if (!bptr)
+		goto put_context;
+
+	/*
+	 * This is a generic failure message for when there's no space left. We
+	 * aren't allowed to change it, so just go straight to sending it off.
+	 */
+	if (bptr == _stp_ctl_oob_warn || bptr == _stp_ctl_oob_err)
+		goto send_msg;
+
+	/*
+	 * The logtype string was already copied in by _stp_ctl_get_buffer(),
+	 * now copy the rest of the message. The trailing NUL termination byte
+	 * automatically added by vscnprintf() is unneeded, so it's ignored.
+	 */
+	bptr->len += vscnprintf(bptr->buf + logtype_len,
+				STP_CTL_BUFFER_SIZE - logtype_len, fmt, args);
+
+	/*
+	 * Make sure the last character is a newline. There will always be
+	 * enough space to do this because vscnprintf() reserves a byte for the
+	 * trailing NUL character which we don't care about.
+	 */
+	if (bptr->buf[bptr->len - 1] != '\n')
+		bptr->buf[bptr->len++] = '\n';
+
+send_msg:
+	stp_spin_lock_irqsave(&_stp_ctl_ready_lock, flags);
+	list_add_tail(&bptr->list, &_stp_ctl_ready_q);
+	stp_spin_unlock_irqrestore(&_stp_ctl_ready_lock, flags);
+put_context:
+	_stp_runtime_entryfn_put_context(c);
 }
 
 /* Calls _stp_ctl_send and then calls wake_up on _stp_ctl_wq

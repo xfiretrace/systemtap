@@ -21,65 +21,74 @@
 #define WARN_STRING "WARNING: "
 #define ERR_STRING "ERROR: "
 
-enum code { INFO=0, WARN, ERROR, DBUG };
+enum code { WARN=1, ERROR, DBUG };
 
 static void _stp_vlog (enum code type, const char *func, int line, const char *fmt, va_list args)
         __attribute ((format (printf, 4, 0)));
 
 static void _stp_vlog (enum code type, const char *func, int line, const char *fmt, va_list args)
 {
+	int prefix_len, msg_len;
 	struct _stp_log *log;
 	unsigned long flags;
-	size_t bytes_avail;
-	int num;
+	va_list args_copy;
 	char *buf;
-	int start = 0;
+
+	/* Warnings and errors are printed to the control channel */
+	switch (type) {
+	case WARN:
+		_stp_ctl_log_werr(WARN_STRING, sizeof(WARN_STRING) - 1,
+				  fmt, args);
+		return;
+	case ERROR:
+		_stp_ctl_log_werr(ERR_STRING, sizeof(ERR_STRING) - 1,
+				  fmt, args);
+		return;
+	case DBUG:
+		/* Debug messages are handled below */
+		break;
+	}
+
+	/*
+	 * Calculate the total possible length of the debug message. It's the
+	 * length of the prefix plus the length of the message plus one in case
+	 * a newline character needs to be appended. Note that we need a copy of
+	 * the va_list arguments because the vsnprintf() call will erase them.
+	 */
+	prefix_len = snprintf(NULL, 0, "%s:%d: ", func, line);
+	va_copy(args_copy, args);
+	msg_len = vsnprintf(NULL, 0, fmt, args_copy);
+	va_end(args_copy);
 
 	if (!_stp_print_trylock_irqsave(&flags))
 		return;
 
+	buf = _stp_reserve_bytes(prefix_len + msg_len + 1);
+	if (!buf)
+		goto err_unlock;
+
+	/*
+	 * We can use raw *sprintf() here because the sizes have already been
+	 * validated. Additionally, the reserved size accomodates for an extra
+	 * byte so there won't be an overflow when the NUL termination is added
+	 * by *sprintf(). The NUL termination isn't desired but there isn't any
+	 * way to prevent it from being added.
+	 */
+	sprintf(buf, "%s:%d: ", func, line);
+	vsprintf(buf + prefix_len, fmt, args);
+
+	/*
+	 * Make sure the last character is a newline. If it already is, then
+	 * discard the extra byte that was reserved.
+	 */
+	if (buf[prefix_len + msg_len - 1] != '\n')
+		buf[prefix_len + msg_len] = '\n';
+	else
+		_stp_unreserve_bytes(1);
+
+	/* Flush the log now so userspace is quickly notified of the message */
 	log = per_cpu_ptr(_stp_log_pcpu, raw_smp_processor_id());
-	bytes_avail = STP_BUFFER_SIZE - log->len;
-	if (unlikely(!bytes_avail))
-		goto err_unlock;
-
-	buf = &log->buf[log->len];
-	if (type == DBUG) {
-		start = _stp_snprintf(buf, bytes_avail, "%s:%d: ", func, line);
-	} else if (type == WARN) {
-		strncpy(buf, WARN_STRING, bytes_avail);
-		start = min(bytes_avail, sizeof(WARN_STRING) - 1);
-	} else if (type == ERROR) {
-		strncpy(buf, ERR_STRING, bytes_avail);
-		start = min(bytes_avail, sizeof(ERR_STRING) - 1);
-	}
-
-	bytes_avail -= start;
-	if (unlikely(!bytes_avail))
-		goto err_unlock;
-
-	num = vscnprintf(buf + start, bytes_avail - 1, fmt, args);
-	if (num + start) {
-		if (buf[num + start - 1] != '\n') {
-			buf[num + start] = '\n';
-			num++;
-			buf[num + start] = '\0';
-		}
-
-#ifdef STAP_DEBUG_PRINTK
-                if (type == DBUG) printk (KERN_DEBUG "%s", buf);
-                else if (type == WARN) printk (KERN_WARNING "%s", buf);
-                else if (type == ERROR) printk (KERN_ERR "%s", buf);
-                else printk (KERN_INFO "%s", buf);
-#else
-		if (type != DBUG) {
-			_stp_ctl_send(STP_OOB_DATA, buf, start + num + 1);
-		} else {
-			log->len += start + num;
-			__stp_print_flush(log);
-		}
-#endif
-	}
+	__stp_print_flush(log);
 err_unlock:
 	_stp_print_unlock_irqrestore(&flags);
 }

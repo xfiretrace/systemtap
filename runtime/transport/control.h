@@ -35,6 +35,10 @@ static struct proc_ops _stp_ctl_proc_ops_cmd;
 static int _stp_ctl_send(int type, void *data, unsigned len);
 static int _stp_ctl_send_notify(int type, void *data, unsigned len);
 
+static void _stp_ctl_log_werr(const char *logtype, size_t logtype_len,
+			      const char *fmt, va_list args)
+	__attribute((format(printf, 3, 0)));
+
 static int _stp_ctl_write_fs(int type, void *data, unsigned len);
 
 static int _stp_register_ctl_channel(void);
