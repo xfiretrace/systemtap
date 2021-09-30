@@ -382,6 +382,7 @@ sdt_benchmark_thread(unsigned long i, double fp1, float fp2)
   fp2 += 0.0;
   double fp_local1 = 1.01;
   float fp_local2 = 2.02;
+  PROBE2(stap, benchmark__fp, fp1+fp_local1, fp2+fp_local2);
   double fp_local3 = 3.03;
   double fp_local4 = 4.04;
   double fp_local5 = 5.05;

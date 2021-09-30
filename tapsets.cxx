@@ -6538,6 +6538,7 @@ struct sdt_uprobe_var_expanding_visitor: public var_expanding_visitor
   void visit_target_symbol (target_symbol* e);
   unsigned get_target_symbol_argno_and_validate (target_symbol* e);
   long parse_out_arg_precision(string& asmarg);
+  char parse_out_arg_type(string& asmarg);
   expression* try_parse_arg_literal (target_symbol *e,
                                      const string& asmarg,
                                      long precision);
@@ -6604,6 +6605,12 @@ sdt_uprobe_var_expanding_visitor::build_dwarf_registers ()
     DRI ("%r15", 15, DI); DRI ("%r15d", 15, SI); DRI ("%r15w", 15, HI);
        DRI ("%r15b", 15, QI);
     DRI ("%rip", 16, DI); DRI ("%eip", 16, SI); DRI ("%ip", 16, HI);
+    DRI ("%xmm0", 17, DI); DRI ("%xmm1", 18, DI);  DRI ("%xmm2", 19, DI); DRI ("%xmm3", 20, DI);
+    DRI ("%xmm4", 21, DI); DRI ("%xmm5", 22, DI);  DRI ("%xmm6", 23, DI); DRI ("%xmm7", 24, DI);
+    DRI ("%xmm8", 25, DI); DRI ("%xmm9", 26, DI);  DRI ("%xmm10", 27, DI); DRI ("%xmm11", 28, DI);
+    DRI ("%xmm12", 29, DI); DRI ("%xmm13", 30, DI);  DRI ("%xmm14", 31, DI); DRI ("%xmm15", 32, DI);
+    DRI ("%st0", 33, DI); DRI ("%st1", 34, DI);  DRI ("%st2", 35, DI); DRI ("%st3", 36, DI);
+    DRI ("%st4", 37, DI); DRI ("%st5", 38, DI);  DRI ("%st6", 39, DI); DRI ("%st7", 40, DI);    
   } else if (elf_machine == EM_386) {
     DRI ("%eax", 0, SI); DRI ("%ax", 0, HI); DRI ("%al", 0, QI);
        DRI ("%ah", 0, QIh);
@@ -6750,6 +6757,14 @@ sdt_uprobe_var_expanding_visitor::build_dwarf_registers ()
     DRI ("x29", 29, DI); DRI ("w29", 29, SI);
     DRI ("x30", 30, DI); DRI ("w30", 30, SI);
     DRI ("sp", 31, DI);
+    DRI ("v0", 64, DI); DRI ("v1", 65, DI);  DRI ("v2", 66, DI); DRI ("v3", 67, DI);
+    DRI ("v4", 68, DI); DRI ("v5", 69, DI);  DRI ("v6", 70, DI); DRI ("v7", 71, DI);
+    DRI ("v8", 72, DI); DRI ("v9", 73, DI);  DRI ("v10", 74, DI); DRI ("v11", 75, DI);
+    DRI ("v12", 76, DI); DRI ("v13", 77, DI);  DRI ("v14", 78, DI); DRI ("v15", 79, DI);
+    DRI ("v16", 80, DI); DRI ("v17", 81, DI);  DRI ("v18", 82, DI); DRI ("v19", 83, DI);
+    DRI ("v20", 84, DI); DRI ("v21", 85, DI);  DRI ("v22", 86, DI); DRI ("v23", 87, DI);
+    DRI ("v24", 88, DI); DRI ("25", 89, DI);  DRI ("v26", 90, DI); DRI ("v27", 91, DI);
+    DRI ("v28", 92, DI); DRI ("v29", 93, DI);  DRI ("v30", 94, DI); DRI ("v31", 95, DI);
   } else if (elf_machine == EM_RISCV) {
     Dwarf_Addr bias;
     Elf* elf = (dwfl_module_getelf (dw.mod_info->mod, &bias));
@@ -6981,8 +6996,9 @@ sdt_uprobe_var_expanding_visitor::parse_out_arg_precision(string& asmarg)
   long precision;
   if (asmarg.find('@') != string::npos)
     {
-      precision = lex_cast<int>(asmarg.substr(0, asmarg.find('@')));
-      asmarg = asmarg.substr(asmarg.find('@')+1);
+      long at_or_type = asmarg.find_first_of("@f");
+      precision = lex_cast<int>(asmarg.substr(0, at_or_type));
+      asmarg = asmarg.substr(at_or_type);
     }
   else
     {
@@ -6994,6 +7010,21 @@ sdt_uprobe_var_expanding_visitor::parse_out_arg_precision(string& asmarg)
         precision = -sizeof(long);
     }
   return precision;
+}
+
+char
+sdt_uprobe_var_expanding_visitor::parse_out_arg_type(string& asmarg)
+{
+  // Reference: __builtin_classify_type
+  char type;
+  if (asmarg.find('@') != string::npos)
+    {
+      type = asmarg[0];
+      asmarg = asmarg.substr(asmarg.find('@')+1);
+    }
+  else
+    type = 'i';
+  return type;
 }
 
 expression*
@@ -7451,6 +7482,8 @@ sdt_uprobe_var_expanding_visitor::visit_target_symbol_arg (target_symbol *e)
 
       // Parse (and remove from asmarg) the leading length
       long precision = parse_out_arg_precision(asmarg);
+      char type __attribute__ ((unused));
+      type = parse_out_arg_type(asmarg);
 
       try
         {

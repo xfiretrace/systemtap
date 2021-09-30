@@ -43,13 +43,14 @@
 
 #ifdef __ASSEMBLER__
 # define _SDT_PROBE(provider, name, n, arglist)	\
-  _SDT_ASM_BODY(provider, name, _SDT_ASM_STRING_1, (_SDT_DEPAREN_##n arglist)) \
+  _SDT_ASM_BODY(provider, name, _SDT_ASM_SUBSTR_1, (_SDT_DEPAREN_##n arglist)) \
   _SDT_ASM_BASE
 # define _SDT_ASM_1(x)			x;
 # define _SDT_ASM_2(a, b)		a,b;
 # define _SDT_ASM_3(a, b, c)		a,b,c;
 # define _SDT_ASM_5(a, b, c, d, e)	a,b,c,d,e;
 # define _SDT_ASM_STRING_1(x)		.asciz #x;
+# define _SDT_ASM_SUBSTR_1(x)		.ascii #x;
 # define _SDT_DEPAREN_0()				/* empty */
 # define _SDT_DEPAREN_1(a)				a
 # define _SDT_DEPAREN_2(a,b)				a b
@@ -86,14 +87,23 @@
 # define _SDT_ASM_5(a, b, c, d, e)	_SDT_S(a) "," _SDT_S(b) "," \
 					_SDT_S(c) "," _SDT_S(d) "," \
 					_SDT_S(e) "\n"
-# define _SDT_ASM_ARGS(n)		_SDT_ASM_STRING(_SDT_ASM_TEMPLATE_##n)
+# define _SDT_ASM_ARGS(n)		_SDT_ASM_TEMPLATE_##n
 # define _SDT_ASM_STRING_1(x)		_SDT_ASM_1(.asciz #x)
+# define _SDT_ASM_SUBSTR_1(x)		_SDT_ASM_1(.ascii #x)
 
-# define _SDT_ARGFMT(no)		%n[_SDT_S##no]@_SDT_ARGTMPL(_SDT_A##no)
+# define _SDT_ARGFMT(no)                _SDT_ASM_1(_SDT_SIGN %n[_SDT_S##no]) \
+                                        _SDT_ASM_1(_SDT_SIZE %n[_SDT_S##no]) \
+                                        _SDT_ASM_1(_SDT_TYPE %n[_SDT_S##no]) \
+                                        _SDT_ASM_SUBSTR(_SDT_ARGTMPL(_SDT_A##no))
+
 
 # ifndef STAP_SDT_ARG_CONSTRAINT
 # if defined __powerpc__
 # define STAP_SDT_ARG_CONSTRAINT        nZr
+# elif defined __x86_64__
+# define STAP_SDT_ARG_CONSTRAINT norfxy
+# elif defined __aarch64__
+# define STAP_SDT_ARG_CONSTRAINT norw
 # else
 # define STAP_SDT_ARG_CONSTRAINT        nor
 # endif
@@ -101,11 +111,14 @@
 
 # define _SDT_STRINGIFY(x)              #x
 # define _SDT_ARG_CONSTRAINT_STRING(x)  _SDT_STRINGIFY(x)
-# define _SDT_ARG(n, x)			\
-  [_SDT_S##n] "n" ((_SDT_ARGSIGNED (x) ? 1 : -1) * (int) _SDT_ARGSIZE (x)), \
+/* _SDT_S encodes the size and type as 0xSSTT which is decoded by the assembler
+   macros _SDT_SIZE and _SDT_TYPE */
+# define _SDT_ARG(n, x)				    \
+  [_SDT_S##n] "n" ((_SDT_ARGSIGNED (x) ? (int)-1 : 1) * (-(((int) _SDT_ARGSIZE (x)) << 8) + (-(0x7f & __builtin_classify_type (x))))), \
   [_SDT_A##n] _SDT_ARG_CONSTRAINT_STRING (STAP_SDT_ARG_CONSTRAINT) (_SDT_ARGVAL (x))
 #endif
 #define _SDT_ASM_STRING(x)		_SDT_ASM_STRING_1(x)
+#define _SDT_ASM_SUBSTR(x)		_SDT_ASM_SUBSTR_1(x)
 
 #define _SDT_ARGARRAY(x)	(__builtin_classify_type (x) == 14	\
 				 || __builtin_classify_type (x) == 5)
@@ -237,7 +250,44 @@ __extension__ extern unsigned long long __sdt_unsp;
 # define _SDT_ASM_AUTOGROUP ""
 #endif
 
+#define _SDT_DEF_MACROS							     \
+	_SDT_ASM_1(.altmacro)						     \
+	_SDT_ASM_1(.macro _SDT_SIGN x)				     	     \
+	_SDT_ASM_3(.pushsection .note.stapsdt,"","note")		     \
+	_SDT_ASM_1(.iflt \\x)						     \
+	_SDT_ASM_1(.ascii "-")						     \
+	_SDT_ASM_1(.endif)						     \
+	_SDT_ASM_1(.popsection)						     \
+	_SDT_ASM_1(.endm)						     \
+	_SDT_ASM_1(.macro _SDT_SIZE_ x)					     \
+	_SDT_ASM_3(.pushsection .note.stapsdt,"","note")		     \
+	_SDT_ASM_1(.ascii "\x")						     \
+	_SDT_ASM_1(.popsection)						     \
+	_SDT_ASM_1(.endm)						     \
+	_SDT_ASM_1(.macro _SDT_SIZE x)					     \
+	_SDT_ASM_1(_SDT_SIZE_ %%((-(-\\x*((-\\x>0)-(-\\x<0))))>>8))	     \
+	_SDT_ASM_1(.endm)						     \
+	_SDT_ASM_1(.macro _SDT_TYPE_ x)				             \
+	_SDT_ASM_3(.pushsection .note.stapsdt,"","note")		     \
+	_SDT_ASM_2(.ifc 8,\\x)					     	     \
+	_SDT_ASM_1(.ascii "f")						     \
+	_SDT_ASM_1(.endif)						     \
+	_SDT_ASM_1(.ascii "@")						     \
+	_SDT_ASM_1(.popsection)						     \
+	_SDT_ASM_1(.endm)						     \
+	_SDT_ASM_1(.macro _SDT_TYPE x)				     	     \
+	_SDT_ASM_1(_SDT_TYPE_ %%((\\x)&(0xff)))			     \
+	_SDT_ASM_1(.endm)
+
+#define _SDT_UNDEF_MACROS						      \
+  _SDT_ASM_1(.purgem _SDT_SIGN)						      \
+  _SDT_ASM_1(.purgem _SDT_SIZE_)					      \
+  _SDT_ASM_1(.purgem _SDT_SIZE)						      \
+  _SDT_ASM_1(.purgem _SDT_TYPE_)					      \
+  _SDT_ASM_1(.purgem _SDT_TYPE)
+
 #define _SDT_ASM_BODY(provider, name, pack_args, args)			      \
+  _SDT_DEF_MACROS							      \
   _SDT_ASM_1(990:	_SDT_NOP)					      \
   _SDT_ASM_3(		.pushsection .note.stapsdt,_SDT_ASM_AUTOGROUP,"note") \
   _SDT_ASM_1(		.balign 4)					      \
@@ -250,6 +300,8 @@ __extension__ extern unsigned long long __sdt_unsp;
   _SDT_ASM_STRING(provider)						      \
   _SDT_ASM_STRING(name)							      \
   pack_args args							      \
+  _SDT_ASM_SUBSTR(\x00)							      \
+  _SDT_UNDEF_MACROS							      \
   _SDT_ASM_1(994:	.balign 4)					      \
   _SDT_ASM_1(		.popsection)
 
@@ -271,19 +323,20 @@ __extension__ extern unsigned long long __sdt_unsp;
 #define _SDT_SEMAPHORE(p,n) _SDT_ASM_1(		_SDT_ASM_ADDR 0)
 #endif
 
+#define _SDT_ASM_BLANK _SDT_ASM_SUBSTR(\x20)
 #define _SDT_ASM_TEMPLATE_0		/* no arguments */
 #define _SDT_ASM_TEMPLATE_1		_SDT_ARGFMT(1)
-#define _SDT_ASM_TEMPLATE_2		_SDT_ASM_TEMPLATE_1 _SDT_ARGFMT(2)
-#define _SDT_ASM_TEMPLATE_3		_SDT_ASM_TEMPLATE_2 _SDT_ARGFMT(3)
-#define _SDT_ASM_TEMPLATE_4		_SDT_ASM_TEMPLATE_3 _SDT_ARGFMT(4)
-#define _SDT_ASM_TEMPLATE_5		_SDT_ASM_TEMPLATE_4 _SDT_ARGFMT(5)
-#define _SDT_ASM_TEMPLATE_6		_SDT_ASM_TEMPLATE_5 _SDT_ARGFMT(6)
-#define _SDT_ASM_TEMPLATE_7		_SDT_ASM_TEMPLATE_6 _SDT_ARGFMT(7)
-#define _SDT_ASM_TEMPLATE_8		_SDT_ASM_TEMPLATE_7 _SDT_ARGFMT(8)
-#define _SDT_ASM_TEMPLATE_9		_SDT_ASM_TEMPLATE_8 _SDT_ARGFMT(9)
-#define _SDT_ASM_TEMPLATE_10		_SDT_ASM_TEMPLATE_9 _SDT_ARGFMT(10)
-#define _SDT_ASM_TEMPLATE_11		_SDT_ASM_TEMPLATE_10 _SDT_ARGFMT(11)
-#define _SDT_ASM_TEMPLATE_12		_SDT_ASM_TEMPLATE_11 _SDT_ARGFMT(12)
+#define _SDT_ASM_TEMPLATE_2		_SDT_ASM_TEMPLATE_1 _SDT_ASM_BLANK _SDT_ARGFMT(2)
+#define _SDT_ASM_TEMPLATE_3		_SDT_ASM_TEMPLATE_2 _SDT_ASM_BLANK _SDT_ARGFMT(3)
+#define _SDT_ASM_TEMPLATE_4		_SDT_ASM_TEMPLATE_3 _SDT_ASM_BLANK _SDT_ARGFMT(4)
+#define _SDT_ASM_TEMPLATE_5		_SDT_ASM_TEMPLATE_4 _SDT_ASM_BLANK _SDT_ARGFMT(5)
+#define _SDT_ASM_TEMPLATE_6		_SDT_ASM_TEMPLATE_5 _SDT_ASM_BLANK _SDT_ARGFMT(6)
+#define _SDT_ASM_TEMPLATE_7		_SDT_ASM_TEMPLATE_6 _SDT_ASM_BLANK _SDT_ARGFMT(7)
+#define _SDT_ASM_TEMPLATE_8		_SDT_ASM_TEMPLATE_7 _SDT_ASM_BLANK _SDT_ARGFMT(8)
+#define _SDT_ASM_TEMPLATE_9		_SDT_ASM_TEMPLATE_8 _SDT_ASM_BLANK _SDT_ARGFMT(9)
+#define _SDT_ASM_TEMPLATE_10		_SDT_ASM_TEMPLATE_9 _SDT_ASM_BLANK _SDT_ARGFMT(10)
+#define _SDT_ASM_TEMPLATE_11		_SDT_ASM_TEMPLATE_10 _SDT_ASM_BLANK _SDT_ARGFMT(11)
+#define _SDT_ASM_TEMPLATE_12		_SDT_ASM_TEMPLATE_11 _SDT_ASM_BLANK _SDT_ARGFMT(12)
 #define _SDT_ASM_OPERANDS_0()		[__sdt_dummy] "g" (0)
 #define _SDT_ASM_OPERANDS_1(arg1)	_SDT_ARG(1, arg1)
 #define _SDT_ASM_OPERANDS_2(arg1, arg2) \
@@ -413,12 +466,12 @@ __extension__ extern unsigned long long __sdt_unsp;
 
 #if __STDC_VERSION__ >= 199901L
 # define STAP_PROBE_ASM(provider, name, ...)		\
-  _SDT_ASM_BODY(provider, name, _SDT_ASM_STRING, (__VA_ARGS__)) \
+  _SDT_ASM_BODY(provider, name, /*_SDT_ASM_STRING */, __VA_ARGS__)	\
   _SDT_ASM_BASE
 # define STAP_PROBE_ASM_OPERANDS(n, ...) _SDT_ASM_OPERANDS_##n(__VA_ARGS__)
 #else
 # define STAP_PROBE_ASM(provider, name, args)	\
-  _SDT_ASM_BODY(provider, name, _SDT_ASM_STRING, (args)) \
+  _SDT_ASM_BODY(provider, name, /* _SDT_ASM_STRING */, (args))	\
   _SDT_ASM_BASE
 #endif
 #define STAP_PROBE_ASM_TEMPLATE(n)	_SDT_ASM_TEMPLATE_##n
