@@ -4732,7 +4732,7 @@ dwarf_var_expanding_visitor::visit_target_symbol (target_symbol *e)
 
       // Now that have location information check if change to variable has any effect
       if (lvalue) {
-	      if (liveness(q.dw.module_name.c_str(), addr, ctx) < 0) {
+	      if (liveness(q.dw.mod_info->elf_path.c_str(), addr, ctx) < 0) {
 		      q.sess.print_warning(_F("write at %lx will have no effect",
 					      addr), e->tok);
 	      }
