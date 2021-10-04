@@ -87,7 +87,7 @@ do {										\
 	/* Build the final format string so there's only one eprintf() call */	\
 	seq = color && color_errors ? parse_stap_color(color) : NULL;		\
 	if (seq)								\
-		num = snprintf(NULL, 0, COLOR_FMT "%s " COLOR_RESET "%s", seq,	\
+		num = snprintf(NULL, 0, COLOR_FMT "%s" COLOR_RESET " %s", seq,	\
 			       tag, fmt);					\
 	else									\
 		num = snprintf(NULL, 0, "%s %s", tag, fmt);			\
@@ -99,7 +99,7 @@ do {										\
 	}									\
 										\
 	if (seq) {								\
-		sprintf(f, COLOR_FMT "%s " COLOR_RESET "%s", seq, tag, fmt);	\
+		sprintf(f, COLOR_FMT "%s" COLOR_RESET " %s", seq, tag, fmt);	\
 		free(seq);							\
 	} else {								\
 		sprintf(f, "%s %s", tag, fmt);					\
