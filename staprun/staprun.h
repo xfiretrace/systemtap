@@ -72,31 +72,55 @@
 
 extern void eprintf(const char *fmt, ...);
 extern void switch_syslog(const char *name);
-extern void print_color(const char *type);
 extern char *parse_stap_color(const char *type);
-
-#define dbug(level, args...) do {if (verbose>=level) {eprintf("%s:%s:%d ",__name__,__FUNCTION__, __LINE__); eprintf(args);}} while (0)
 
 extern char *__name__;
 
 /* print to stderr */
-#define err(args...) do {	\
-		print_color("error");	\
-		eprintf(_("ERROR:"));	\
-		print_color(NULL); \
-		eprintf(" ");	\
-		eprintf(args);	\
-	} while (0)
+#define COLOR_FMT	"\033[%sm\033[K"
+#define COLOR_RESET	"\033[m\033[K"
+#define print_stderr(color, tag, fmt, ...) \
+do {										\
+	char *f, *seq;								\
+	int num;								\
+										\
+	/* Build the final format string so there's only one eprintf() call */	\
+	seq = color ? parse_stap_color(color) : NULL;				\
+	if (seq)								\
+		num = snprintf(NULL, 0, COLOR_FMT "%s " COLOR_RESET "%s", seq,	\
+			       tag, fmt);					\
+	else									\
+		num = snprintf(NULL, 0, "%s %s", tag, fmt);			\
+										\
+	f = malloc(num + 1);							\
+	if (!f) {								\
+		fprintf(stderr, "Memory allocation failed.\n");			\
+		exit(-2);							\
+	}									\
+										\
+	if (seq) {								\
+		sprintf(f, COLOR_FMT "%s " COLOR_RESET "%s", seq, tag, fmt);	\
+		free(seq);							\
+	} else {								\
+		sprintf(f, "%s %s", tag, fmt);					\
+	}									\
+										\
+	eprintf(f, ##__VA_ARGS__);						\
+	free(f);								\
+} while (0)
 
-#define warn(args...) do {	\
-		if (suppress_warnings)	\
-			break;		\
-		print_color("warning");	\
-		eprintf(_("WARNING:"));	\
-		print_color(NULL); \
-		eprintf(" ");	\
-		eprintf(args);	\
-	} while (0)
+#define err(fmt, ...) \
+	print_stderr("error", _("ERROR:"), fmt, ##__VA_ARGS__)
+
+#define warn(fmt, ...) \
+	print_stderr("warning", _("WARNING:"), fmt, ##__VA_ARGS__)
+
+#define dbug(level, fmt, ...) \
+do {										\
+	if (verbose >= level)							\
+		print_stderr(NULL, "%s:%s:%d", fmt, __name__,			\
+			     __FUNCTION__, __LINE__, ##__VA_ARGS__);		\
+} while (0)
 
 /* better perror() */
 #define perr(args...) do {					\
@@ -106,7 +130,9 @@ extern char *__name__;
 	} while (0)
 
 /* Error messages. Use these for serious errors, not informational messages to stderr. */
-#define _err(args...) do {eprintf("%s:%s:%d: ERROR: ",__name__, __FUNCTION__, __LINE__); eprintf(args);} while(0)
+#define _err(fmt, ...) \
+	print_stderr(NULL, "%s:%s:%d: ERROR:", fmt, __name__,	\
+		     __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #define _perr(args...) do {					\
 		int _errno = errno;				\
 		_err(args);					\

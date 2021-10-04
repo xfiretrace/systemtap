@@ -25,6 +25,16 @@ char *__name__ = "stapio";
 
 int main(int argc, char **argv)
 {
+	/* Force libc to make our stderr messages atomic by enabling line
+	   buffering since stderr is unbuffered by default. Without this, libc
+	   is at liberty to split a single stderr message into multiple writes
+	   to the fd while holding flockfile(stderr). POSIX only guarantees that
+	   a single write(2) is atomic; chaining several write(2) calls together
+	   won't be atomic, and we don't want libc to do that within a single
+	   *fprintf(stderr) call since it'll mangle messages printed across
+	   different processes (*not* threads). */
+	setlinebuf(stderr);
+
 #if ENABLE_NLS
 	setlocale (LC_ALL, "");
 	bindtextdomain (PACKAGE, LOCALEDIR);

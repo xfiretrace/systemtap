@@ -446,6 +446,16 @@ int main(int argc, char **argv)
 {
 	int rc;
 
+	/* Force libc to make our stderr messages atomic by enabling line
+	   buffering since stderr is unbuffered by default. Without this, libc
+	   is at liberty to split a single stderr message into multiple writes
+	   to the fd while holding flockfile(stderr). POSIX only guarantees that
+	   a single write(2) is atomic; chaining several write(2) calls together
+	   won't be atomic, and we don't want libc to do that within a single
+	   *fprintf(stderr) call since it'll mangle messages printed across
+	   different processes (*not* threads). */
+	setlinebuf(stderr);
+
 	/* NB: Don't do the geteuid()!=0 check here, since we want to
 	   test command-line error-handling while running non-root. */
 	/* Get rid of a few standard environment variables (which */

@@ -511,8 +511,7 @@ static void fatal_handler (int signum)
         int rc;
         char *str = strsignal(signum);
         rc = write (STDERR_FILENO, ERR_MSG, sizeof(ERR_MSG));
-        rc = write (STDERR_FILENO, str, strlen(str));
-        rc = write (STDERR_FILENO, "\n", 1);
+        fprintf(stderr, "%s\n", str);
         (void) rc; /* notused */
 	_exit(1);
 }
@@ -696,24 +695,6 @@ void switch_syslog(const char *name)
 	openlog(name, LOG_PID, LOG_DAEMON);
 	use_syslog = 1;
 	color_errors = 0;
-}
-
-void print_color(const char *type)
-{
-	if (!color_errors)
-		return;
-
-	if (type == NULL) // Reset
-		eprintf("\033[m\033[K");
-	else {
-		char *seq = parse_stap_color(type);
-		if (seq != NULL) {
-			eprintf("\033[");
-			eprintf("%s", seq);
-			eprintf("m\033[K");
-			free(seq);
-		}
-	}
 }
 
 /* Parse SYSTEMTAP_COLORS and returns the SGR parameter(s) for the given
