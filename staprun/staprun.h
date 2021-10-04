@@ -85,7 +85,7 @@ do {										\
 	int num;								\
 										\
 	/* Build the final format string so there's only one eprintf() call */	\
-	seq = color ? parse_stap_color(color) : NULL;				\
+	seq = color && color_errors ? parse_stap_color(color) : NULL;		\
 	if (seq)								\
 		num = snprintf(NULL, 0, COLOR_FMT "%s " COLOR_RESET "%s", seq,	\
 			       tag, fmt);					\
