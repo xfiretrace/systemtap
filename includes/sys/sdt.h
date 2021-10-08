@@ -104,6 +104,8 @@
 # define STAP_SDT_ARG_CONSTRAINT norfxy
 # elif defined __aarch64__
 # define STAP_SDT_ARG_CONSTRAINT norw
+# elif defined __s390__ || defined __s390x__
+# define STAP_SDT_ARG_CONSTRAINT        norf
 # else
 # define STAP_SDT_ARG_CONSTRAINT        nor
 # endif

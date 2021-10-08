@@ -2,8 +2,11 @@ set test "sdt_notes"
 
 # Test layout of .note.stapsdt section and interaction with eu-readelf and gdb
 
+set exeflags [sdt_includes]
+set exeflags "$exeflags additional_flags=-O2"
+
 set res [target_compile $srcdir/$subdir/sdt_types.c \
-	     sdt_types.x executable additional_flags=-O2]
+	     sdt_types.x executable $exeflags]
 if { $res != "" } {
     verbose "target_compile failed: $res" 2
     untested "$test compiling types"

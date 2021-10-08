@@ -6707,7 +6707,23 @@ sdt_uprobe_var_expanding_visitor::build_dwarf_registers ()
     DRI ("%r13", 13, DI);
     DRI ("%r14", 14, DI);
     DRI ("%r15", 15, DI);
-  } else if (elf_machine == EM_ARM) {
+    DRI ("%f0", 16, DI);
+    DRI ("%f1", 17, DI);
+    DRI ("%f2", 18, DI);
+    DRI ("%f3", 19, DI);
+    DRI ("%f4", 20, DI);
+    DRI ("%f5", 21, DI);
+    DRI ("%f6", 22, DI);
+    DRI ("%f7", 23, DI);
+    DRI ("%f8", 24, DI);
+    DRI ("%f9", 25, DI);
+    DRI ("%f10", 26, DI);
+    DRI ("%f11", 27, DI);
+    DRI ("%f12", 28, DI);
+    DRI ("%f13", 29, DI);
+    DRI ("%f14", 30, DI);
+    DRI ("%f15", 31, DI);
+} else if (elf_machine == EM_ARM) {
     DRI ("r0", 0, SI);
     DRI ("r1", 1, SI);
     DRI ("r2", 2, SI);

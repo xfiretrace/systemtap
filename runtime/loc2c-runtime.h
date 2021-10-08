@@ -306,13 +306,16 @@
   
 #elif defined (__s390__) || defined (__s390x__)
 
+#define _fetch_float_register(regno) \
+  ({unsigned long v;  __asm__ __volatile__("lgdr %[_DEST],%%f%n[_REGNO]" : [_DEST] "=r" (v): [_REGNO] "n" (-(regno-16))) ; v;})
+
 #undef pt_regs_fetch_register
 #undef pt_regs_store_register
 #define pt_regs_fetch_register(pt_regs,regno) \
-  ((intptr_t) pt_regs->gprs[regno])
+  (regno < 16 ? ((intptr_t) pt_regs->gprs[regno]) : (_fetch_float_register(regno)))
 #define pt_regs_store_register(pt_regs,regno,value) \
   (pt_regs->gprs[regno] = (value))
-#define pt_regs_maxno 16 /* NUM_GPRS */
+#define pt_regs_maxno 32 /* NUM_GPRS */
   
 #endif
 
