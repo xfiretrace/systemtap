@@ -13,7 +13,7 @@
 
 set -e
 
-STRACE_SRC=${STRACE_SRC:-$HOME/strace-code}
+STRACE_SRC=${STRACE_SRC:-$HOME/strace-code/src}
 TAPSET_SRC=$(readlink -f $(dirname $0)/../tapset)
 
 TAPSET_X86_64=$TAPSET_SRC/linux/x86_64/syscall_num.stp
@@ -35,7 +35,12 @@ function __init() {
 
 function __dump_syscalls() {
     test $2 -eq 64 && __OUT=$SYSCALLS_64 || __OUT=$SYSCALLS_32
-    cat $1 | tr -d ' ' | awk -v bt=$2 -F'[][\"]' '/^\[[0-9]+\]={[^}]/ {
+    #Need to mung things so BASE_NR replaced with actual number
+    noincludes=$(mktemp)
+    processed=$(mktemp)
+    cat $1 |grep -v include > $noincludes
+    cpp $noincludes -DLINUX_MIPSO32 -DLINUX_MIPSN32 -DLINUX_MIPSN64 > $processed
+    cat $processed | tr -d ' ' | awk -v bt=$2 -F'[][\"]' '/^\[[^\]]+\]={[^}]/ {
         printf("__syscall_%s_num2name[%s]=\"%s\"\n", bt, $2, $4);
         printf("__syscall_%s_name2num[\"%s\"]=%s\n", bt, $4, $2)
     }' >> $__OUT
@@ -119,7 +124,7 @@ __dump_syscalls $STRACE_SRC/linux/mips/syscallent-n32.h 32
 __generate_tapset $TAPSET_MIPS
 # ======= riscv =======
 __init
-__dump_syscalls $STRACE_SRC/linux/riscv/syscallent.h 64
+__dump_syscalls $STRACE_SRC/linux/riscv64/syscallent.h 64
 __generate_tapset $TAPSET_RISCV
 
 rm -f $SYSCALLS_32 $SYSCALLS_64
