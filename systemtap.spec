@@ -38,6 +38,7 @@
 %{!?with_python3_probes: %global with_python3_probes (0%{?fedora} >= 23 || 0%{?rhel} > 7)}
 %{!?with_httpd: %global with_httpd 0}
 %{!?with_specific_python: %global with_specific_python 0%{?fedora} >= 31}
+%{!?with_sysusers: %global with_sysusers 0%{?fedora} >= 32 || 0%{?rhel} >= 9}
 
 # Virt is supported on these arches, even on el7, but it's not in core EL7
 %if 0%{?rhel} <= 7
@@ -211,6 +212,10 @@ BuildRequires: /usr/bin/pathfix.py
 BuildRequires: libmicrohttpd-devel
 BuildRequires: libuuid-devel
 %endif
+%if %{with_sysusers}
+BuildRequires:  systemd-rpm-macros
+%endif
+
 
 # Install requirements
 Requires: systemtap-client = %{version}-%{release}
@@ -650,6 +655,13 @@ for dir in $(ls -1d $RPM_BUILD_ROOT%{_mandir}/{??,??_??}) ; do
     echo "%%lang($lang) $dir/man*/*" >> %{name}.lang
 done
 
+%if %{with_sysusers}
+install -p -D -m 0644 systemtap-runtime.sysusers %{buildroot}%{_sysusersdir}/systemtap-runtime.conf
+install -p -D -m 0644 systemtap-server.sysusers %{buildroot}%{_sysusersdir}/systemtap-server.conf
+install -p -D -m 0644 systemtap-testsuite.sysusers %{buildroot}%{_sysusersdir}/systemtap-testsuite.conf
+%endif
+
+
 ln -s %{_datadir}/systemtap/examples
 
 # Fix paths in the example scripts.
@@ -773,24 +785,37 @@ pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}%{python3_sitearch
 %endif
 
 %pre runtime
+%if %{with_sysusers}
+%sysusers_create_compat $RPM_BUILD_ROOT/systemtap-runtime.sysusers
+%else
 getent group stapusr >/dev/null || groupadd -f -g 156 -r stapusr
 getent group stapsys >/dev/null || groupadd -f -g 157 -r stapsys
 getent group stapdev >/dev/null || groupadd -f -g 158 -r stapdev
+%endif
 exit 0
 
 %pre server
+%if %{with_sysusers}
+%sysusers_create_compat $RPM_BUILD_ROOT/systemtap-server.sysusers
+%else
 getent group stap-server >/dev/null || groupadd -f -g 155 -r stap-server
 getent passwd stap-server >/dev/null || \
   useradd -c "Systemtap Compile Server" -u 155 -g stap-server -d %{_localstatedir}/lib/stap-server -r -s /sbin/nologin stap-server 2>/dev/null || \
   useradd -c "Systemtap Compile Server" -g stap-server -d %{_localstatedir}/lib/stap-server -r -s /sbin/nologin stap-server
+%endif
+exit 0
 
 %pre testsuite
+%if %{with_sysusers}
+%sysusers_create_compat $RPM_BUILD_ROOT/systemtap-testsuite.sysusers
+%else
 getent passwd stapusr >/dev/null || \
     useradd -c "Systemtap 'stapusr' User" -g stapusr -r -s /sbin/nologin stapusr
 getent passwd stapsys >/dev/null || \
     useradd -c "Systemtap 'stapsys' User" -g stapsys -G stapusr -r -s /sbin/nologin stapsys
 getent passwd stapdev >/dev/null || \
     useradd -c "Systemtap 'stapdev' User" -g stapdev -G stapusr -r -s /sbin/nologin stapdev
+%endif
 exit 0
 
 %post server
@@ -1012,6 +1037,9 @@ exit 0
 %doc README README.unprivileged AUTHORS NEWS 
 %{!?_licensedir:%global license %%doc}
 %license COPYING
+%if %{with_sysusers}
+%{_sysusersdir}/systemtap-server.conf
+%endif
 
 
 %files devel -f systemtap.lang
@@ -1081,6 +1109,9 @@ exit 0
 %doc README README.security AUTHORS NEWS 
 %{!?_licensedir:%global license %%doc}
 %license COPYING
+%if %{with_sysusers}
+%{_sysusersdir}/systemtap-runtime.conf
+%endif
 
 
 %files client -f systemtap.lang
@@ -1147,6 +1178,9 @@ exit 0
 %files testsuite
 %dir %{_datadir}/systemtap
 %{_datadir}/systemtap/testsuite
+%if %{with_sysusers}
+%{_sysusersdir}/systemtap-testsuite.conf
+%endif
 
 
 %if %{with_java}

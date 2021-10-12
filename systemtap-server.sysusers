@@ -1,0 +1,5 @@
+# See systemd-sysusers(8) sysusers.d(5)
+
+g     stap-server  -
+u     stap-server  -      "systemtap compiler server"   /var/lib/stap-server   /sbin/nologin
+m     stap-server stap-server

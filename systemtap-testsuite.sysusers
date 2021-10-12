@@ -1,0 +1,10 @@
+# See systemd-sysusers(8) sysusers.d(5)
+
+u     stapusr  -          "systemtap testsuite user"    /   /sbin/nologin
+u     stapsys  -          "systemtap testsuite user"    /   /sbin/nologin
+u     stapdev  -          "systemtap testsuite user"    /   /sbin/nologin
+m     stapusr  stapusr
+m     stapsys  stapusr
+m     stapsys  stapsys
+m     stapdev  stapusr
+m     stapdev  stapdev
