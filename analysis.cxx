@@ -22,27 +22,55 @@ using namespace ParseAPI;
 using namespace std;
 
 
+// Data structures to cache dyninst parsing of binaries
+class bin_info {
+public:
+	bin_info(SymtabCodeSource *s=NULL, CodeObject *c=NULL): sts(s), co(c) {};
+	~bin_info(){};
+	SymtabCodeSource *sts;
+	CodeObject *co;
+};
+typedef map<string, bin_info> parsed_bin;
+static parsed_bin cached_info;
+
 class analysis {
 public:
-	analysis(char *name);
+	analysis(string name);
 	SymtabCodeSource *sts;
 	CodeObject *co;
 };
 
 //  Get the binary set up for anaysis
-analysis::analysis(char *name)
+analysis::analysis(string name)
 {
-	// Should see if binary already cached
+	char *name_str = strdup(name.c_str());
 	sts = NULL;
 	co = NULL;
 
-	// If not seen before
+	// Use cached information if available
+	if (cached_info.find(name) != cached_info.end()) {
+		cout << "liveness analysis using cached info for " << name << endl;
+		sts = cached_info[name].sts;
+		co = cached_info[name].co;
+		goto cleanup;
+	}
+
+	// Not not seen before
 	// Create a new binary code object from the filename argument
-	sts = new SymtabCodeSource(name);
-	if(!sts) return;
+	sts = new SymtabCodeSource(name_str);
+	if(!sts) goto cleanup;
 
 	co = new CodeObject(sts);
-	if(!co) return;
+	if(!co) goto cleanup;
+
+	// Cache the info for future reference
+	{
+		bin_info entry(sts,co);
+		cached_info.insert(make_pair(name,entry));
+	}
+
+cleanup:
+	free(name_str);
 }
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -187,13 +215,12 @@ static const MachRegister dyninst_register_32[] = {
 };
 #endif
 
-int liveness(const char *executable,
+int liveness(string executable,
 	     Dwarf_Addr addr,
 	     location_context ctx)
 {
 	// should cache the executable names like the other things
-	char *exe = strdup(executable);
-	analysis func_to_analyze(exe);
+	analysis func_to_analyze(executable);
 	MachRegister r;
 
 	// Determine whether 32-bit or 64-bit code as the register names are different in dyninst

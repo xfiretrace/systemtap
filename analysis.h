@@ -17,7 +17,7 @@
 
 #ifdef HAVE_DYNINST
 
-extern int liveness(const char *executable,
+extern int liveness(std::string executable,
 		    Dwarf_Addr location,
 		    location_context ctx);
 
