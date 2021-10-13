@@ -215,6 +215,10 @@ static const MachRegister dyninst_register_32[] = {
 };
 #endif
 
+// Data structures to cache dyninst liveness analysis of a function
+typedef map<string, LivenessAnalyzer*> precomputed_liveness;
+static precomputed_liveness cached_liveness;
+
 int liveness(string executable,
 	     Dwarf_Addr addr,
 	     location_context ctx)
@@ -251,10 +255,18 @@ int liveness(string executable,
 	if(func_to_analyze.co->findFuncs(NULL, addr, ff_s) <= 0) return 0;
 	ParseAPI::Function *func = *ff_s.begin();
 
-	// FIXME Check to see if a previous liveness information exists for function to reuse
-	// Otherwise create new liveness analysis
-	LivenessAnalyzer la(reg_width);
-	la.analyze(func);
+	LivenessAnalyzer *la;
+	// LivenessAnalyzer does allow some caching on a per executable basis
+	// Check if a previous liveness analyzer exists for the executable
+	if (cached_liveness.find(executable) != cached_liveness.end()) {
+		cout << "liveness analysis using cached liveness info for " << executable << endl;
+		la = cached_liveness[executable];
+	}else {
+		// Otherwise create new liveness analysis
+		la = new LivenessAnalyzer(reg_width);
+		cached_liveness.insert(make_pair(executable,la));
+	}
+	la->analyze(func);
 
 	// Get the basic block and instruction containing the the probe point.
 	set<Block *> bb_s;
@@ -269,7 +281,7 @@ int liveness(string executable,
 
 	// Query to see if whether the register is live at that point
 	bool used;
-	la.query(iloc, LivenessAnalyzer::Before, r, used);
+	la->query(iloc, LivenessAnalyzer::Before, r, used);
 	cout << "liveness analysis " << executable << " " << func->name()
 	     << " " << hex << addr << endl;
 	cout << r.name() <<  (used ? " used"  : " unused") << endl;
