@@ -245,7 +245,9 @@ int liveness(string executable,
 		if (regno >= (sizeof(dyninst_register_64)/sizeof(MachRegister))) return 0;
 		r = dyninst_register_64[regno]; break;
 	default:
-		cout << "Reg width " << reg_width << " bytes not understood." << endl;
+		// All the current architectures that systemtap (and dyninst) support
+		// are 32-bit (4 byte) or 64-bit (8 byte). Should never end up here.
+		assert(false);
 		return 0;
 	}
 
