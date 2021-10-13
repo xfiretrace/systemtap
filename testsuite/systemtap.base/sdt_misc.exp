@@ -101,6 +101,8 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
     # 1. Test executable built with dtrace generated header file
     
     foreach runtime [get_runtime_list] {
+	if {$runtime == "dyninst" && $pbtype_mssg != "V3_uprobe"} {
+	    continue }
 	set test_xtra ""
 	if {$runtime != ""} {
 	    set test_xtra " ($runtime)"
@@ -158,6 +160,8 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
     }
     
     foreach runtime [get_runtime_list] {
+	if {$runtime == "dyninst" && $pbtype_mssg != "V3_uprobe"} {
+	    continue }
 	set test_xtra ""
 	if {$runtime != ""} {
 	    set test_xtra " ($runtime)"
@@ -280,9 +284,7 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
 	    # On ARM these tests are known to fail with timeout for V1
 	    # and V2 probes.  Skip them altogether to speed execution.
 	    if {[istarget "arm*-*-*"] \
-		    && ($pbtype_mssg == "V1_uprobe" \
-			    || $pbtype_mssg == "V2_kprobe" \
-			    || $pbtype_mssg == "V2_uprobe")} {
+		    && ($pbtype_mssg == "V1_uprobe" || $pbtype_mssg == "V2_uprobe")} {
 		xfail "$test types $test_suffix"
 		continue
 	    }
@@ -306,6 +308,8 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
 	    }
 	    
 	    foreach runtime [get_runtime_list] {
+		if {$runtime == "dyninst" && $pbtype_mssg != "V3_uprobe"} {
+		    continue }
 		set test_xtra ""
 		if {$runtime != ""} {
 		    set test_xtra " ($runtime)"
@@ -324,6 +328,7 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
 		set notok 0
 		set fail ""
 		set uns_notok 0
+		set float_notok 0
 		expect {
 		    -timeout 180
 		    # i386 unsigned may xfail because of sign extension
@@ -333,6 +338,8 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
 			set s $expect_out(1,string);
 			if {[regexp "unsigned" $s] && [istarget "i*86-*-*"]} {
 			    incr uns_notok }
+			if {[regexp "float" $s] || [regexp "double" $s]} {
+			    incr float_notok }
 			incr notok; set fail "$fail $s"; exp_continue }
 		    -re {^[^\r]*\r\n} { incr notok; exp_continue }
 		    timeout { fail "$test types (timeout) $test_suffix" }
@@ -341,7 +348,15 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
 		catch {close}; catch {wait}
 		
 		if { $notok != 0 || $ok == 0} {
-		    if { [lindex $type_xfail $j] || $notok == $uns_notok} {
+		    if { $notok == $float_notok } {
+			# Ignore float failures for V1, V2, and dyninst
+			if { $pbtype_mssg != "V3_uprobe" || $runtime == "dyninst" } {
+			    pass "$test types $test_suffix"
+			} else {
+			    incr fail_count
+			    fail "$test types $fail $test_suffix"
+			}
+		    } elseif { [lindex $type_xfail $j] || $notok == $uns_notok } {
 			xfail "$test types $fail $test_suffix"
 		    } else {
 			incr fail_count
@@ -379,6 +394,8 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
     }
     
     foreach runtime [get_runtime_list] {
+	if {$runtime == "dyninst" && $pbtype_mssg != "V3_uprobe"} {
+	    continue }
 	set test_xtra ""
 	if {$runtime != ""} {
 	    set test_xtra " ($runtime)"
@@ -444,6 +461,8 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
     }
     
     foreach runtime [get_runtime_list] {
+	if {$runtime == "dyninst" && $pbtype_mssg != "V3_uprobe"} {
+	    continue }
 	set test_xtra ""
 	if {$runtime != ""} {
 	    set test_xtra " ($runtime)"
@@ -568,6 +587,8 @@ for {set i 0} {$i < [llength $pbtype_flags]} {incr i} {
 # 7. Test V3 $$parms support
 
 foreach runtime [get_runtime_list] {
+    if {$runtime == "dyninst" && $pbtype_mssg != "V3_uprobe"} {
+	continue }
     set test_xtra ""
     if {$runtime != ""} {
 	set test_xtra " ($runtime)"

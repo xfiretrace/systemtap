@@ -35,6 +35,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //#include <stdbool.h>
 //#include <stdint.h>
+/* --dyninst includes stdint.h so avoid stdint.h conflicts
+ * INT64_C and UINT64_C are macros so undef them
+ * *fast* are typedefs so define them
+ * TODO: Consider changing softfloat to use stdint defs
+ */
+#undef INT64_C
+#undef UINT64_C
+#define int_fast16_t sf_int_fast16_t
+#define uint_fast16_t sf_uint_fast16_t
+#define int_fast32_t sf_int_fast32_t
+#define uint_fast32_t sf_uint_fast32_t
 #include "softfloat/platform.h"
 #include "softfloat/internals.h"
 #include "softfloat.h"

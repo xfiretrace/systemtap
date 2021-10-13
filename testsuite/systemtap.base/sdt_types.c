@@ -1,6 +1,7 @@
 #include "sys/sdt.h"
 #include <stdint.h>
 #include <values.h>
+#include <stdio.h>
 
 struct opaque;
 
@@ -48,6 +49,7 @@ main (int argc, char **argv)
   long int * volatile long_int_ptr_volatile_var = &long_int_var;
 
   /* c89 doesn't define __STDC_VERSION. With -pedantic warns about long long. */
+
 #if ! defined NO_LONG_LONG && __SIZEOF_SIZE_T__ == 8
   long long int long_long_int_var = 0x7fffffffffffffffLL;
   const long long int const_long_long_int_var = -0x7fffffffffffffffLL;
@@ -106,6 +108,12 @@ main (int argc, char **argv)
   struct opaque_struct *incomplete_struct_type = 0;
 # endif
 
+  float float_var;
+  double double_var;
+  /* Avoid float_var being treated as .Label(Reg) which is not supported by stap */
+  sscanf("3.14159", "%f", &float_var);
+  double_var = (double)float_var;
+
   /* gnu90 and gnu99 don't support this so for now don't test it
      enum opaque_enum *incomplete_enum_type = 0; */
 
@@ -151,6 +159,10 @@ main (int argc, char **argv)
   STAP_PROBE2(provider,long_int_ptr_const_var,long_int_ptr_const_var,&long_int_var);
   STAP_PROBE2(provider,ptr_volatile_long_int_var,ptr_volatile_long_int_var,&long_int_var);
   STAP_PROBE2(provider,long_int_ptr_volatile_var,long_int_ptr_volatile_var,&long_int_var);
+
+  /* float / double */
+  STAP_PROBE1(provider,float_var,float_var);
+  STAP_PROBE1(provider,double_var,double_var);
 
   /* long long */
 #if ! defined NO_LONG_LONG && __SIZEOF_SIZE_T__ == 8

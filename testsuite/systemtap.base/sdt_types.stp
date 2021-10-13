@@ -6,6 +6,18 @@ function check(name, value, expected)
     printf ("sdt_types FAIL: %s (%#x != %#x)\n", name, value, expected)
 }
 
+function check_float(name, value, expected, need_double)
+{
+  if (need_double)
+    value = fp32_to_fp64(value)
+  range = string_to_fp("0.00001")
+  /* Check that value is in the interval [expected - range < x < expected + range] */
+  if (fp_le(fp_sub(expected,range),value) && fp_le(value,fp_add(expected,range)))
+    printf ("sdt_types PASS: %s\n", name)
+  else
+    printf ("sdt_types FAIL: %s (%s != %s)\n", name, fp_to_string(value,8), fp_to_string(expected,8))
+}
+
 function check_string(name, value, expected)
 {
   if (value == expected)
@@ -231,6 +243,18 @@ probe process(@1).mark("long_int_ptr_volatile_var")
   check($$name, user_long($arg1), 0x6fffffff)
 }
 
+
+/********** float / double **********/
+
+probe process(@1).mark("float_var")
+{
+  check_float($$name, $arg1, string_to_fp("3.14159"),1)
+}
+
+probe process(@1).mark("double_var")
+{
+  check_float($$name, $arg1, string_to_fp("3.14159"),0)
+}
 
 /********** long long **********/
 
