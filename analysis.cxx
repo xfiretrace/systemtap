@@ -49,7 +49,6 @@ analysis::analysis(string name)
 
 	// Use cached information if available
 	if (cached_info.find(name) != cached_info.end()) {
-		cout << "liveness analysis using cached info for " << name << endl;
 		sts = cached_info[name].sts;
 		co = cached_info[name].co;
 		goto cleanup;
@@ -259,7 +258,6 @@ int liveness(string executable,
 	// LivenessAnalyzer does allow some caching on a per executable basis
 	// Check if a previous liveness analyzer exists for the executable
 	if (cached_liveness.find(executable) != cached_liveness.end()) {
-		cout << "liveness analysis using cached liveness info for " << executable << endl;
 		la = cached_liveness[executable];
 	}else {
 		// Otherwise create new liveness analysis
@@ -282,9 +280,6 @@ int liveness(string executable,
 	// Query to see if whether the register is live at that point
 	bool used;
 	la->query(iloc, LivenessAnalyzer::Before, r, used);
-	cout << "liveness analysis " << executable << " " << func->name()
-	     << " " << hex << addr << endl;
-	cout << r.name() <<  (used ? " used"  : " unused") << endl;
 	return (used ? 1 : -1);
 }
 
