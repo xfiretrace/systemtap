@@ -30,6 +30,7 @@ proc stap_run { TEST_NAME {LOAD_GEN_FUNCTION ""} {OUTPUT_CHECK_STRING ""} args }
     set probe_errors 0
     set skipped_probes 0
     set warning_regexp {^WARNING: Number of errors: ([0-9]+), skipped probes: ([0-9]+)\r\n}
+    set warning_child_regexp {^WARNING: Child process exited with signal [0-9]+ \(.*\)\r\n}
 
     if {[info procs installtest_p] != "" && ![installtest_p]} { untested $TEST_NAME; return }
 
@@ -81,6 +82,8 @@ proc stap_run { TEST_NAME {LOAD_GEN_FUNCTION ""} {OUTPUT_CHECK_STRING ""} args }
 		-re $warning_regexp {
                     set probe_errors $expect_out(1,string)
                     set skipped_probes $expect_out(2,string)
+                    exp_continue}
+		-re  $warning_child_regexp {
                     exp_continue}
 		-re  $output {
 		    pass "$TEST_NAME shutdown and output"
