@@ -36,10 +36,8 @@ function __init() {
 function __dump_syscalls() {
     test $2 -eq 64 && __OUT=$SYSCALLS_64 || __OUT=$SYSCALLS_32
     #Need to mung things so BASE_NR replaced with actual number
-    noincludes=$(mktemp)
     processed=$(mktemp)
-    cat $1 |grep -v include > $noincludes
-    cpp $noincludes -DLINUX_MIPSO32 -DLINUX_MIPSN32 -DLINUX_MIPSN64 > $processed
+    cpp -I${STRACE_SRC}/linux/generic $1 -DLINUX_MIPSO32 -DLINUX_MIPSN32 -DLINUX_MIPSN64 > $processed
     cat $processed | tr -d ' ' | awk -v bt=$2 -F'[][\"]' '/^\[[^\]]+\]={[^}]/ {
         printf("__syscall_%s_num2name[%s]=\"%s\"\n", bt, $2, $4);
         printf("__syscall_%s_name2num[\"%s\"]=%s\n", bt, $4, $2)
