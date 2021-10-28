@@ -14,7 +14,7 @@ set ok 0
 
 spawn stap -vgp4 $srcdir/$subdir/$test.stp
 expect {
-    -re "WARNING: write at \[0-9a-fA-F\]+ will have no effect" {incr ok ; exp_continue}
+    -re "WARNING: write at 0x\[0-9a-fA-F\]+ will have no effect" {incr ok ; exp_continue}
 }
 
 if { $ok == 3 } { pass "$test" } { fail "$test" }
