@@ -273,10 +273,9 @@ int liveness(string executable,
 	if (func_to_analyze.co->findBlocks(NULL, addr, bb_s) != 1 )
 		return 0; // too many (or too few) basic blocks, punt
 	Block *bb = *bb_s.begin();
-	Instruction curInsn = bb->getInsn(addr);
 
 	// Construct a liveness query location for the probe point.
-	InsnLoc i(bb,  addr, curInsn);
+	InsnLoc i(bb,  addr, bb->getInsn(addr));
 	Location iloc(func, i);
 
 	// Query to see if whether the register is live at that point
