@@ -137,6 +137,7 @@ foreach runtime [get_runtime_list] {
 	-re {^label=init_an_int\r\n} { incr ok; exp_continue }
 	-re {^label=init_an_int_again\r\n} { incr ok; exp_continue }
 	-re {^label=ptr_inited\r\n} { incr ok; exp_continue }
+        -re {^WARNING: Child process exited with status [0-9]+\r\n} { exp_continue }
 	timeout { fail "$test (timeout)" }
 	eof { }
     }
