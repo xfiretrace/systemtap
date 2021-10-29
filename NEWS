@@ -3,6 +3,13 @@
 - stap-prep now tries to download the main kernel debuginfo file from
   a debuginfod server, if configured.
 
+- Updated syscall_any tapset mapping to include newer syscalls.
+
+- syscall_any tapset can be used by the bpf backend.
+
+- Checks whether guru-mode modification of target variables will have
+  an effect on x86_64, PowerPC, and AArch64.
+
 * What's new in version 4.5, 2021-05-07
 
 - Java probing support has been updated to work with the latest
