@@ -26,6 +26,11 @@ static int backlog_order=0;
 #define BACKLOG_MASK ((1 << backlog_order) - 1)
 #define MONITORLINELENGTH 4096
 
+/* tracking message sequence #s for cross-cpu merging */
+static uint32_t last_sequence_number;
+static pthread_mutex_t last_sequence_number_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t last_sequence_number_changed = PTHREAD_COND_INITIALIZER;
+
 #ifdef NEED_PPOLL
 int ppoll(struct pollfd *fds, nfds_t nfds,
 	  const struct timespec *timeout, const sigset_t *sigmask)
@@ -124,15 +129,18 @@ static int switch_outfile(int cpu, int *fnum)
  */
 static void *reader_thread(void *data)
 {
-        char buf[131072];
+        char buf[128*1024]; // NB: maximum possible output amount from a single probe hit's print_flush
+        struct _stp_trace bufhdr;
+
         int rc, cpu = (int)(long)data;
         struct pollfd pollfd;
+        /* 200ms, close to human level of "instant" */
 	struct timespec tim = {.tv_sec=0, .tv_nsec=200000000}, *timeout = &tim;
 	sigset_t sigs;
 	off_t wsize = 0;
 	int fnum = 0;
 	cpu_set_t cpu_mask;
-
+                
 	sigemptyset(&sigs);
 	sigaddset(&sigs,SIGUSR2);
 	pthread_sigmask(SIG_BLOCK, &sigs, NULL);
@@ -188,69 +196,122 @@ static void *reader_thread(void *data)
 			}
                 }
 
-		while ((rc = read(relay_fd[cpu], buf, sizeof(buf))) > 0) {
-                        int wbytes = rc;
-                        char *wbuf = buf;
+                /* Read the header. */
+                rc = read(relay_fd[cpu], &bufhdr, sizeof(bufhdr));
+                if (rc == 0) /* seen during normal shutdown */
+                        continue;
+                if (rc != sizeof(bufhdr)) {
+                        _perr("bufhdr read error, attempting resync");
+                        (void) read(relay_fd[cpu], buf, sizeof(buf)); /* drain the buffers */
+                        continue;
+                }
 
-                        dbug(3, "cpu %d: read %d bytes of data\n", cpu, rc);
+                /* Validate it slightly.  Because of lost messages, we might be getting
+                   not a proper _stp_trace struct but the interior of some piece of 
+                   trace text message.  XXX: validate bufhdr.sequence a little bit too? */
+                if (bufhdr.pdu_len == 0 || bufhdr.pdu_len > sizeof(buf)) {
+                        _perr("bufhdr corrupt, attempting resync");
+                        (void) read(relay_fd[cpu], buf, sizeof(buf)); /* drain the buffers */
+                        continue; /* may resync at next subbuf boundary so don't give up */
+                }
 
-			/* Switching file */
-			pthread_mutex_lock(&mutex[cpu]);
-			if ((fsize_max && ((wsize + rc) > fsize_max)) ||
-			    switch_file[cpu]) {
-				if (switch_outfile(cpu, &fnum) < 0) {
-					switch_file[cpu] = 0;
-					pthread_mutex_unlock(&mutex[cpu]);
-					goto error_out;
-				}
-				switch_file[cpu] = 0;
-				wsize = 0;
-			}
-			pthread_mutex_unlock(&mutex[cpu]);
-
-                        /* Copy loop.  Must repeat write(2) in case of a pipe overflow
-                           or other transient fullness. */
-                        while (wbytes > 0) {
-				if (monitor) {
-					ssize_t bytes = wbytes > MONITORLINELENGTH ? MONITORLINELENGTH : wbytes;
-					/* Start scanning the wbuf[] for lines - \n.
-					  Plop each one found into the h_queue.lines[] ring. */
-					char *p = wbuf; /* scan position */
-					char *p_end = wbuf + bytes; /* one past last byte */
-					char *line = p;
-					while (p < p_end) {
-						if (*p == '\n') { /* got a line */
-							monitor_remember_output_line(line, (p-line)+1); /* strlen, including \n */
-							line = p+1;
-						}
-						p++;
-					}
-					/* Flush remaining output */
-					if (line != p_end)
-						monitor_remember_output_line(line, (p_end - line));
-					wbytes -= bytes;
-					wbuf += bytes;
-					wsize += bytes;
-				} else {
-					int fd;
-					/* Only bulkmode and fsize_max use per-cpu output files. Otherwise,
-					   there's just a single output fd stored at out_fd[avail_cpus[0]]. */
-					if (bulkmode || fsize_max)
-						fd = out_fd[cpu];
-					else
-						fd = out_fd[avail_cpus[0]];
-	                                rc = write(fd, wbuf, wbytes);
-	                                if (rc <= 0) {
-						perr("Couldn't write to output %d for cpu %d, exiting.",
-	                                             fd, cpu);
-	                                        goto error_out;
-	                                }
-	                                wbytes -= rc;
-	                                wbuf += rc;
-	                                wsize += rc;
-				}
+                /* Read the message, perhaps in pieces (such as if crossing
+                 * relayfs subbuf boundaries). */
+                size_t bufread = 0;
+                while (bufread < bufhdr.pdu_len) {
+                        rc = read(relay_fd[cpu], buf+bufread, bufhdr.pdu_len-bufread);
+                        if (rc <= 0) {
+                                /* _perr("partial message received"); */
+                                break; /* still process it; hope we can resync next time. */
                         }
-		}
+                        bufread += rc;
+                }
+
+                /* Wait until the bufhdr.sequence number indicates it's OUR TURN to go ahead. */
+                struct timespec ts = {.tv_sec=time(NULL)+2, .tv_nsec=0}; /* wait 1-2 seconds */
+                pthread_mutex_lock(& last_sequence_number_mutex);
+                while ((last_sequence_number+1 != bufhdr.sequence) && /* normal case */
+                       (last_sequence_number < bufhdr.sequence)) { /* we're late!!! */
+                        int rc = pthread_cond_timedwait (& last_sequence_number_changed,
+                                                         & last_sequence_number_mutex,
+                                                         & ts);
+                        if (rc == ETIMEDOUT) {
+                                /* _perr("message sequencing timeout"); */
+                                break;
+                        }
+                }
+                pthread_mutex_unlock(& last_sequence_number_mutex);
+                
+                int wbytes = rc;
+                char *wbuf = buf;
+
+                dbug(3, "cpu %d: read %d bytes of data\n", cpu, rc);
+
+                /* Switching file */
+                pthread_mutex_lock(&mutex[cpu]);
+                if ((fsize_max && ((wsize + rc) > fsize_max)) ||
+                    switch_file[cpu]) {
+                        if (switch_outfile(cpu, &fnum) < 0) {
+                                switch_file[cpu] = 0;
+                                pthread_mutex_unlock(&mutex[cpu]);
+                                goto error_out;
+                        }
+                        switch_file[cpu] = 0;
+                        wsize = 0;
+                }
+                pthread_mutex_unlock(&mutex[cpu]);
+                
+                /* Copy loop.  Must repeat write(2) in case of a pipe overflow
+                   or other transient fullness. */
+                while (wbytes > 0) {
+                        if (monitor) {
+                                ssize_t bytes = wbytes > MONITORLINELENGTH ? MONITORLINELENGTH : wbytes;
+                                /* Start scanning the wbuf[] for lines - \n.
+                                   Plop each one found into the h_queue.lines[] ring. */
+                                char *p = wbuf; /* scan position */
+                                char *p_end = wbuf + bytes; /* one past last byte */
+                                char *line = p;
+                                while (p < p_end) {
+                                        if (*p == '\n') { /* got a line */
+                                                monitor_remember_output_line(line, (p-line)+1); /* strlen, including \n */
+                                                line = p+1;
+                                        }
+                                        p++;
+                                }
+                                /* Flush remaining output */
+                                if (line != p_end)
+                                        monitor_remember_output_line(line, (p_end - line));
+                                wbytes -= bytes;
+                                wbuf += bytes;
+                                wsize += bytes;
+                        } else {
+                                int fd;
+                                /* Only bulkmode and fsize_max use per-cpu output files. Otherwise,
+                                   there's just a single output fd stored at out_fd[avail_cpus[0]]. */
+                                if (bulkmode || fsize_max)
+                                        fd = out_fd[cpu];
+                                else
+                                        fd = out_fd[avail_cpus[0]];
+                                rc = write(fd, wbuf, wbytes);
+                                if (rc <= 0) {
+                                        perr("Couldn't write to output %d for cpu %d, exiting.",
+                                             fd, cpu);
+                                        goto error_out;
+                                }
+                                wbytes -= rc;
+                                wbuf += rc;
+                                wsize += rc;
+                        }
+                }
+
+                /* update the sequence number & let other cpus go ahead */
+                pthread_mutex_lock(& last_sequence_number_mutex);
+                if (last_sequence_number < bufhdr.sequence) { /* not if someone leapfrogged us */
+                        last_sequence_number = bufhdr.sequence;
+                        pthread_cond_broadcast (& last_sequence_number_changed);
+                }
+                pthread_mutex_unlock(& last_sequence_number_mutex);
+                
         } while (!stop_threads);
 	dbug(3, "exiting thread for cpu %d\n", cpu);
 	return(NULL);

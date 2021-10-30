@@ -321,10 +321,6 @@ extern int optind;
 /* relay*.c uses these */
 extern int out_fd[MAX_NR_CPUS];
 
-/* relay_old uses these. Set in ctl.c */
-extern unsigned subbuf_size;
-extern unsigned n_subbufs;
-
 /*
  * ppoll exists in glibc >= 2.4
  */
