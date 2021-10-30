@@ -202,7 +202,8 @@ static void *reader_thread(void *data)
                         continue;
                 if (rc != sizeof(bufhdr)) {
                         _perr("bufhdr read error, attempting resync");
-                        (void) read(relay_fd[cpu], buf, sizeof(buf)); /* drain the buffers */
+                        rc = read(relay_fd[cpu], buf, sizeof(buf)); /* drain the buffers */
+                        (void) rc;
                         continue;
                 }
 
@@ -211,7 +212,8 @@ static void *reader_thread(void *data)
                    trace text message.  XXX: validate bufhdr.sequence a little bit too? */
                 if (bufhdr.pdu_len == 0 || bufhdr.pdu_len > sizeof(buf)) {
                         _perr("bufhdr corrupt, attempting resync");
-                        (void) read(relay_fd[cpu], buf, sizeof(buf)); /* drain the buffers */
+                        rc = read(relay_fd[cpu], buf, sizeof(buf)); /* drain the buffers */
+                        (void) rc;
                         continue; /* may resync at next subbuf boundary so don't give up */
                 }
 
