@@ -12038,14 +12038,102 @@ no) ;;
      DYNINST_LDFLAGS="-L/usr/lib64/dyninst -L/usr/lib/dyninst" # XXX both lib paths!?!
      # Add Dyninst libraries only if they are available
      if test -d "/usr/include/dyninst"; then
-       DYNINST_LIBS="-l parseAPI -l symtabAPI -l instructionAPI -ltbb -lcommon"
+       save_LIBS="$LIBS"
+       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TBB_runtime_interface_version in -ltbb" >&5
+$as_echo_n "checking for TBB_runtime_interface_version in -ltbb... " >&6; }
+if ${ac_cv_lib_tbb_TBB_runtime_interface_version+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltbb  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char TBB_runtime_interface_version ();
+int
+main ()
+{
+return TBB_runtime_interface_version ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_tbb_TBB_runtime_interface_version=yes
+else
+  ac_cv_lib_tbb_TBB_runtime_interface_version=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tbb_TBB_runtime_interface_version" >&5
+$as_echo "$ac_cv_lib_tbb_TBB_runtime_interface_version" >&6; }
+if test "x$ac_cv_lib_tbb_TBB_runtime_interface_version" = xyes; then :
+  tbb_LIBS=-ltbb
+else
+  tbb_LIBS=
+fi
+
+       LIBS="$save_LIBS"
+       DYNINST_LIBS="-lparseAPI -lsymtabAPI -linstructionAPI $tbb_LIBS -lcommon"
      fi
      ;;
 *)  # Use paths in the user-specified prefix
     DYNINST_CXXFLAGS="-I$with_dyninst/include"
     DYNINST_LDFLAGS="-L$with_dyninst/lib/" # XXX need lib64 too?
     # Will assume Dyninst libraries are available as the path is specified
-    DYNINST_LIBS="-l parseAPI -l symtabAPI -l instructionAPI -ltbb -lcommon"
+    save_LIBS="$LIBS"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TBB_runtime_interface_version in -ltbb" >&5
+$as_echo_n "checking for TBB_runtime_interface_version in -ltbb... " >&6; }
+if ${ac_cv_lib_tbb_TBB_runtime_interface_version+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltbb  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char TBB_runtime_interface_version ();
+int
+main ()
+{
+return TBB_runtime_interface_version ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_tbb_TBB_runtime_interface_version=yes
+else
+  ac_cv_lib_tbb_TBB_runtime_interface_version=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tbb_TBB_runtime_interface_version" >&5
+$as_echo "$ac_cv_lib_tbb_TBB_runtime_interface_version" >&6; }
+if test "x$ac_cv_lib_tbb_TBB_runtime_interface_version" = xyes; then :
+  tbb_LIBS=-ltbb
+else
+  tbb_LIBS=
+fi
+
+    LIBS="$save_LIBS"
+    DYNINST_LIBS="-lparseAPI -lsymtabAPI -linstructionAPI $tbb_LIBS -lcommon"
     ;;
 esac
 if test "$with_dyninst" != "no"; then

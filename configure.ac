@@ -615,14 +615,20 @@ no) ;;
      DYNINST_LDFLAGS="-L/usr/lib64/dyninst -L/usr/lib/dyninst" # XXX both lib paths!?!
      # Add Dyninst libraries only if they are available
      if test -d "/usr/include/dyninst"; then
-       DYNINST_LIBS="-l parseAPI -l symtabAPI -l instructionAPI -ltbb -lcommon"
+       save_LIBS="$LIBS"
+       AC_CHECK_LIB(tbb, TBB_runtime_interface_version, [tbb_LIBS=-ltbb],[tbb_LIBS=])       
+       LIBS="$save_LIBS"
+       DYNINST_LIBS="-lparseAPI -lsymtabAPI -linstructionAPI $tbb_LIBS -lcommon"
      fi
      ;;
 *)  # Use paths in the user-specified prefix
     DYNINST_CXXFLAGS="-I$with_dyninst/include"
     DYNINST_LDFLAGS="-L$with_dyninst/lib/" # XXX need lib64 too?
     # Will assume Dyninst libraries are available as the path is specified
-    DYNINST_LIBS="-l parseAPI -l symtabAPI -l instructionAPI -ltbb -lcommon"
+    save_LIBS="$LIBS"
+    AC_CHECK_LIB(tbb, TBB_runtime_interface_version, [tbb_LIBS=-ltbb],[tbb_LIBS=])       
+    LIBS="$save_LIBS"
+    DYNINST_LIBS="-lparseAPI -lsymtabAPI -linstructionAPI $tbb_LIBS -lcommon"
     ;;
 esac
 if test "$with_dyninst" != "no"; then
