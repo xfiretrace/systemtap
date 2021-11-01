@@ -255,6 +255,9 @@ static void *kallsyms_signal_wake_up;
 #if !defined(STAPCONF___LOCK_TASK_SIGHAND_EXPORTED)
 static void *kallsyms___lock_task_sighand;
 #endif
+#if !defined(STAPCONF_GET_MM_EXE_FILE_EXPORTED)
+static void *kallsyms_get_mm_exe_file;
+#endif
 
 #include "access_process_vm.h"
 #include "loc2c-runtime.h"

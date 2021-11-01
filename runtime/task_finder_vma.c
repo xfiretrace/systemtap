@@ -420,8 +420,14 @@ stap_find_exe_file(struct mm_struct* mm)
 	// still use our own code. The original get_mm_exe_file() can
 	// sleep (since it calls down_read()), so we'll have to roll
 	// our own.
-#if defined(STAPCONF_DPATH_PATH) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
+#if defined(STAPCONF_GET_MM_EXE_FILE_EXPORTED) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
 	return get_mm_exe_file(mm);
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
+        typedef typeof(&get_mm_exe_file) get_mm_exe_file_fn;
+        if (kallsyms_get_mm_exe_file == NULL)
+          return NULL; /* can't happen; _stp_handle_start would abort before this point */
+        else
+          return (* (get_mm_exe_file_fn) kallsyms_get_mm_exe_file)(mm);
 #else
 	struct file *exe_file = NULL;
 

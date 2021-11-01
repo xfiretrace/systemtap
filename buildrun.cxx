@@ -370,7 +370,7 @@ compile_pass (systemtap_session& s)
   output_exportconf(s, o2, "synchronize_sched", "STAPCONF_SYNCHRONIZE_SCHED");
   output_autoconf(s, o, cs, "autoconf-task-uid.c", "STAPCONF_TASK_UID", NULL);
   output_autoconf(s, o, cs, "autoconf-from_kuid_munged.c", "STAPCONF_FROM_KUID_MUNGED", NULL);
-  output_exportconf(s, o2, "get_mm_exe_file", "STAPCONF_GET_MM_EXE_FILE");
+  output_exportconf(s, o2, "get_mm_exe_file", "STAPCONF_GET_MM_EXE_FILE_EXPORTED");
   output_dual_exportconf(s, o2, "alloc_vm_area", "free_vm_area", "STAPCONF_VM_AREA");
   output_autoconf(s, o, cs, "autoconf-procfs-owner.c", "STAPCONF_PROCFS_OWNER", NULL);
   output_autoconf(s, o, cs, "autoconf-alloc-percpu-align.c", "STAPCONF_ALLOC_PERCPU_ALIGN", NULL);
