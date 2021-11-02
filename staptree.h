@@ -123,8 +123,11 @@ struct exp_type_details
   // Expand this autocast_op into a function call
   virtual bool expandable() const = 0;
   virtual functioncall *expand(autocast_op* e, bool lvalue) = 0;
+  virtual void print (std::ostream& o) const = 0;
 };
 typedef std::shared_ptr<exp_type_details> exp_type_ptr;
+
+std::ostream& operator << (std::ostream& o, const exp_type_details& d);
 
 
 struct token;

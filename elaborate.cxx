@@ -6190,6 +6190,7 @@ struct exp_type_null : public exp_type_details
   uintptr_t id () const { return 0; }
   bool expandable() const { return false; }
   functioncall *expand(autocast_op*, bool) { return NULL; }
+  void print (std::ostream& o) const { o << "null"; }
 };
 
 typeresolution_info::typeresolution_info (systemtap_session& s):
@@ -6409,7 +6410,7 @@ typeresolution_info::visit_assignment (assignment *e)
       // Propagate type details from the RHS to the assignment
       if (e->type == e->right->type &&
           e->right->type_details && !e->type_details)
-        resolved_details(e->right->type_details, e->type_details);
+        resolve_details(e->tok, e->right->type_details, e->type_details);
 
       // Propagate type details from the assignment to the LHS
       if (e->type == e->left->type && e->type_details)
@@ -6417,9 +6418,9 @@ typeresolution_info::visit_assignment (assignment *e)
           if (e->left->type_details &&
               *e->left->type_details != *e->type_details &&
               *e->left->type_details != *null_type)
-            resolved_details(null_type, e->left->type_details);
+            resolve_details(e->left->tok, null_type, e->left->type_details);
           else if (!e->left->type_details)
-            resolved_details(e->type_details, e->left->type_details);
+            resolve_details(e->left->tok, e->type_details, e->left->type_details);
         }
     }
   else
@@ -6539,7 +6540,7 @@ typeresolution_info::visit_ternary_expression (ternary_expression* e)
       e->type == e->truevalue->type && e->type == e->falsevalue->type &&
       e->truevalue->type_details && e->falsevalue->type_details &&
       *e->truevalue->type_details == *e->falsevalue->type_details)
-    resolved_details(e->truevalue->type_details, e->type_details);
+    resolve_details(e->tok, e->truevalue->type_details, e->type_details);
 }
 
 
@@ -6607,13 +6608,13 @@ typeresolution_info::visit_symbol (symbol* e)
          {
            this->session.print_warning(_("Potential type mismatch in reassignment"), e->tok);
 
-           resolved_details(null_type, e->type_details);
-           resolved_details(null_type, e->referent->type_details);
+           resolve_details(e->tok, null_type, e->type_details);
+           resolve_details(e->referent->tok, null_type, e->referent->type_details);
          }
        else if (e->type_details && !e->referent->type_details)
-         resolved_details(e->type_details, e->referent->type_details);	
+         resolve_details(e->referent->tok, e->type_details, e->referent->type_details);	
        else if (!e->type_details && e->referent->type_details)
-         resolved_details(e->referent->type_details, e->type_details);
+         resolve_details(e->tok, e->referent->type_details, e->type_details);
 
     }
 
@@ -6909,7 +6910,7 @@ typeresolution_info::visit_functioncall (functioncall* e)
       const exp_type_ptr& func_type = referent->type_details;
       if (func_type && referent->type == e->type
           && (!e->type_details || *func_type != *e->type_details))
-        resolved_details(referent->type_details, e->type_details);
+        resolve_details(e->tok, referent->type_details, e->type_details);
 
       // now resolve the function parameters
       if (e->args.size() != referent->formal_args.size())
@@ -7272,10 +7273,10 @@ typeresolution_info::visit_return_statement (return_statement* e)
       exp_type_ptr& func_type = current_function->type_details;
       if (!func_type)
         // The function can take on the type details of the return value.
-        resolved_details(value_type, func_type);
+        resolve_details(current_function->tok, value_type, func_type);
       else if (*func_type != *value_type && *func_type != *null_type)
         // Conflicting return types?  NO TYPE FOR YOU!
-        resolved_details(null_type, func_type);
+        resolve_details(current_function->tok, null_type, func_type);
     }
 }
 
@@ -7647,11 +7648,14 @@ typeresolution_info::resolved (const token *tok, exp_type t,
 }
 
 void
-typeresolution_info::resolved_details (const exp_type_ptr& src,
-                                       exp_type_ptr& dest)
+typeresolution_info::resolve_details (const token* tok,
+                                      const exp_type_ptr& src,
+                                      exp_type_ptr& dest)
 {
   num_newly_resolved ++;
   dest = src;
+  if (session.verbose > 4)
+    clog << "resolved type details " << *dest << " to " << *tok << endl;
 }
 
 /* vim: set sw=2 ts=8 cino=>4,n-2,{2,^-2,t0,(0,u0,w1,M1 : */

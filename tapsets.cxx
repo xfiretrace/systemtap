@@ -5200,6 +5200,13 @@ exp_type_dwarf::expand(autocast_op* e, bool lvalue)
 }
 
 
+void exp_type_dwarf::print(ostream& o) const
+{
+  o << "dwarf=" << dwarf_type_name((Dwarf_Die*) & die);
+}
+
+
+
 struct dwarf_atvar_expanding_visitor: public var_expanding_visitor
 {
   dwarf_builder& db;

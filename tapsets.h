@@ -175,6 +175,7 @@ struct exp_type_dwarf : public exp_type_details
   uintptr_t id () const { return reinterpret_cast<uintptr_t>(die.addr); }
   bool expandable() const { return true; }
   functioncall *expand(autocast_op* e, bool lvalue);
+  void print (std::ostream& o) const;
 };
 
 #endif // TAPSETS_H

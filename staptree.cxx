@@ -4068,4 +4068,11 @@ debug_print(const statement* x)
   cout << endl;
 }
 
+
+ostream& operator << (ostream& o, const exp_type_details& d)
+{
+  d.print (o);
+  return o;
+}
+
 /* vim: set sw=2 ts=8 cino=>4,n-2,{2,^-2,t0,(0,u0,w1,M1 : */
