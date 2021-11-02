@@ -228,6 +228,7 @@ ETAGS = etags
 CTAGS = ctags
 pkglibexecdir = @pkglibexecdir@
 ACLOCAL = @ACLOCAL@
+ALIGNEDNEW = @ALIGNEDNEW@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@

@@ -190,6 +190,14 @@ AS_IF([test "x$HAVE_CXX11" != x1],[
   AC_LANG_POP(C++)
   ])
 
+dnl Some versions of dyninst (10.1) need -faligned-new
+dnl If -faligned-new available, pass it in
+AC_LANG_PUSH(C++)
+AX_CHECK_COMPILE_FLAG([-faligned-new], ALIGNEDNEW="-faligned-new", ALIGNEDNEW="")
+AC_LANG_POP(C++)
+
+AC_SUBST(ALIGNEDNEW)
+
 dnl Carry forward some empty PIE*FLAGS so we don't have to modify
 dnl all the Makefile.am's just now.
 AC_SUBST(PIELDFLAGS)
