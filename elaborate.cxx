@@ -6606,7 +6606,17 @@ typeresolution_info::visit_symbol (symbol* e)
        if (e->type_details && e->referent->type_details &&
            *e->type_details != *e->referent->type_details) 
          {
-           this->session.print_warning(_("Potential type mismatch in reassignment"), e->tok);
+           // NB: Don't bother warn users about this.  With enough
+           // verbosity (5), they can discover the mismatch details,
+           // should an expected autocast expression fail to resolve.
+           //
+           // There are tapset functions like task_dentry_path() that
+           // have some harmless polymorphism over variables.  These
+           // are protected by @defined() guards which are resolved at
+           // a pass later than this one.  That one would always warn,
+           // without offering any possible user action to help.
+           
+           // this->session.print_warning(_("Potential type mismatch in reassignment"), e->tok);
 
            resolve_details(e->tok, null_type, e->type_details);
            resolve_details(e->referent->tok, null_type, e->referent->type_details);
