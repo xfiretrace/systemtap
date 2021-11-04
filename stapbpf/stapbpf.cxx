@@ -2020,7 +2020,7 @@ procfs_write_event_loop (procfsprobe_data* data, bpf_transport_context* uctx)
                     path, strerror(errno));
 
         if (bytes_read > 0)
-          msg.append(std::string(buffer_feed));
+          msg.append(buffer_feed, bytes_read);
 
       } while (bytes_read > 0);
 
