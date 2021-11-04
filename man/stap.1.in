@@ -1331,8 +1331,10 @@ The basic syntax is as follows:
 second operand must be a string literal containing a syntactically
 valid regular expression.)
 .PP
-The regular expression syntax supports most of the features of POSIX
-Extended Regular Expressions, except for subexpression reuse ("\\1")
+The regular expression syntax supports POSIX
+Extended Regular Expression features as documented in
+.IR egrep (1)
+except for subexpression reuse ("\\1")
 functionality.
 .PP
 After a successful match, the contents of the matched
