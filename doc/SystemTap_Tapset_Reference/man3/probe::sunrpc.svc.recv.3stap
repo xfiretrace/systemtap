@@ -2,12 +2,12 @@
 .\"     Title: probe::sunrpc.svc.recv
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2021
+.\"      Date: November 2021
 .\"    Manual: Networking Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SUNRPC\&.SVC\" "3stap" "May 2021" "SystemTap Tapset Reference" "Networking Tapset"
+.TH "PROBE::SUNRPC\&.SVC\" "3stap" "November 2021" "SystemTap Tapset Reference" "Networking Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,6 +36,11 @@ sunrpc\&.svc\&.recv
 .fi
 .SH "VALUES"
 .PP
+\fIsv_name\fR
+.RS 4
+the service name
+.RE
+.PP
 \fIsv_nrthreads\fR
 .RS 4
 the number of concurrent threads
@@ -44,11 +49,6 @@ the number of concurrent threads
 \fIsv_prog\fR
 .RS 4
 the number of the program
-.RE
-.PP
-\fIsv_name\fR
-.RS 4
-the service name
 .RE
 .PP
 \fItimeout\fR

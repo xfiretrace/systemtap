@@ -2,12 +2,12 @@
 .\"     Title: probe::signal.send_sig_queue
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2021
+.\"      Date: November 2021
 .\"    Manual: Signal Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SIGNAL\&.SEND" "3stap" "May 2021" "SystemTap Tapset Reference" "Signal Tapset"
+.TH "PROBE::SIGNAL\&.SEND" "3stap" "November 2021" "SystemTap Tapset Reference" "Signal Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,9 +36,9 @@ signal\&.send_sig_queue
 .fi
 .SH "VALUES"
 .PP
-\fIname\fR
+\fIpid_name\fR
 .RS 4
-Name of the probe point
+Name of the process to which the signal is queued
 .RE
 .PP
 \fIsig\fR
@@ -46,14 +46,14 @@ Name of the probe point
 The queued signal
 .RE
 .PP
+\fIsig_name\fR
+.RS 4
+A string representation of the signal
+.RE
+.PP
 \fIsigqueue_addr\fR
 .RS 4
 The address of the signal queue
-.RE
-.PP
-\fIpid_name\fR
-.RS 4
-Name of the process to which the signal is queued
 .RE
 .PP
 \fIsig_pid\fR
@@ -61,9 +61,9 @@ Name of the process to which the signal is queued
 The PID of the process to which the signal is queued
 .RE
 .PP
-\fIsig_name\fR
+\fIname\fR
 .RS 4
-A string representation of the signal
+Name of the probe point
 .RE
 .SH SEE ALSO\n 
 .IR tapset::signal (3stap)

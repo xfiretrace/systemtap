@@ -2,12 +2,12 @@
 .\"     Title: probe::nfs.proc.lookup
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2021
+.\"      Date: November 2021
 .\"    Manual: Network File Storage Tapsets
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::NFS\&.PROC\&." "3stap" "May 2021" "SystemTap Tapset Reference" "Network File Storage Tapsets"
+.TH "PROBE::NFS\&.PROC\&." "3stap" "November 2021" "SystemTap Tapset Reference" "Network File Storage Tapsets"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,22 +36,12 @@ nfs\&.proc\&.lookup
 .fi
 .SH "VALUES"
 .PP
-\fIprot\fR
-.RS 4
-transfer protocol
-.RE
-.PP
 \fIfilename\fR
 .RS 4
 the name of file which client opens/searches on server
 .RE
 .PP
-\fIserver_ip\fR
-.RS 4
-IP address of server
-.RE
-.PP
-\fIbitmask0\fR
+\fIbitmask1\fR
 .RS 4
 V4 bitmask representing the set of attributes supported on this filesystem
 .RE
@@ -61,12 +51,22 @@ V4 bitmask representing the set of attributes supported on this filesystem
 NFS version
 .RE
 .PP
+\fIprot\fR
+.RS 4
+transfer protocol
+.RE
+.PP
+\fIserver_ip\fR
+.RS 4
+IP address of server
+.RE
+.PP
 \fIname_len\fR
 .RS 4
 the length of file name
 .RE
 .PP
-\fIbitmask1\fR
+\fIbitmask0\fR
 .RS 4
 V4 bitmask representing the set of attributes supported on this filesystem
 .RE

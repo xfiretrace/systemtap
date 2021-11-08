@@ -2,12 +2,12 @@
 .\"     Title: probe::irq_handler.exit
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2021
+.\"      Date: November 2021
 .\"    Manual: Interrupt Request (IRQ) Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::IRQ_HANDLER\&" "3stap" "May 2021" "SystemTap Tapset Reference" "Interrupt Request (IRQ) Tapset"
+.TH "PROBE::IRQ_HANDLER\&" "3stap" "November 2021" "SystemTap Tapset Reference" "Interrupt Request (IRQ) Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,14 +36,14 @@ irq_handler\&.exit
 .fi
 .SH "VALUES"
 .PP
-\fIirq\fR
+\fIdev_name\fR
 .RS 4
-interrupt number
+name of device
 .RE
 .PP
-\fIthread_flags\fR
+\fIdev_id\fR
 .RS 4
-Flags related to thread
+Cookie to identify device
 .RE
 .PP
 \fIflags_str\fR
@@ -51,24 +51,9 @@ Flags related to thread
 symbolic string representation of IRQ flags
 .RE
 .PP
-\fIdir\fR
-.RS 4
-pointer to the proc/irq/NN/name entry
-.RE
-.PP
 \fIaction\fR
 .RS 4
 struct irqaction*
-.RE
-.PP
-\fIhandler\fR
-.RS 4
-interrupt handler function that was executed
-.RE
-.PP
-\fIthread_fn\fR
-.RS 4
-interrupt handler function for threaded interrupts
 .RE
 .PP
 \fIret\fR
@@ -76,9 +61,14 @@ interrupt handler function for threaded interrupts
 return value of the handler
 .RE
 .PP
-\fIflags\fR
+\fIdir\fR
 .RS 4
-flags for IRQ handler
+pointer to the proc/irq/NN/name entry
+.RE
+.PP
+\fIthread_fn\fR
+.RS 4
+interrupt handler function for threaded interrupts
 .RE
 .PP
 \fIthread\fR
@@ -86,9 +76,9 @@ flags for IRQ handler
 thread pointer for threaded interrupts
 .RE
 .PP
-\fIdev_name\fR
+\fIhandler\fR
 .RS 4
-name of device
+interrupt handler function that was executed
 .RE
 .PP
 \fInext_irqaction\fR
@@ -96,9 +86,19 @@ name of device
 pointer to next irqaction for shared interrupts
 .RE
 .PP
-\fIdev_id\fR
+\fIthread_flags\fR
 .RS 4
-Cookie to identify device
+Flags related to thread
+.RE
+.PP
+\fIflags\fR
+.RS 4
+flags for IRQ handler
+.RE
+.PP
+\fIirq\fR
+.RS 4
+interrupt number
 .RE
 .SH SEE ALSO\n 
 .IR tapset::irq (3stap)

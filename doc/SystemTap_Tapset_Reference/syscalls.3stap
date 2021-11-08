@@ -1,5 +1,5 @@
 ." -*- nroff -*-
-.TH TAPSET::SYSCALLS 3stap "May 2021" "Systemtap Tapset Reference"
+.TH TAPSET::SYSCALLS 3stap "November 2021" "Systemtap Tapset Reference"
 .SH NAME
 tapset::syscalls \- systemtap syscall tapset
 
@@ -163,7 +163,7 @@ value_uaddr, which
 .P
 .TP
 .B syscall.compat_lookup_dcookie
-buffer_uaddr, cookie, len
+$id, $regs, buffer_uaddr, cookie, int, len, pt_regs*
 .P
 .TP
 .B syscall.compat_nanosleep
@@ -667,7 +667,7 @@ fd, offset_high, offset_low, result_uaddr, whence, whence_str
 .P
 .TP
 .B syscall.lookup_dcookie
-buffer_uaddr, cookie, len
+$id, $regs, buffer_uaddr, cookie, int, len, pt_regs*
 .P
 .TP
 .B syscall.lremovexattr

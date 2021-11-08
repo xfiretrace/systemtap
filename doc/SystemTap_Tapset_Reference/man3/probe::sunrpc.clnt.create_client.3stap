@@ -2,12 +2,12 @@
 .\"     Title: probe::sunrpc.clnt.create_client
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2021
+.\"      Date: November 2021
 .\"    Manual: Networking Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SUNRPC\&.CLNT" "3stap" "May 2021" "SystemTap Tapset Reference" "Networking Tapset"
+.TH "PROBE::SUNRPC\&.CLNT" "3stap" "November 2021" "SystemTap Tapset Reference" "Networking Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,11 +36,6 @@ sunrpc\&.clnt\&.create_client
 .fi
 .SH "VALUES"
 .PP
-\fIvers\fR
-.RS 4
-the RPC program version number
-.RE
-.PP
 \fIservername\fR
 .RS 4
 the server machine name
@@ -54,6 +49,11 @@ the IP protocol number
 \fIprogname\fR
 .RS 4
 the RPC program name
+.RE
+.PP
+\fIvers\fR
+.RS 4
+the RPC program version number
 .RE
 .PP
 \fIauthflavor\fR

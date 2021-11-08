@@ -2,12 +2,12 @@
 .\"     Title: probe::nfs.aop.writepage
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2021
+.\"      Date: November 2021
 .\"    Manual: Network File Storage Tapsets
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::NFS\&.AOP\&.W" "3stap" "May 2021" "SystemTap Tapset Reference" "Network File Storage Tapsets"
+.TH "PROBE::NFS\&.AOP\&.W" "3stap" "November 2021" "SystemTap Tapset Reference" "Network File Storage Tapsets"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,9 +36,14 @@ nfs\&.aop\&.writepage
 .fi
 .SH "VALUES"
 .PP
-\fIfor_kupdate\fR
+\fIi_state\fR
 .RS 4
-a flag of writeback_control, indicates if it\*(Aqs a kupdate writeback
+inode state flags
+.RE
+.PP
+\fIsize\fR
+.RS 4
+number of pages to be written in this execution
 .RE
 .PP
 \fIwsize\fR
@@ -46,19 +51,9 @@ a flag of writeback_control, indicates if it\*(Aqs a kupdate writeback
 write size
 .RE
 .PP
-\fIi_flag\fR
-.RS 4
-file flags
-.RE
-.PP
 \fIdev\fR
 .RS 4
 device identifier
-.RE
-.PP
-\fIsb_flag\fR
-.RS 4
-super block flags
 .RE
 .PP
 \fIi_size\fR
@@ -66,9 +61,14 @@ super block flags
 file length in bytes
 .RE
 .PP
-\fIfor_reclaim\fR
+\fIino\fR
 .RS 4
-a flag of writeback_control, indicates if it\*(Aqs invoked from the page allocator
+inode number
+.RE
+.PP
+\fIfor_kupdate\fR
+.RS 4
+a flag of writeback_control, indicates if it\*(Aqs a kupdate writeback
 .RE
 .PP
 \fI__page\fR
@@ -76,14 +76,14 @@ a flag of writeback_control, indicates if it\*(Aqs invoked from the page allocat
 the address of page
 .RE
 .PP
-\fIino\fR
+\fIsb_flag\fR
 .RS 4
-inode number
+super block flags
 .RE
 .PP
-\fIi_state\fR
+\fIi_flag\fR
 .RS 4
-inode state flags
+file flags
 .RE
 .PP
 \fIpage_index\fR
@@ -91,9 +91,9 @@ inode state flags
 offset within mapping, can used a page identifier and position identifier in the page frame
 .RE
 .PP
-\fIsize\fR
+\fIfor_reclaim\fR
 .RS 4
-number of pages to be written in this execution
+a flag of writeback_control, indicates if it\*(Aqs invoked from the page allocator
 .RE
 .SH "DESCRIPTION"
 .PP

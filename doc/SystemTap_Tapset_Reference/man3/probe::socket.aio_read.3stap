@@ -2,12 +2,12 @@
 .\"     Title: probe::socket.aio_read
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2021
+.\"      Date: November 2021
 .\"    Manual: Socket Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SOCKET\&.AIO_" "3stap" "May 2021" "SystemTap Tapset Reference" "Socket Tapset"
+.TH "PROBE::SOCKET\&.AIO_" "3stap" "November 2021" "SystemTap Tapset Reference" "Socket Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,14 +36,19 @@ socket\&.aio_read
 .fi
 .SH "VALUES"
 .PP
-\fIflags\fR
+\fItype\fR
 .RS 4
-Socket flags value
+Socket type value
 .RE
 .PP
-\fIstate\fR
+\fIsize\fR
 .RS 4
-Socket state value
+Message size in bytes
+.RE
+.PP
+\fIprotocol\fR
+.RS 4
+Protocol value
 .RE
 .PP
 \fIfamily\fR
@@ -56,19 +61,14 @@ Protocol family value
 Name of this probe
 .RE
 .PP
-\fIprotocol\fR
+\fIflags\fR
 .RS 4
-Protocol value
+Socket flags value
 .RE
 .PP
-\fIsize\fR
+\fIstate\fR
 .RS 4
-Message size in bytes
-.RE
-.PP
-\fItype\fR
-.RS 4
-Socket type value
+Socket state value
 .RE
 .SH "CONTEXT"
 .PP

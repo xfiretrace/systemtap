@@ -2,12 +2,12 @@
 .\"     Title: probe::nfs.proc.commit
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2021
+.\"      Date: November 2021
 .\"    Manual: Network File Storage Tapsets
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::NFS\&.PROC\&." "3stap" "May 2021" "SystemTap Tapset Reference" "Network File Storage Tapsets"
+.TH "PROBE::NFS\&.PROC\&." "3stap" "November 2021" "SystemTap Tapset Reference" "Network File Storage Tapsets"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,11 +36,6 @@ nfs\&.proc\&.commit
 .fi
 .SH "VALUES"
 .PP
-\fIprot\fR
-.RS 4
-transfer protocol
-.RE
-.PP
 \fIbitmask0\fR
 .RS 4
 V4 bitmask representing the set of attributes supported on this filesystem
@@ -51,9 +46,9 @@ V4 bitmask representing the set of attributes supported on this filesystem
 IP address of server
 .RE
 .PP
-\fIsize\fR
+\fIprot\fR
 .RS 4
-read bytes in this execution
+transfer protocol
 .RE
 .PP
 \fIversion\fR
@@ -61,14 +56,19 @@ read bytes in this execution
 NFS version
 .RE
 .PP
-\fIoffset\fR
+\fIsize\fR
 .RS 4
-the file offset
+read bytes in this execution
 .RE
 .PP
 \fIbitmask1\fR
 .RS 4
 V4 bitmask representing the set of attributes supported on this filesystem
+.RE
+.PP
+\fIoffset\fR
+.RS 4
+the file offset
 .RE
 .SH "DESCRIPTION"
 .PP

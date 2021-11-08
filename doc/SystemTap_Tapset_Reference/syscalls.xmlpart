@@ -208,7 +208,7 @@ same convenience variables.
 <row><entry>
     compat_lookup_dcookie
 </entry><entry>
-    buffer_uaddr, cookie, len
+    $id, $regs, buffer_uaddr, cookie, int, len, pt_regs*
 </entry></row>
 <row><entry>
     compat_nanosleep
@@ -838,7 +838,7 @@ same convenience variables.
 <row><entry>
     lookup_dcookie
 </entry><entry>
-    buffer_uaddr, cookie, len
+    $id, $regs, buffer_uaddr, cookie, int, len, pt_regs*
 </entry></row>
 <row><entry>
     lremovexattr
