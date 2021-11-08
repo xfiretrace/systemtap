@@ -322,7 +322,7 @@ keywords: socket syscall
 
 
 general/stopwatches.stp - See the amount of wall clock time a process spends in various states
-keywords: time
+keywords: time bpf
 
   The stopwatch.stp script illustrates how to use multiple stopwatches
   record how much wallclock time a process spends in kernel- and

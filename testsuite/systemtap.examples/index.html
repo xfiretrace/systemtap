@@ -146,7 +146,7 @@ keywords: <a href="keyword-index.html#STATISTICS">STATISTICS</a> <a href="keywor
 keywords: <a href="keyword-index.html#SOCKET">SOCKET</a> <a href="keyword-index.html#SYSCALL">SYSCALL</a> <br>
 <p>Prints the life cycle of all sockets associated with a process. This includes bytes and timing. The timing information that is tracked includes event completion relative to the start of said event and the end of the previous event. Currently tracks read, write, recv, send, connect and close.</p><p><font size="-2"><pre># stap socket-events.stp</pre></font></p>
 </li><li><a name="general/stopwatches.stp"></a><a href="#general/stopwatches.stp">&para;</a> <a href="general/stopwatches.stp">general/stopwatches.stp</a> - See the amount of wall clock time a process spends in various states<br>
-keywords: <a href="keyword-index.html#TIME">TIME</a> <br>
+keywords: <a href="keyword-index.html#TIME">TIME</a> <a href="keyword-index.html#BPF">BPF</a> <br>
 <p>The stopwatch.stp script illustrates how to use multiple stopwatches record how much wallclock time a process spends in kernel- and user-space.  On exit the script prints out the time in seconds, milliseconds, microseconds, and nanoseconds. Note that this output of this script is not directly comparable to the time command because time records the time that the process is actually active in kernel- and user-space.</p><p><font size="-2"><pre># stap stopwatches.stp -T 1</pre></font></p>
 </li><li><a name="general/tcl-funtop.stp"></a><a href="#general/tcl-funtop.stp">&para;</a> <a href="general/tcl-funtop.stp">general/tcl-funtop.stp</a> - Profile Tcl calls<br>
 keywords: <a href="keyword-index.html#PROFILING">PROFILING</a> <br>
