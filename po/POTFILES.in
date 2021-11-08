@@ -1,3 +1,5 @@
+analysis.cxx
+analysis.h
 bpf-base.cxx
 bpf-bitset.cxx
 bpf-bitset.h
@@ -73,7 +75,6 @@ staprun/modverify.c
 staprun/modverify.h
 staprun/monitor.c
 staprun/relay.c
-staprun/relay_old.c
 staprun/stapio.c
 staprun/stap_merge.c
 staprun/staprun.c
