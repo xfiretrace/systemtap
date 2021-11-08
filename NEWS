@@ -17,6 +17,11 @@
   larger "-s BUF" parameter to reliably transfer.  "-b" bulk mode
   is also available again as an alternative.
 
+- abort() tapset can be used by the bpf backend.
+
+- The bpf backend now supports foreach iteration in multi-key
+  associative arrays.
+
 * What's new in version 4.5, 2021-05-07
 
 - Java probing support has been updated to work with the latest
