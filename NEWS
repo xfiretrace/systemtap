@@ -9,8 +9,10 @@
 
 - syscall_any tapset can be used by the bpf backend.
 
-- Checks whether guru-mode modification of target variables will have
-  an effect on x86_64, PowerPC, and AArch64.
+- SystemTap now uses DynInst to perform a liveness analysis on
+  target variables and warn when a guru-mode modification to a variable
+  will have no effect. The liveness analysis is currently done on
+  x86_64, PowerPC, and AArch64.
 
 - The kernel-user relayfs transport again sorts messages into a total
   time order across CPUs.  High output-volume scripts may need a
