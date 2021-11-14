@@ -51,32 +51,39 @@ static void _stp_do_relocation(const char __user *buf, size_t count)
 {
   static struct _stp_msg_relocation msg; /* by protocol, never concurrently used */
   static struct _stp13_msg_relocation msg13; /* ditto */
+  int rc = 0;
 
+  dbug_sym(2, "do_relocation size=%ld\n", (long) count);
+  
   /* PR12612: Let's try to be compatible with systemtap modules being
      compiled by new systemtap, but loaded (staprun'd) by an older
      systemtap runtime.  The only known incompatilibility is that we
      get an older, smaller, relocation message.  So here we accept both
      sizes. */
   if (sizeof(msg) == count) { /* systemtap 1.4+ runtime */
-    if (unlikely(copy_from_user (& msg, buf, count)))
-            return;
+          rc = copy_from_user (& msg, buf, count);
+
   } else if (sizeof(msg13) == count) { /* systemtap 1.3- runtime */
-    if (unlikely(copy_from_user (& msg13, buf, count)))
-            return;
+          
+          rc = copy_from_user (& msg13, buf, count);
+          if (rc == 0) {
 #if STP_MODULE_NAME_LEN <= STP13_MODULE_NAME_LEN
 #error "STP_MODULE_NAME_LEN should not be smaller than STP13_MODULE_NAME_LEN"
 #endif
-    strlcpy (msg.module, msg13.module, STP13_MODULE_NAME_LEN);
-    strlcpy (msg.reloc, msg13.reloc, STP13_MODULE_NAME_LEN);
-    msg.address = msg13.address;
+                  strlcpy (msg.module, msg13.module, STP13_MODULE_NAME_LEN);
+                  strlcpy (msg.reloc, msg13.reloc, STP13_MODULE_NAME_LEN);
+                  msg.address = msg13.address;
+          }
   } else {
       errk ("STP_RELOCATE message size mismatch (%lu or %lu vs %lu)\n",
             (long unsigned) sizeof(msg), (long unsigned) sizeof (msg13), (long unsigned) count);
       return;
   }
 
-  dbug_sym(2, "relocate (%s %s 0x%lx)\n", msg.module, msg.reloc, (unsigned long) msg.address);
-
+  dbug_sym(2, "relocate (%s %s 0x%lx) rc=%d\n", msg.module, msg.reloc, (unsigned long) msg.address, rc);
+  if (rc != 0)
+          return;
+  
   /* Detect actual kernel load address. */
   if (!strcmp ("kernel", msg.module)
       && !strcmp ("_stext", msg.reloc)) {

@@ -150,20 +150,23 @@ stapkp_prepare_kprobe(struct stap_kprobe_probe *skp)
    struct kprobe *kp = &skp->kprobe->u.kp;
    unsigned long addr = 0;
 
-   if (! skp->symbol_name) {
-      addr = stapkp_relocate_addr(skp);
-      if (addr == 0)
-	 return 1;
-      kp->addr = (void *) addr;
+   // PR28557 Try a pass resolving the address now with the currently
+   // known module/section addresses within our own stap-symbols tables.
+   addr = stapkp_relocate_addr(skp);
+   if (addr != 0) {
+           kp->addr = (void*) addr;
    }
-   else {
+   
+   // fall back to kallsyms-based or kernel kprobes-delegated symbolic
+   // registration
+   else if (skp->symbol_name) {
       // If we're doing symbolic name + offset probing (that gets
       // converted to an address), it doesn't really matter if the
       // symbol is in a module and the module isn't loaded right
       // now. The registration will fail, but will get tried again
       // when the module is loaded.
       if (USE_KALLSYMS_ON_EACH_SYMBOL && kp->addr == 0)
-	 return 1;
+	 return 4;
       else if (!USE_KALLSYMS_ON_EACH_SYMBOL) {
         // If we don't have kallsyms_on_each_symbol(), we'll use
         // symbol_name+offset probing and let
@@ -193,6 +196,7 @@ stapkp_prepare_kprobe(struct stap_kprobe_probe *skp)
       }
    }
 
+   // NB: success paths need to come here, to set the pre_handler
    kp->pre_handler = &enter_kprobe_probe;
 
 #ifdef __ia64__ // PR6028
@@ -250,6 +254,11 @@ stapkp_register_kprobe(struct stap_kprobe_probe *skp)
    int ret = stapkp_prepare_kprobe(skp);
    if (ret == 0)
       ret = stapkp_arch_register_kprobe(skp);
+   
+   dbug_stapkp("stapkp_register_kprobe module %s addr 0x%lx rc %d\n",
+               skp->module, (unsigned long)skp->address,
+               ret);
+
    return ret;
 }
 
@@ -352,6 +361,10 @@ stapkp_register_kretprobe(struct stap_kprobe_probe *skp)
 static int
 stapkp_register_probe(struct stap_kprobe_probe *skp)
 {
+   dbug_stapkp("stapkp_register_probe module %s addr 0x%lx reg %d\n",
+               skp->module, (unsigned long)skp->address,
+               skp->registered_p);
+
    if (skp->registered_p)
       return 0;
 

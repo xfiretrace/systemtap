@@ -728,6 +728,9 @@ static int _stp_build_id_check (struct _stp_module *m,
     }
   }
 
+  dbug_sym(1, "build-id validation [%s] %s vs. notes@=%lx %s\n", m->name, hexstring_theory,
+           (unsigned long) notes_addr, hexstring_practice);
+  
   // have two strings, will travel
   if (strcmp (hexstring_practice, hexstring_theory)) {
 	  // NB: It is normal for different binaries with the same file path

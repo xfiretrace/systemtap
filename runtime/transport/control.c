@@ -57,8 +57,8 @@ static ssize_t _stp_ctl_write_cmd(struct file *file, const char __user *buf, siz
 
 #if defined(DEBUG_TRANS) && (DEBUG_TRANS >= 2)
 	if (type < STP_MAX_CMD)
-		dbug_trans2("Got %s. len=%d\n", _stp_command_name[type],
-			    (int)count);
+		dbug_trans2("Got %s. euid=%ld, len=%d\n", _stp_command_name[type],
+			    (long)euid, (int)count);
 #endif
 
         // PR17232: preclude reentrancy during handling of messages.
