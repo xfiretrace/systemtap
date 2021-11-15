@@ -1240,6 +1240,9 @@ exit 0
 
 # PRERELEASE
 %changelog
+* Mon Nov 08 2021 Serhei Makarov <me@serhei.io> - 4.6-1
+- Upstream release.
+
 * Fri May 07 2021 Serhei Makarov <me@serhei.io> - 4.5-1
 - Upstream release.
 
