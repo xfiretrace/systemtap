@@ -73,7 +73,7 @@ static inline void _stp_unlock_inode(struct inode *inode);
 #include "control.c"
 
 static unsigned _stp_nsubbufs = 256;
-static unsigned _stp_subbuf_size = STP_BUFFER_SIZE;
+static unsigned _stp_subbuf_size = 8 * STP_BUFFER_SIZE; /* 64K */
 
 /* module parameters */
 static int _stp_bufsize;
