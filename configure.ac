@@ -88,12 +88,8 @@ fi
 AS_VAR_APPEND([ac_configure_args], [" python='$PYTHON' pyexecdir='$pyexecdir'"])
 
 # Now let's try to find python version 3.
-if test "x$PYTHON_UNKNOWN" != "xno" -a "x$ac_cv_python_unknown_version" = "x3"; then
-   AC_PATH_PROG([PYTHON3], [python])
-else
-   AC_PATH_PROGS([PYTHON3],
-		 [python3 python3.7 python3.6 python3.5 python3.4 python3.3 python3.2 python3.1 python3.0], [:])
-fi
+AC_PATH_PROGS([PYTHON3],
+              	 [python3 python3.7 python3.6 python3.5 python3.4 python3.3 python3.2 python3.1 python3.0], [:])
 python3_basename=$(basename "$PYTHON3")
 AC_DEFINE_UNQUOTED([PYTHON3_BASENAME], "${python3_basename}",
 		   [Base name of the python3 interpreter binary.])
