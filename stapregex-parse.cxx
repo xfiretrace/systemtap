@@ -295,15 +295,27 @@ regex_parser::parse_factor ()
     }
   else if (c == '(')
     {
+      // Allow non-capturing group (?:...)
+      bool do_tag_now = do_tag;
+      rchar c2 = cur.peek();
+      if (c2 == '?')
+        {
+          cur.next();
+          rchar c3 = cur.peek();
+          if (c3 != ':')
+            parse_error(_F("unexpected '(?%c'", c3));
+          do_tag_now = false;
+        }
+
       // To number tags correctly, reserve a subexpression number here:
       unsigned curr_subexpression = 0;
-      if (do_tag)
+      if (do_tag_now)
         curr_subexpression = num_subexpressions++;
 
       result = parse_expr ();
 
       // PR15065 glom appropriate tag_ops onto the expr
-      if (do_tag) {
+      if (do_tag_now) {
         result = new cat_op(new tag_op(TAG_START(curr_subexpression)), result);
         result = new cat_op(result, new tag_op(TAG_END(curr_subexpression)));
       } else {
