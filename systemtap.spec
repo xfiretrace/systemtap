@@ -786,7 +786,7 @@ pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}%{python3_sitearch
 
 %pre runtime
 %if %{with_sysusers}
-%sysusers_create_compat $RPM_BUILD_ROOT/systemtap-runtime.sysusers
+%sysusers_create_compat %{buildroot}%{_sysusersdir}/systemtap-runtime.conf
 %else
 getent group stapusr >/dev/null || groupadd -f -g 156 -r stapusr
 getent group stapsys >/dev/null || groupadd -f -g 157 -r stapsys
@@ -796,7 +796,7 @@ exit 0
 
 %pre server
 %if %{with_sysusers}
-%sysusers_create_compat $RPM_BUILD_ROOT/systemtap-server.sysusers
+%sysusers_create_compat %{buildroot}%{_sysusersdir}/systemtap-server.conf
 %else
 getent group stap-server >/dev/null || groupadd -f -g 155 -r stap-server
 getent passwd stap-server >/dev/null || \
@@ -807,7 +807,7 @@ exit 0
 
 %pre testsuite
 %if %{with_sysusers}
-%sysusers_create_compat $RPM_BUILD_ROOT/systemtap-testsuite.sysusers
+%sysusers_create_compat %{buildroot}%{_sysusersdir}/systemtap-testsuite.conf
 %else
 getent passwd stapusr >/dev/null || \
     useradd -c "Systemtap 'stapusr' User" -g stapusr -r -s /sbin/nologin stapusr
