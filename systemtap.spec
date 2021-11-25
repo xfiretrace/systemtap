@@ -88,6 +88,34 @@
 # To avoid testsuite/*/*.stp has shebang which doesn't start with '/'
 %define __brp_mangle_shebangs_exclude_from .stp$
 
+%define _systemtap_runtime_preinstall \
+# See systemd-sysusers(8) sysusers.d(5)\
+\
+g     stapusr  156\
+g     stapsys  157\
+g     stapdev  158
+
+%define _systemtap_server_preinstall \
+# See systemd-sysusers(8) sysusers.d(5)\
+\
+g     stap-server  -\
+u     stap-server  -      "systemtap compiler server"   /var/lib/stap-server   /sbin/nologin\
+m     stap-server stap-server
+
+
+%define _systemtap_testsuite_preinstall \
+# See systemd-sysusers(8) sysusers.d(5)\
+\
+u     stapusr  -          "systemtap testsuite user"    /   /sbin/nologin\
+u     stapsys  -          "systemtap testsuite user"    /   /sbin/nologin\
+u     stapdev  -          "systemtap testsuite user"    /   /sbin/nologin\
+m     stapusr  stapusr\
+m     stapsys  stapusr\
+m     stapsys  stapsys\
+m     stapdev  stapusr\
+m     stapdev  stapdev
+
+
 Name: systemtap
 Version: 4.7
 Release: 1%{?release_override}%{?dist}
@@ -656,9 +684,10 @@ for dir in $(ls -1d $RPM_BUILD_ROOT%{_mandir}/{??,??_??}) ; do
 done
 
 %if %{with_sysusers}
-install -p -D -m 0644 systemtap-runtime.sysusers %{buildroot}%{_sysusersdir}/systemtap-runtime.conf
-install -p -D -m 0644 systemtap-server.sysusers %{buildroot}%{_sysusersdir}/systemtap-server.conf
-install -p -D -m 0644 systemtap-testsuite.sysusers %{buildroot}%{_sysusersdir}/systemtap-testsuite.conf
+mkdir -p %{buildroot}%{_sysusersdir}
+echo '%_systemtap_runtime_preinstall' > %{buildroot}%{_sysusersdir}/systemtap-runtime.conf
+echo '%_systemtap_server_preinstall' > %{buildroot}%{_sysusersdir}/systemtap-server.conf
+echo '%_systemtap_testsuite_preinstall' > %{buildroot}%{_sysusersdir}/systemtap-testsuite.conf
 %endif
 
 
@@ -786,7 +815,7 @@ pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}%{python3_sitearch
 
 %pre runtime
 %if %{with_sysusers}
-%sysusers_create_compat %{buildroot}%{_sysusersdir}/systemtap-runtime.conf
+echo '%_systemtap_runtime_preinstall' | systemd-sysusers --replace=%{_sysusersdir}/systemtap-runtime.conf -
 %else
 getent group stapusr >/dev/null || groupadd -f -g 156 -r stapusr
 getent group stapsys >/dev/null || groupadd -f -g 157 -r stapsys
@@ -796,7 +825,7 @@ exit 0
 
 %pre server
 %if %{with_sysusers}
-%sysusers_create_compat %{buildroot}%{_sysusersdir}/systemtap-server.conf
+echo '%_systemtap_server_preinstall' | systemd-sysusers --replace=%{_sysusersdir}/systemtap-server.conf -
 %else
 getent group stap-server >/dev/null || groupadd -f -g 155 -r stap-server
 getent passwd stap-server >/dev/null || \
@@ -807,7 +836,7 @@ exit 0
 
 %pre testsuite
 %if %{with_sysusers}
-%sysusers_create_compat %{buildroot}%{_sysusersdir}/systemtap-testsuite.conf
+echo '%_systemtap_testsuite_preinstall' | systemd-sysusers --replace=%{_sysusersdir}/systemtap-testsuite.conf -
 %else
 getent passwd stapusr >/dev/null || \
     useradd -c "Systemtap 'stapusr' User" -g stapusr -r -s /sbin/nologin stapusr

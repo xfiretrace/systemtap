@@ -1,5 +1,0 @@
-# See systemd-sysusers(8) sysusers.d(5)
-
-g     stapusr  156
-g     stapsys  157 
-g     stapdev  158
