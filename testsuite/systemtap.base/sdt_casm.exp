@@ -18,7 +18,8 @@ proc cleanup_handler { verbose } {
 
 set script $srcdir/$subdir/$test.stp
 set ::result_string {PASS: probe0
-PASS: probe1}
+PASS: probe1
+PASS: probe2}
 
 set asm_flags [sdt_includes]
 set asm_flags "$asm_flags additional_flags=-std=c99"

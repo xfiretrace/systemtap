@@ -290,7 +290,7 @@ __extension__ extern unsigned long long __sdt_unsp;
   _SDT_ASM_1(.purgem _SDT_TYPE_)					      \
   _SDT_ASM_1(.purgem _SDT_TYPE)
 
-#define _SDT_ASM_BODY(provider, name, pack_args, args)			      \
+#define _SDT_ASM_BODY(provider, name, pack_args, args, ...)		      \
   _SDT_DEF_MACROS							      \
   _SDT_ASM_1(990:	_SDT_NOP)					      \
   _SDT_ASM_3(		.pushsection .note.stapsdt,_SDT_ASM_AUTOGROUP,"note") \
@@ -417,9 +417,9 @@ __extension__ extern unsigned long long __sdt_unsp;
    counted, so we don't have to worry about the behavior of macros
    called without any arguments.  */
 
-#ifdef SDT_USE_VARIADIC
 #define _SDT_NARG(...) __SDT_NARG(__VA_ARGS__, 12,11,10,9,8,7,6,5,4,3,2,1,0)
 #define __SDT_NARG(_0,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12, N, ...) N
+#ifdef SDT_USE_VARIADIC
 #define _SDT_PROBE_N(provider, name, N, ...) \
   _SDT_PROBE(provider, name, N, (__VA_ARGS__))
 #define STAP_PROBEV(provider, name, ...) \
@@ -468,9 +468,15 @@ __extension__ extern unsigned long long __sdt_unsp;
     Note that these can use operand templates like %0 or %[name],
     and likewise they must write %%reg for a literal operand of %reg.  */
 
+#define _SDT_ASM_BODY_1(p,n,...) _SDT_ASM_BODY(p,n,_SDT_ASM_SUBSTR,(__VA_ARGS__))
+#define _SDT_ASM_BODY_2(p,n,...) _SDT_ASM_BODY(p,n,/*_SDT_ASM_STRING */,__VA_ARGS__)
+#define _SDT_ASM_BODY_N2(p,n,no,...) _SDT_ASM_BODY_ ## no(p,n,__VA_ARGS__)
+#define _SDT_ASM_BODY_N1(p,n,no,...) _SDT_ASM_BODY_N2(p,n,no,__VA_ARGS__)
+#define _SDT_ASM_BODY_N(p,n,...) _SDT_ASM_BODY_N1(p,n,_SDT_NARG(0, __VA_ARGS__),__VA_ARGS__)
+
 #if __STDC_VERSION__ >= 199901L
 # define STAP_PROBE_ASM(provider, name, ...)		\
-  _SDT_ASM_BODY(provider, name, /*_SDT_ASM_STRING */, __VA_ARGS__)	\
+  _SDT_ASM_BODY_N(provider, name, __VA_ARGS__)					\
   _SDT_ASM_BASE
 # define STAP_PROBE_ASM_OPERANDS(n, ...) _SDT_ASM_OPERANDS_##n(__VA_ARGS__)
 #else
@@ -478,7 +484,7 @@ __extension__ extern unsigned long long __sdt_unsp;
   _SDT_ASM_BODY(provider, name, /* _SDT_ASM_STRING */, (args))	\
   _SDT_ASM_BASE
 #endif
-#define STAP_PROBE_ASM_TEMPLATE(n)	_SDT_ASM_TEMPLATE_##n
+#define STAP_PROBE_ASM_TEMPLATE(n) _SDT_ASM_TEMPLATE_##n,"use _SDT_ASM_TEMPLATE_"
 
 
 /* DTrace compatible macro names.  */
