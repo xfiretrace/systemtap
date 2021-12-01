@@ -979,7 +979,7 @@ probe nfs.aop.readpages = kernel.function ("nfs_readpages") !,
         ino = $mapping->host->i_ino
 
         nr_pages = $nr_pages
-        file = $filp
+        file = @choose_defined($filp, $file)
 
         rpages = __nfs_rpages($mapping->host)
         rsize  = __nfs_server_rsize($mapping->host)
