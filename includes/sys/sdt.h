@@ -101,7 +101,7 @@
 # if defined __powerpc__
 # define STAP_SDT_ARG_CONSTRAINT        nZr
 # elif defined __x86_64__
-# define STAP_SDT_ARG_CONSTRAINT norfxy
+# define STAP_SDT_ARG_CONSTRAINT norx
 # elif defined __aarch64__
 # define STAP_SDT_ARG_CONSTRAINT norw
 # elif defined __s390__ || defined __s390x__
