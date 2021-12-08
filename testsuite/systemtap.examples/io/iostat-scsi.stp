@@ -26,6 +26,7 @@ probe module("sd_mod").function("sd_init_command") !,
 %(kernel_v >= "2.6.31" %?
 %{
 #include <linux/blkdev.h>
+#include <linux/blk-mq.h>
 %}
 
 function get_nr_sectors:long(rq:long)
@@ -47,13 +48,24 @@ probe sd_prep_fn = module("sd_mod").function("sd_prep_fn") !,
   _cmd_flags = $rq->cmd_flags
 }
 
+function scsi_cmd_to_rq(scmd) {
+    return scmd - @cast_module_sizeof("kernel", "request")
+}
+
 probe sd_init_command = module("sd_mod").function("sd_init_command") !,
 			kernel.function("sd_init_command")
 {
-  device = kernel_string(@choose_defined($cmd, $SCpnt)->request->rq_disk->disk_name)
-  sector_size = @choose_defined($cmd, $SCpnt)->device->sector_size
-  nr_sectors = get_nr_sectors(@choose_defined($cmd, $SCpnt)->request)
-  _cmd_flags = @choose_defined($cmd, $SCpnt)->request->cmd_flags
+    sector_size = @choose_defined($cmd, $SCpnt)->device->sector_size
+    # Kernel commits aa8e25e5006aac52c943c84e9056ab488630ee19 2266a2def97ce11ec979b6c58a1b637a16eca7dd
+    if (@defined(@choose_defined($cmd, $SCpnt)->request)) {
+      device = kernel_string(@choose_defined($cmd, $SCpnt)->request->rq_disk->disk_name)
+      nr_sectors = get_nr_sectors(@choose_defined($cmd, $SCpnt)->request)
+      _cmd_flags = @choose_defined($cmd, $SCpnt)->request->cmd_flags
+    } else {
+      device = kernel_string(@cast(scsi_cmd_to_rq(@choose_defined($cmd, $SCpnt)), "request", "kernel")->rq_disk->disk_name)
+      nr_sectors = get_nr_sectors(scsi_cmd_to_rq(@choose_defined($cmd, $SCpnt)))
+      _cmd_flags = @cast(scsi_cmd_to_rq(@choose_defined($cmd, $SCpnt)), "request", "kernel")->cmd_flags
+  }
 }
 
 probe sd_prep_fn !, sd_init_command
@@ -71,7 +83,8 @@ probe sd_prep_fn !, sd_init_command
 probe module("st").function("st_do_scsi").call !,
       kernel.function("st_do_scsi").call
 {
-  device = kernel_string($STp->disk->disk_name)
+  # Kernel commit 45938335d0a9773d65a82a7ca722bb76e4b997a8
+  device = kernel_string(@choose_defined($STp->disk->disk_name, $STp->name))
   devices[device] = 1
   if ($direction)
     writes[device] <<< $bytes
