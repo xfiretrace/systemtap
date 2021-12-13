@@ -11,7 +11,9 @@
 // </tapsetdescription>
 %{
 #include <linux/blkdev.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,16,0)
 #include <linux/elevator.h>
+#endif
 %}
 
 /**
@@ -76,7 +78,8 @@ probe ioscheduler.elv_completed_request
 	elevator_name = kernel_string(
 		@choose_defined($q->elevator->type->elevator_name,
 			@choose_defined($q->elevator->elevator_type->elevator_name,
-                                        $q->elevator->elevator_name)), "")
+                                        @choose_defined($q->elevator->elevator_name,
+                                                        0))), "")
 	if($rq == 0)  {
 		disk_major = -1
 		disk_minor = -1
@@ -114,7 +117,8 @@ probe ioscheduler.elv_add_request.kp =
 	elevator_name = kernel_string(
 		@choose_defined($q->elevator->type->elevator_name,
 			@choose_defined($q->elevator->elevator_type->elevator_name,
-                                        $q->elevator->elevator_name)), "")
+                                        @choose_defined($q->elevator->elevator_name,
+                                                        0))), "")
 	q = $q
 	if($rq == 0)  {
 		disk_major = -1
@@ -152,7 +156,8 @@ probe ioscheduler.elv_add_request.tp = kernel.trace("block_rq_insert") ?
         elevator_name = kernel_string(
 			@choose_defined($rq->q->elevator->type->elevator_name,
 				@choose_defined($rq->q->elevator->elevator_type->elevator_name,
-                                                $rq->q->elevator->elevator_name)), "")
+                                                @choose_defined($rq->q->elevator->elevator_name,
+                                                                0))), "")
 	rq = $rq
 
 	if ($rq == 0 || $rq->rq_disk ==0) {
@@ -201,7 +206,8 @@ probe ioscheduler_trace.elv_completed_request
         elevator_name = kernel_string(
 			@choose_defined($rq->q->elevator->type->elevator_name,
 				@choose_defined($rq->q->elevator->elevator_type->elevator_name,
-                                                $rq->q->elevator->elevator_name)), "")
+                                                @choose_defined($rq->q->elevator->elevator_name,
+                                                                0))), "")
 
 	rq = $rq
 
@@ -237,7 +243,8 @@ probe ioscheduler_trace.elv_issue_request
         elevator_name = kernel_string(
 			@choose_defined($rq->q->elevator->type->elevator_name,
 				@choose_defined($rq->q->elevator->elevator_type->elevator_name,
-                                                $rq->q->elevator->elevator_name)), "")
+                                                @choose_defined($rq->q->elevator->elevator_name,
+                                                                0))), "")
 	rq = $rq
 
 	if ($rq == 0 || $rq->rq_disk ==0) {
@@ -272,7 +279,8 @@ probe ioscheduler_trace.elv_requeue_request
         elevator_name = kernel_string(
 			@choose_defined($rq->q->elevator->type->elevator_name,
 				@choose_defined($rq->q->elevator->elevator_type->elevator_name,
-                                                $rq->q->elevator->elevator_name)), "")
+                                                @choose_defined($rq->q->elevator->elevator_name,
+                                                                0))), "")
 	rq = $rq
 
 	if ($rq == 0 || $rq->rq_disk ==0) {
@@ -306,7 +314,8 @@ probe ioscheduler_trace.elv_abort_request
         elevator_name = kernel_string(
 			@choose_defined($rq->q->elevator->type->elevator_name,
 				@choose_defined($rq->q->elevator->elevator_type->elevator_name,
-                                                $rq->q->elevator->elevator_name)), "")
+                                                @choose_defined($rq->q->elevator->elevator_name,
+                                                                0))), "")
 	rq = $rq
 
 	if ($rq == 0 || $rq->rq_disk ==0) {
@@ -364,6 +373,9 @@ probe ioscheduler_trace.unplug_timer = kernel.trace("block_unplug_timer") ?
 
 function disk_major_from_request:long(var_q:long)
 %{ /* pure */
+#ifndef _ELEVATOR_H
+        STAP_ERROR ("unsupported (PR28634)");
+#else
 	struct request_queue *q = (struct request_queue *)((uintptr_t)STAP_ARG_var_q);
 
 	/* We need to make sure there isn't a deref hazard here when
@@ -382,10 +394,14 @@ function disk_major_from_request:long(var_q:long)
 		STAP_RETVALUE = kread(&(rq_disk->major));
 	}
 	CATCH_DEREF_FAULT();
+#endif
 %}
 
 function disk_minor_from_request:long(var_q:long)
 %{ /* pure */
+#ifndef _ELEVATOR_H
+        STAP_ERROR ("unsupported (PR28634)");
+#else
 	struct request_queue *q = (struct request_queue *)((uintptr_t)STAP_ARG_var_q);
 
 	/* We need to make sure there isn't a deref hazard here when
@@ -404,4 +420,6 @@ function disk_minor_from_request:long(var_q:long)
 		STAP_RETVALUE = kread(&(rq_disk->first_minor));
 	}
 	CATCH_DEREF_FAULT();
+#endif
 %}
+
