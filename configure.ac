@@ -866,6 +866,7 @@ AC_ARG_WITH([java],
   [with_java=/usr/lib/jvm/java])
 dnl don't use AC_CHECK_FILE here, as that blocks cross-compiling
 if test ! -d "$with_java"; then
+   AC_MSG_NOTICE([directory $with_java not found, disabling java support])
    with_java=no
 fi
 AC_SUBST(JAVADIR, "${with_java}") # always needed to compile

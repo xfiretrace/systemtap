@@ -13092,6 +13092,8 @@ else
 fi
 
 if test ! -d "$with_java"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: directory $with_java not found, disabling java support" >&5
+$as_echo "$as_me: directory $with_java not found, disabling java support" >&6;}
    with_java=no
 fi
 JAVADIR="${with_java}"
