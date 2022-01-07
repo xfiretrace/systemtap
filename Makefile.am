@@ -149,6 +149,10 @@ stap_CXXFLAGS += $(nss_CFLAGS)
 stap_CPPFLAGS += $(nss_CFLAGS)
 stap_LDADD += $(nss_LIBS)
 
+if HAVE_DYNINST
+stap_CXXFLAGS += $(DYNINST_CXXFLAGS)
+endif
+
 install-exec-local: install-scripts
 
 PHONIES += install-scripts

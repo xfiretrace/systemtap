@@ -12042,8 +12042,8 @@ fi
 case "$with_dyninst" in
 no) ;;
 ''|yes) # Try a simple-minded distro search
-     DYNINST_CXXFLAGS="-I/usr/include/dyninst"
-     DYNINST_LDFLAGS="-L/usr/lib64/dyninst -L/usr/lib/dyninst" # XXX both lib paths!?!
+     DYNINST_CXXFLAGS=""
+     DYNINST_LDFLAGS="-L/usr/lib64/dyninst"
      # Add Dyninst libraries only if they are available
      if test -d "/usr/include/dyninst"; then
        save_LIBS="$LIBS"
@@ -12095,7 +12095,7 @@ fi
      ;;
 *)  # Use paths in the user-specified prefix
     DYNINST_CXXFLAGS="-I$with_dyninst/include"
-    DYNINST_LDFLAGS="-L$with_dyninst/lib/" # XXX need lib64 too?
+    DYNINST_LDFLAGS="-L$with_dyninst/lib64/dyninst -Wl,-rpath-link,$with_dyninst/lib64/dyninst"
     # Will assume Dyninst libraries are available as the path is specified
     save_LIBS="$LIBS"
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TBB_runtime_interface_version in -ltbb" >&5
@@ -12155,12 +12155,12 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
   CPPFLAGS="$CPPFLAGS $DYNINST_CXXFLAGS"
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking dyninst support" >&5
 $as_echo "$as_me: checking dyninst support" >&6;}
-  for ac_header in BPatch_object.h
+  for ac_header in dyninst/BPatch_object.h
 do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "BPatch_object.h" "ac_cv_header_BPatch_object_h" "$ac_includes_default"
-if test "x$ac_cv_header_BPatch_object_h" = xyes; then :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "dyninst/BPatch_object.h" "ac_cv_header_dyninst_BPatch_object_h" "$ac_includes_default"
+if test "x$ac_cv_header_dyninst_BPatch_object_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_BPATCH_OBJECT_H 1
+#define HAVE_DYNINST_BPATCH_OBJECT_H 1
 _ACEOF
 
 

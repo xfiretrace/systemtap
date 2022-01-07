@@ -13,11 +13,11 @@ extern "C" {
 #include <sys/types.h>
 }
 
-#include <BPatch_function.h>
-#include <BPatch_image.h>
-#include <BPatch_module.h>
-#include <BPatch_point.h>
-#include <BPatch_thread.h>
+#include <dyninst/BPatch_function.h>
+#include <dyninst/BPatch_image.h>
+#include <dyninst/BPatch_module.h>
+#include <dyninst/BPatch_point.h>
+#include <dyninst/BPatch_thread.h>
 
 #include "dynutil.h"
 #include "../util.h"

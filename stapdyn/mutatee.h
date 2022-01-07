@@ -12,9 +12,9 @@
 #include <string>
 #include <vector>
 
-#include <BPatch_object.h>
-#include <BPatch_process.h>
-#include <BPatch_snippet.h>
+#include <dyninst/BPatch_object.h>
+#include <dyninst/BPatch_process.h>
+#include <dyninst/BPatch_snippet.h>
 
 #include "dynprobe.h"
 #include "dynutil.h"

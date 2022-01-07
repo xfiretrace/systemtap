@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <BPatch_process.h>
+#include <dyninst/BPatch_process.h>
 
 // Check that environment DYNINSTAPI_RT_LIB exists and is a valid file.
 // If not, try to guess a good value and set it.

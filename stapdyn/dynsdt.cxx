@@ -27,10 +27,10 @@ extern "C" {
 #include <libelf.h>
 }
 
-#include <BPatch.h>
-#include <BPatch_function.h>
-#include <BPatch_object.h>
-#include <BPatch_point.h>
+#include <dyninst/BPatch.h>
+#include <dyninst/BPatch_function.h>
+#include <dyninst/BPatch_object.h>
+#include <dyninst/BPatch_point.h>
 
 #include "dynutil.h"
 #include "../util.h"

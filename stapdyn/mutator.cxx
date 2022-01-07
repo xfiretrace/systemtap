@@ -17,7 +17,7 @@ extern "C" {
 #include <time.h>
 }
 
-#include <BPatch_snippet.h>
+#include <dyninst/BPatch_snippet.h>
 
 #include "dynutil.h"
 #include "../util.h"

@@ -615,8 +615,8 @@ AC_ARG_WITH([dyninst],
 case "$with_dyninst" in
 no) ;;
 ''|yes) # Try a simple-minded distro search
-     DYNINST_CXXFLAGS="-I/usr/include/dyninst"
-     DYNINST_LDFLAGS="-L/usr/lib64/dyninst -L/usr/lib/dyninst" # XXX both lib paths!?!
+     DYNINST_CXXFLAGS=""
+     DYNINST_LDFLAGS="-L/usr/lib64/dyninst"
      # Add Dyninst libraries only if they are available
      if test -d "/usr/include/dyninst"; then
        save_LIBS="$LIBS"
@@ -627,7 +627,7 @@ no) ;;
      ;;
 *)  # Use paths in the user-specified prefix
     DYNINST_CXXFLAGS="-I$with_dyninst/include"
-    DYNINST_LDFLAGS="-L$with_dyninst/lib/" # XXX need lib64 too?
+    DYNINST_LDFLAGS="-L$with_dyninst/lib64/dyninst -Wl,-rpath-link,$with_dyninst/lib64/dyninst"
     # Will assume Dyninst libraries are available as the path is specified
     save_LIBS="$LIBS"
     AC_CHECK_LIB(tbb, TBB_runtime_interface_version, [tbb_LIBS=-ltbb],[tbb_LIBS=])       
@@ -640,7 +640,7 @@ if test "$with_dyninst" != "no"; then
   old_CPPFLAGS="$CPPFLAGS"
   CPPFLAGS="$CPPFLAGS $DYNINST_CXXFLAGS"
   AC_MSG_NOTICE([checking dyninst support])
-  AC_CHECK_HEADERS([BPatch_object.h], [
+  AC_CHECK_HEADERS([dyninst/BPatch_object.h], [
       AC_SUBST(DYNINST_CXXFLAGS)
       AC_SUBST(DYNINST_LDFLAGS)
       AC_SUBST(DYNINST_LIBS)

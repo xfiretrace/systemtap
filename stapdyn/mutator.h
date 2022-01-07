@@ -13,10 +13,10 @@
 #include <string>
 #include <vector>
 
-#include <BPatch.h>
-#include <BPatch_module.h>
-#include <BPatch_process.h>
-#include <BPatch_thread.h>
+#include <dyninst/BPatch.h>
+#include <dyninst/BPatch_module.h>
+#include <dyninst/BPatch_process.h>
+#include <dyninst/BPatch_thread.h>
 
 #include "dynprobe.h"
 #include "dynutil.h"
