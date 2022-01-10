@@ -7,6 +7,7 @@
 // later version.
 
 #include "config.h"
+#include "session.h"
 
 #ifdef HAVE_DYNINST
 
@@ -223,7 +224,8 @@ static const MachRegister dyninst_register_32[] = {
 typedef map<string, LivenessAnalyzer*> precomputed_liveness;
 static precomputed_liveness cached_liveness;
 
-int liveness(string executable,
+int liveness(systemtap_session& s,
+	     string executable,
 	     Dwarf_Addr addr,
 	     location_context ctx)
 {
@@ -233,8 +235,9 @@ int liveness(string executable,
 
 	// Punt if unsuccessful in parsing binary
 	if (!func_to_analyze.co){
-	  cout << "Punt can't parse binary" << endl;
-	  return 0;
+		s.print_warning(_F("livenss analysis unable to parse binary %s",
+				   executable.c_str()));
+		return 0;
 	}
 
 	// Determine whether 32-bit or 64-bit code as the register names are different in dyninst
