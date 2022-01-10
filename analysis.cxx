@@ -46,6 +46,8 @@ analysis::analysis(string name)
 	char *name_str = strdup(name.c_str());
 	sts = NULL;
 	co = NULL;
+	SymtabAPI::Symtab *symTab;
+	bool isParsable;
 
 	// Use cached information if available
 	if (cached_info.find(name) != cached_info.end()) {
@@ -56,6 +58,9 @@ analysis::analysis(string name)
 
 	// Not not seen before
 	// Create a new binary code object from the filename argument
+	isParsable = SymtabAPI::Symtab::openFile(symTab, name_str);
+	if(!isParsable) goto cleanup;
+
 	sts = new SymtabCodeSource(name_str);
 	if(!sts) goto cleanup;
 
@@ -225,6 +230,12 @@ int liveness(string executable,
 	// should cache the executable names like the other things
 	analysis func_to_analyze(executable);
 	MachRegister r;
+
+	// Punt if unsuccessful in parsing binary
+	if (!func_to_analyze.co){
+	  cout << "Punt can't parse binary" << endl;
+	  return 0;
+	}
 
 	// Determine whether 32-bit or 64-bit code as the register names are different in dyninst
 	int reg_width = func_to_analyze.co->cs()->getAddressWidth();
