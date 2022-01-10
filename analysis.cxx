@@ -225,6 +225,7 @@ typedef map<string, LivenessAnalyzer*> precomputed_liveness;
 static precomputed_liveness cached_liveness;
 
 int liveness(systemtap_session& s,
+	     target_symbol *e,
 	     string executable,
 	     Dwarf_Addr addr,
 	     location_context ctx)
@@ -235,8 +236,8 @@ int liveness(systemtap_session& s,
 
 	// Punt if unsuccessful in parsing binary
 	if (!func_to_analyze.co){
-		s.print_warning(_F("livenss analysis unable to parse binary %s",
-				   executable.c_str()));
+		s.print_warning(_F("liveness analysis unable to parse binary %s",
+				   executable.c_str()), e->tok);
 		return 0;
 	}
 
