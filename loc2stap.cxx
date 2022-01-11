@@ -702,6 +702,7 @@ location_context::translate (const Dwarf_Op *expr, const size_t len,
 	    break;
 
           case DW_OP_GNU_push_tls_address:
+          case DW_OP_form_tls_address:
             {
               POP(addr);
               functioncall *fc = new functioncall;
