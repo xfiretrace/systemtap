@@ -14,7 +14,7 @@ set env(SYSTEMTAP_DIR) $local_systemtap_dir
 set basic_script1 "\"probe begin { println(1) }\""
 set basic_script2 "\"probe begin, end { println(2) }\""
 set error_script "\"probe XbeginX { }\""
-set var_script1 {{probe begin { println(@var("jiffies")) }}}
+set var_script1 {{probe kernel.function("schedule_timeout") { println($jiffies) }}}
 
 # Check basic functionality.  The 1st compilation of a script won't
 # be cached, the 2nd should be cached.
