@@ -25,7 +25,7 @@ extern int liveness(systemtap_session& s,
 
 #else
 
-#define liveness(executable, location, var) (0)
+#define liveness(session, target, executable, location, var) (0)
 
 #endif // HAVE_DYNINST
 #endif // ANALYSIS_H
