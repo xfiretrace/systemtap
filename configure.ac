@@ -616,7 +616,25 @@ case "$with_dyninst" in
 no) ;;
 ''|yes) # Try a simple-minded distro search
      DYNINST_CXXFLAGS=""
-     DYNINST_LDFLAGS="-L/usr/lib64/dyninst"
+     old_LIBS="$LIBS"
+     old_LDFLAGS="$LDFLAGS"
+     AC_LANG_PUSH(C++)
+     for location in /usr/lib64/dyninst /usr/lib/dyninst ${libdir}/dyninst; do
+       LDFLAGS="-L${location}"
+         LIBS="-lparseAPI ${BOOST_SYSTEM_LIB}"
+	   AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <dyninst/CodeSource.h>]],
+					   [[char *s; Dyninst::ParseAPI::SymtabCodeSource *sts = new Dyninst::ParseAPI::SymtabCodeSource(s);]])],
+
+					   [found_DYNINST_LDFLAGS=yes],[found_DYNINST_LDFLAGS=no])
+       if test "$found_DYNINST_LDFLAGS" = "yes"; then
+         DYNINST_LDFLAGS="$LDFLAGS"
+	 break
+       fi
+     done
+     AC_LANG_POP(C++)
+     LDFLAGS="$old_LDFLAGS"
+     LIBS="$old_LIBS"
+
      # Add Dyninst libraries only if they are available
      if test -d "/usr/include/dyninst"; then
        save_LIBS="$LIBS"

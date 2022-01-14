@@ -12043,7 +12043,49 @@ case "$with_dyninst" in
 no) ;;
 ''|yes) # Try a simple-minded distro search
      DYNINST_CXXFLAGS=""
-     DYNINST_LDFLAGS="-L/usr/lib64/dyninst"
+     old_LIBS="$LIBS"
+     old_LDFLAGS="$LDFLAGS"
+     ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     for location in /usr/lib64/dyninst /usr/lib/dyninst ${libdir}/dyninst; do
+       LDFLAGS="-L${location}"
+         LIBS="-lparseAPI ${BOOST_SYSTEM_LIB}"
+	   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <dyninst/CodeSource.h>
+int
+main ()
+{
+char *s; Dyninst::ParseAPI::SymtabCodeSource *sts = new Dyninst::ParseAPI::SymtabCodeSource(s);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  found_DYNINST_LDFLAGS=yes
+else
+  found_DYNINST_LDFLAGS=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+       if test "$found_DYNINST_LDFLAGS" = "yes"; then
+         DYNINST_LDFLAGS="$LDFLAGS"
+	 break
+       fi
+     done
+     ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+     LDFLAGS="$old_LDFLAGS"
+     LIBS="$old_LIBS"
+
      # Add Dyninst libraries only if they are available
      if test -d "/usr/include/dyninst"; then
        save_LIBS="$LIBS"
