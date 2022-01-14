@@ -1676,6 +1676,13 @@ systemtap_session::parse_cmdline (int argc, char * const argv [])
         }
     }
 
+  // add the -c CMD / -x PID into the unwindsyms list as if -d ... were given
+  try {
+    if (cmd != "" || target_pid != 0)
+      additional_unwindsym_modules.insert(resolve_path(find_executable(cmd_file(),
+                                                                       sysroot, sysenv)));
+  } catch (...) { }
+  
   for (std::set<std::string>::iterator it = additional_unwindsym_modules.begin();
        it != additional_unwindsym_modules.end();
        it++)
