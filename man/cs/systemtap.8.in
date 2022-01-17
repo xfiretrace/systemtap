@@ -224,7 +224,7 @@ se v cache.  Před startem služby je vhodné obsah cache zkontrolovat.
 .B LOG_BOOT_ERR
 Protože "boot-time" skripty se spouštějí dříve než je namountován kořenový
 souborový systém, nelze chybový výstup programy staprun posílat do LOG_FILE
-jak je obvyklé.  Nicméně log lze přesměrovat do /var/run/systemtap/$script.log
+jak je obvyklé.  Nicméně log lze přesměrovat do /run/systemtap/$script.log
 nastavením LOG_BOOT_ERR na \fByes\fR.  Pokud STAT_PATH je odlišná od výchozí
 hodnoty, budou logovací soubory přesunuty na požadované místo dříve, než se
 spustí jakýkoliv příkaz služby.  Výchozí hodnota je \fBno\fR.

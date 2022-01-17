@@ -118,7 +118,7 @@ Globální konfigurační soubor programu stap\-server.
 @sysconfdir@/stap\-server/conf.d/*.conf
 Konfigurační soubory pro výchozí stap\-server služby.
 .TP
-/var/run/stap\-server/
+/run/stap\-server/
 Umístění "status" souborů pro běžící stap\-server služby.
 .TP
 /var/log/stap\-server/log

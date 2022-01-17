@@ -77,7 +77,7 @@ DEFAULT_START=
 # Allow cache only scripts
 ALLOW_CACHEONLY=no
 
-# Log boot-time staprun stderr to /var/run/systemtap/$script.log
+# Log boot-time staprun stderr to /run/systemtap/$script.log
 LOG_BOOT_ERR=no
 
 # Optional settings

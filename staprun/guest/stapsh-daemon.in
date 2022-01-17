@@ -11,8 +11,8 @@ if [ ! -n "$1" ]; then
    exit 1
 fi
 
-STAPSH_PID=/var/run/stapsh.$(basename $1).pid
-STAPSHD_PID=/var/run/stapshd.$(basename $1).pid
+STAPSH_PID=/run/stapsh.$(basename $1).pid
+STAPSHD_PID=/run/stapshd.$(basename $1).pid
 
 # Make sure the port exists
 if [ ! -c "$1" ]; then

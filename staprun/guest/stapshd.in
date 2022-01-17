@@ -30,7 +30,7 @@ ports() {
 count_missing() {
    missing=0
    for port in $(ports); do
-      if [ ! -f "/var/run/stapshd.$(basename $port).pid" ]; then
+      if [ ! -f "/run/stapshd.$(basename $port).pid" ]; then
          missing=$(expr $missing + 1)
       fi
    done
@@ -51,7 +51,7 @@ start() {
       return 0
    fi
    for port in $prts; do
-      pidfile="/var/run/stapshd.$(basename $port).pid"
+      pidfile="/run/stapshd.$(basename $port).pid"
       if [ ! -f "$pidfile" ]; then
          $STAPSHD "$port" &>/dev/null &
          echo $! > $pidfile
@@ -62,7 +62,7 @@ start() {
 
 # First stops stapshd instances and then the stapsh instances
 stop() {
-   for pidfile in /var/run/stapshd.$(basename $PORT_BASENAME).*.pid; do
+   for pidfile in /run/stapshd.$(basename $PORT_BASENAME).*.pid; do
       if [ -f "$pidfile" ]; then
          killproc -p $pidfile stapshd
       fi
@@ -71,7 +71,7 @@ stop() {
          rm $pidfile
       fi
    done
-   for pidfile in /var/run/stapsh.$(basename $PORT_BASENAME).*.pid; do
+   for pidfile in /run/stapsh.$(basename $PORT_BASENAME).*.pid; do
       if [ -f "$pidfile" ]; then
          killproc -p $pidfile stapsh
       fi
@@ -85,7 +85,7 @@ stop() {
 
 # Only restart if we're running
 condrestart() {
-   if [ -f "/var/run/stapshd.$(basename $PORT_BASENAME).*.pid" ]; then
+   if [ -f "/run/stapshd.$(basename $PORT_BASENAME).*.pid" ]; then
       stop
       start
    fi
@@ -112,8 +112,8 @@ status() {
 # Stops any stapshd instances that are still running for a non-existent port
 # and starts stapshd instances for any port that doesn't have one
 reload() {
-   for pidfile in /var/run/stapshd.$(basename $PORT_BASENAME).*.pid; do
-      chardev=$(basename $pidfile .pid) # trim /var/run and .pid
+   for pidfile in /run/stapshd.$(basename $PORT_BASENAME).*.pid; do
+      chardev=$(basename $pidfile .pid) # trim /run and .pid
       chardev=${chardev#stapshd.}       # trim leading 'stapshd.'
       if [ -f "$pidfile" -a ! -c "/dev/virtio-ports/$chardev" ]; then
          killproc -p $pidfile stapshd
@@ -123,8 +123,8 @@ reload() {
          fi
       fi
    done
-   for pidfile in /var/run/stapsh.$(basename $PORT_BASENAME).*.pid; do
-      chardev=$(basename $pidfile .pid) # trim /var/run and .pid
+   for pidfile in /run/stapsh.$(basename $PORT_BASENAME).*.pid; do
+      chardev=$(basename $pidfile .pid) # trim /run and .pid
       chardev=${chardev#stapsh.}        # trim leading 'stapsh.'
       if [ -f "$pidfile" -a ! -c "/dev/virtio-ports/$chardev" ]; then
          killproc -p $pidfile stapsh

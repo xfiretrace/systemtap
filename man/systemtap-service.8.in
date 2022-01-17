@@ -240,7 +240,7 @@ The cache directory should be checked before enabling this option.
 .B LOG_BOOT_ERR
 Because boot-time scripts are run before the root filesystem is mounted,
 staprun's stderr cannot be logged to the LOG_FILE as usual. However, the log
-can instead be output to /var/run/systemtap/$script.log by setting LOG_BOOT_ERR
+can instead be output to /run/systemtap/$script.log by setting LOG_BOOT_ERR
 to \fByes\fR. If STAT_PATH is different from the default, the log files will be
 moved there upon executing any of the initscript commands. The default is
 \fBno\fR.

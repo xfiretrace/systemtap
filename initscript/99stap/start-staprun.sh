@@ -4,10 +4,10 @@
 
 . /etc/systemtap-params.conf
 
-# From here, we can access /var/run (or rather what it will link to),
+# From here, we can access /run (or rather what it will link to),
 # but because $STAT_PATH is user-configurable, we're not guaranteed that
-# it will be /var/run.  Regardless, we can't have access to the final
-# root so we make do and write to /var/run/systemtap anyway. The init
+# it will be /run.  Regardless, we can't have access to the final
+# root so we make do and write to /run/systemtap anyway. The init
 # script will take care of moving the PID files to the real directory if
 # necessary.
 PIDDIR=/run/systemtap
