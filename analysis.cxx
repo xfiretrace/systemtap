@@ -230,6 +230,9 @@ int liveness(systemtap_session& s,
 	     Dwarf_Addr addr,
 	     location_context ctx)
 {
+  try{
+	// Doing this inside a try/catch because dyninst may require
+	// too much memory to parse the binary.
 	// should cache the executable names like the other things
 	analysis func_to_analyze(executable);
 	MachRegister r;
@@ -297,6 +300,11 @@ int liveness(systemtap_session& s,
 	bool used;
 	la->query(iloc, LivenessAnalyzer::Before, r, used);
 	return (used ? 1 : -1);
+  } catch (std::bad_alloc & ex){
+    s.print_warning(_F("unable to allocate memory for liveness analysis of %s",
+				   executable.c_str()), e->tok);
+    return 0;
+  }
 }
 
 #endif // HAVE_DYNINST
