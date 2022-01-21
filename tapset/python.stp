@@ -3,13 +3,13 @@
 /*
    Define python.function.entry/return:
 */
-probe python.function.entry = process("python").library("/usr/lib*/libpython*.so*").mark("function__entry")
+probe python.function.entry = process("/usr/lib*/libpython*.so*").mark("function__entry")
 {
     filename = user_string($arg1);
     funcname = user_string($arg2);
     lineno = $arg3;
 }
-probe python.function.return = process("python").library("/usr/lib*/libpython*.so*").mark("function__return")
+probe python.function.return = process("/usr/lib*/libpython*.so*").mark("function__return")
 {
     filename = user_string($arg1);
     funcname = user_string($arg2);
