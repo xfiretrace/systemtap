@@ -239,8 +239,8 @@ and average amount of time spent in each probe-point. Also shows
 the derivation for each probe-point.
 .TP
 .BI \-s " NUM"
-Use NUM megabyte buffers for kernel-to-user data transfer.  On a
-multiprocessor in bulk mode, this is a per-processor amount.
+Use NUM megabyte buffers for kernel-to-user data transfer per processor.
+The default is 16MB, or less on smaller memory machines.
 .TP
 .BI \-I " DIR"
 Add the given directory to the tapset search directory.  See the

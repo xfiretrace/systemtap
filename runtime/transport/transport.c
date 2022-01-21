@@ -72,6 +72,9 @@ static inline void _stp_unlock_inode(struct inode *inode);
 #include "procfs.c"
 #include "control.c"
 
+/* set default buffer parameters.  User may override these via stap -s #, and
+   the runtime may auto-shrink it on low memory machines too. */
+/* NB: Note default in man/stap.1.in */
 static unsigned _stp_nsubbufs = 256;
 static unsigned _stp_subbuf_size = 8 * STP_BUFFER_SIZE; /* 64K */
 
@@ -602,17 +605,29 @@ static int _stp_transport_init(void)
         _stp_need_kallsyms_stext = 0;
 #endif
 
-	if (_stp_bufsize) {
-		unsigned size = _stp_bufsize * 1024 * 1024;
+        if (_stp_bufsize == 0) { // option not specified?
+		struct sysinfo si;
+                long _stp_bufsize_avail;
+                si_meminfo(&si);
+                _stp_bufsize_avail = (long)((si.freeram + si.bufferram) / 4) << PAGE_SHIFT; // limit to quarter of free ram
+                if ((_stp_nsubbufs * _stp_subbuf_size * num_online_cpus()) > _stp_bufsize_avail) {
+                        _stp_bufsize = max_t (int, 1, _stp_bufsize_avail / 1024 / 1024);
+                        dbug_trans(1, "Shrinking default _stp_bufsize to %d MB due to low free memory\n", _stp_bufsize);
+                }
+        }      
+        
+	if (_stp_bufsize) { // overridden by user or by si_meminfo heuristic?
+		long size = _stp_bufsize * 1024 * 1024;
 		_stp_subbuf_size = 65536;
+                // bump up subbuf size from 64K to 1M to keep _stp_nsubbufs not too large
 		while (size / _stp_subbuf_size > 64 &&
 		       _stp_subbuf_size < 1024 * 1024) {
 			_stp_subbuf_size <<= 1;
 		}
 		_stp_nsubbufs = size / _stp_subbuf_size;
-		dbug_trans(1, "Using %d subbufs of size %d\n", _stp_nsubbufs, _stp_subbuf_size);
 	}
-
+        dbug_trans(1, "Using %d subbufs of size %d\n", _stp_nsubbufs, _stp_subbuf_size);
+        
 	ret = _stp_transport_fs_init(THIS_MODULE->name);
 	if (ret)
 		goto err0;
