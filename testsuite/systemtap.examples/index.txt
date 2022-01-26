@@ -2042,6 +2042,12 @@ keywords: security guru
   historical emergency security band-aid, for reference/education only
 
 
+security-band-aids/cve-2021-4034.stp - cve-2021-4034 security band-aid
+keywords: security guru
+
+  historical emergency security band-aid, for reference/education only
+
+
 security-band-aids/cve-2021-4155.stp - cve-2021-4155 security band-aid
 keywords: security guru
 
