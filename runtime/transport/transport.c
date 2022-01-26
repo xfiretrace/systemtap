@@ -75,8 +75,8 @@ static inline void _stp_unlock_inode(struct inode *inode);
 /* set default buffer parameters.  User may override these via stap -s #, and
    the runtime may auto-shrink it on low memory machines too. */
 /* NB: Note default in man/stap.1.in */
-static unsigned _stp_nsubbufs = 256;
-static unsigned _stp_subbuf_size = 8 * STP_BUFFER_SIZE; /* 64K */
+static unsigned _stp_nsubbufs = 128;
+static unsigned _stp_subbuf_size = 2 * STP_BUFFER_SIZE; /* 2 * 64K */
 
 /* module parameters */
 static int _stp_bufsize;
@@ -609,10 +609,11 @@ static int _stp_transport_init(void)
 		struct sysinfo si;
                 long _stp_bufsize_avail;
                 si_meminfo(&si);
-                _stp_bufsize_avail = (long)((si.freeram + si.bufferram) / 4) << PAGE_SHIFT; // limit to quarter of free ram
+                _stp_bufsize_avail = (long)((si.freeram + si.bufferram) / 4 / num_online_cpus())
+                        << PAGE_SHIFT; // limit to quarter of free ram total
                 if ((_stp_nsubbufs * _stp_subbuf_size * num_online_cpus()) > _stp_bufsize_avail) {
                         _stp_bufsize = max_t (int, 1, _stp_bufsize_avail / 1024 / 1024);
-                        dbug_trans(1, "Shrinking default _stp_bufsize to %d MB due to low free memory\n", _stp_bufsize);
+                        dbug_trans(1, "Shrinking default _stp_bufsize to %d MB/cpu due to low free memory\n", _stp_bufsize);
                 }
         }      
         
