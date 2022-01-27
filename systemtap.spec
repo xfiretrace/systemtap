@@ -1,3 +1,5 @@
+# Work around for rhbz2047316
+%global optflags %(echo %{optflags} -Wno-error=use-after-free)
 %{!?with_sqlite: %global with_sqlite 0%{?fedora} >= 17 || 0%{?rhel} >= 7}
 # prefer prebuilt docs
 %{!?with_docs: %global with_docs 0}
