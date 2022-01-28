@@ -1,4 +1,7 @@
 #include <stdint.h>
+#include <wchar.h>
+#include <uchar.h>
+#include <stdlib.h>
 
 static struct {
     char c8;
@@ -16,7 +19,22 @@ static struct {
     U"stap\u0391\u03A9\u263A\U0001F608",
 };
 
+mbstate_t mbs;
+
 int main()
 {
+    const char16_t* pt = strings.s16;
+    char buffer [MB_CUR_MAX];
+    size_t length;
+
+    mbrlen (NULL,0,&mbs);   /* initialize mbs */
+
+    while (*pt) {
+      length = c16rtomb(buffer,*pt,&mbs);
+      if ((length==0)||(length>MB_CUR_MAX)) break;
+      ++pt;
+    }
+
+ main_return:
     return 0;
 }

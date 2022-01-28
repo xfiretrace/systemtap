@@ -3757,7 +3757,7 @@ dwarf_pretty_print::print_chars (Dwarf_Die* start_type, target_symbol* e,
       return false;
     }
 
-  string function = userspace_p ? "user_string_quoted" : "kernel_string_quoted";
+  string function = userspace_p ? "user_string_quoted" : "kernel_or_user_string_quoted";
   Dwarf_Word size = (Dwarf_Word) -1;
   dwarf_formudata (dwarf_attr_integrate (&type, DW_AT_byte_size, &attr), &size);
   switch (size)
