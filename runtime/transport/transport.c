@@ -427,7 +427,7 @@ static void _stp_cleanup_and_exit(int send_exit)
 
 		failures = atomic_read(&_stp_transport_failures);
 		if (failures)
-			_stp_warn("There were %d transport failures.\n", failures);
+			_stp_warn("There were %d transport failures. Try stap -s to increase the buffer size.\n", failures);
 
 		dbug_trans(1, "*** calling _stp_transport_data_fs_stop ***\n");
 		_stp_transport_data_fs_stop();
