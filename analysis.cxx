@@ -26,13 +26,26 @@ using namespace std;
 // Data structures to cache dyninst parsing of binaries
 class bin_info {
 public:
-	bin_info(SymtabCodeSource *s=NULL, CodeObject *c=NULL): sts(s), co(c) {};
+  bin_info(SymtabCodeSource *s=NULL, CodeObject *c=NULL, SymtabAPI::Symtab *sym=NULL): symtab(sym), sts(s), co(c) {};
 	~bin_info(){};
+	SymtabAPI::Symtab *symtab;
 	SymtabCodeSource *sts;
 	CodeObject *co;
 };
 typedef map<string, bin_info> parsed_bin;
 static parsed_bin cached_info;
+
+// Clean things up when analysis no longer needs the cached dyninst objects
+void flush_analysis_caches()
+{
+  for(auto i: cached_info) {
+    delete i.second.co;
+    delete i.second.sts;
+    SymtabAPI::Symtab::closeSymtab(i.second.symtab);
+  }
+  cached_info.clear();
+}
+
 
 class analysis {
 public:
@@ -62,7 +75,7 @@ analysis::analysis(string name)
 	isParsable = SymtabAPI::Symtab::openFile(symTab, name_str);
 	if(!isParsable) goto cleanup;
 
-	sts = new SymtabCodeSource(name_str);
+	sts = new SymtabCodeSource(symTab);
 	if(!sts) goto cleanup;
 
 	co = new CodeObject(sts);
@@ -70,7 +83,7 @@ analysis::analysis(string name)
 
 	// Cache the info for future reference
 	{
-		bin_info entry(sts,co);
+		bin_info entry(sts,co,symTab);
 		cached_info.insert(make_pair(name,entry));
 	}
 

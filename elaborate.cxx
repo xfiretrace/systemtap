@@ -17,6 +17,7 @@
 #include "task_finder.h"
 #include "stapregex.h"
 #include "stringtable.h"
+#include "analysis.h"
 
 extern "C" {
 #include <sys/utsname.h>
@@ -1864,6 +1865,10 @@ build_no_more (systemtap_session& s)
   // Inform all derived_probe builders that we're done with
   // all resolution, so it's time to release caches.
   s.pattern_root->build_no_more (s);
+
+  // No further analysis is going to be done.
+  // Free up the memory used by the Dyninst analysis.
+  flush_analysis_caches();
 }
 
 
