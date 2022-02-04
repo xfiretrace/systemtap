@@ -151,10 +151,10 @@ private global tls_module = 0
     println ("l_map=", @var("_rtld_global","/usr/lib64/ld64.so.2")->_dl_ns[0]->_ns_loaded$);
 %)
 %( arch == "s390" %?
-  l_map_count = @var("_rtld_global","/usr/lib64/ld64.so.1")->_dl_nns
-  l_map = @var("_rtld_global","/usr/lib64/ld64.so.1")->_dl_ns[0]->_ns_loaded;
+  l_map_count = @var("_rtld_global","/usr/lib/ld64.so.1")->_dl_nns
+  l_map = @var("_rtld_global","/usr/lib/ld64.so.1")->_dl_ns[0]->_ns_loaded;
   if (tls_debug > 1) 
-    println ("l_map=", @var("_rtld_global","/usr/lib64/ld64.so.1")->_dl_ns[0]->_ns_loaded$);
+    println ("l_map=", @var("_rtld_global","/usr/lib/ld64.so.1")->_dl_ns[0]->_ns_loaded$);
 %)
      
   while (l_map)
