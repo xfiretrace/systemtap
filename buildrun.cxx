@@ -601,6 +601,9 @@ compile_pass (systemtap_session& s)
   // Accept extra diagnostic-suppression pragmas etc.
   o << "EXTRA_CFLAGS += -Wno-pragmas" << endl;
 
+  // Suppress gcc12 diagnostic bug in kernel-devel for 5.16ish
+  o << "EXTRA_CFLAGS += -Wno-infinite-recursion" << endl;
+  
   // PR25845: Recent gcc (seen on 9.3.1) warns fairly common 32-bit pointer-conversions:
   o << "EXTRA_CFLAGS += $(call cc-option,-Wno-pointer-to-int-cast)" << endl;
   o << "EXTRA_CFLAGS += $(call cc-option,-Wno-int-to-pointer-cast)" << endl;
