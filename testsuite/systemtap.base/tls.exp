@@ -72,13 +72,19 @@ foreach runtime [get_runtime_list] {
     }
 
     set ok 0
+    set nodb 0
     spawn $stap_path --runtime=$runtime -g -c $x1_exepath $srcdir/$subdir/tls1.stp $so1_sopath IGNORE
     expect {
 	-timeout 180
+	-re {WARNING:.*No DWARF information found} { incr nodb }
 	-re {In Stap(()| increase_tls): (tls1=0x[23] tls2=0x[34]|tls=99)} { incr ok; exp_continue }
 	eof { }
     }
     catch {close}; catch {wait}
+    if {$nodb != 0} {
+	untested "$test_type (missing debuginfo)"
+	return
+    }
     if {$ok == 3} {
 	pass "$test_type local tls vars"
     } else {
