@@ -1704,6 +1704,9 @@ static const _stp_val_array _stp_mfd_flags_list[] = {
 #ifdef MFD_ALLOW_SEALING
         V(MFD_ALLOW_SEALING),
 #endif
+#ifdef O_CLOEXEC
+        V(O_CLOEXEC),
+#endif
         {0, NULL}
 };
 %}

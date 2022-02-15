@@ -920,6 +920,9 @@
 #ifndef __NR_ia32_memfd_create
 #define __NR_ia32_memfd_create 356
 #endif
+#ifndef __NR_ia32_memfd_secret
+#define __NR_ia32_memfd_secret 447
+#endif
 #ifndef __NR_ia32_migrate_pages
 #define __NR_ia32_migrate_pages 294
 #endif
@@ -1999,6 +2002,7 @@
 #define __NR_compat_mbind		__NR_mbind
 #define __NR_compat_membarrier		__NR_membarrier
 #define __NR_compat_memfd_create	__NR_memfd_create
+#define __NR_compat_memfd_secret  	__NR_memfd_secret
 #define __NR_compat_migrate_pages	__NR_migrate_pages
 #define __NR_compat_mincore		__NR_mincore
 #define __NR_compat_mkdir		__NR_mkdir
