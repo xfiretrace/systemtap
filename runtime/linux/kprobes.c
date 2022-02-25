@@ -269,15 +269,17 @@ stapkp_prepare_kretprobe(struct stap_kprobe_probe *skp)
    struct kretprobe *krp = &skp->kprobe->u.krp;
    unsigned long addr = 0;
 
-   if (! skp->symbol_name) {
-      addr = stapkp_relocate_addr(skp);
-      if (addr == 0)
-	 return 1;
-      krp->kp.addr = (void *) addr;
+   // PR28557 Try a pass resolving the address now with the currently
+   // known module/section addresses within our own stap-symbols tables.
+   addr = stapkp_relocate_addr(skp);
+   if (addr != 0) {
+           krp->kp.addr = (void*) addr;
    }
-   else {
+   // fall back to kallsyms-based or kernel kprobes-delegated symbolic
+   // registration
+   else if (skp->symbol_name) {
       if (USE_KALLSYMS_ON_EACH_SYMBOL && krp->kp.addr == 0)
-	 return 1;
+	 return 4;
       else if (!USE_KALLSYMS_ON_EACH_SYMBOL) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
         if (krp->kp.symbol_name == NULL)
