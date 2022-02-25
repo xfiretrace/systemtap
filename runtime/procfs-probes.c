@@ -56,7 +56,11 @@ _stp_proc_open_file(struct inode *inode, struct file *filp)
 	struct stap_procfs_probe *spp;
 	int res;
 
+#ifdef STAPCONF_PDE_DATA2
+	spp = (struct stap_procfs_probe *)pde_data(inode);
+#else
 	spp = (struct stap_procfs_probe *)PDE_DATA(inode);
+#endif
 	if (spp == NULL) {
 		return -EINVAL;
 	}

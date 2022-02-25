@@ -28,11 +28,11 @@
 #include "uidgid_compatibility.h"
 
 
-/* If STAPCONF_PDE_DATA isn't defined, we're using the original /proc
+/* If STAPCONF_PDE_DATA* aren't defined, we're using the original /proc
  * interface (where 'struct proc_dir_entry' isn't opaque). In this
  * case allow the (undocumented) feature of slashes
  * (i.e. subdirectories) in paths. */
-#ifndef STAPCONF_PDE_DATA
+#if !defined(STAPCONF_PDE_DATA) && !defined(STAPCONF_PDE_DATA2)
 #define _STP_ALLOW_PROCFS_PATH_SUBDIRS
 #endif
 

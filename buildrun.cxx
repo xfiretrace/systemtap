@@ -430,6 +430,7 @@ compile_pass (systemtap_session& s)
   output_exportconf(s, o2, "proc_create_data", "STAPCONF_PROC_CREATE_DATA");
   output_autoconf(s, o, cs, "autoconf-proc_ops.c", "STAPCONF_PROC_OPS", NULL);
   output_exportconf(s, o2, "PDE_DATA", "STAPCONF_PDE_DATA");
+  output_autoconf(s, o, cs, "autoconf-pde_data.c", "STAPCONF_PDE_DATA2", NULL);
   output_autoconf(s, o, cs, "autoconf-module-sect-attrs.c", "STAPCONF_MODULE_SECT_ATTRS", NULL);
   output_autoconf(s, o, cs, "autoconf-kernel_read-new-args.c", "STAPCONF_KERNEL_READ_NEW_ARGS", NULL);
   output_autoconf(s, o, cs, "autoconf-utrace-via-tracepoints.c", "STAPCONF_UTRACE_VIA_TRACEPOINTS", NULL);

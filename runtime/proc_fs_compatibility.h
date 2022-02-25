@@ -17,7 +17,7 @@
 /* If STAPCONF_PDE_DATA isn't defined, we're using the original /proc
  * interface (where 'struct proc_dir_entry' isn't opaque). Provide
  * some of the new interface's functions. */
-#ifndef STAPCONF_PDE_DATA
+#if !defined(STAPCONF_PDE_DATA) && !defined(STAPCONF_PDE_DATA2)
 
 #ifndef STAPCONF_LINUX_UIDGID_H
 static void proc_set_user(struct proc_dir_entry *de, uid_t uid, gid_t gid)
