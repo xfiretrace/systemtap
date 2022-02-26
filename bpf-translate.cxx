@@ -1203,7 +1203,7 @@ bpf_unparser::emit_asm_arg (const asm_stmt &stmt, const std::string &arg,
     {
       /* arg is a register number */
       std::string reg = arg[0] == 'r' ? arg.substr(1) : arg;
-      unsigned long num;
+      unsigned long num = ULONG_MAX;
       bool parsed = false;
       try {
         num = stoul(reg, 0, 0);
@@ -1941,8 +1941,6 @@ bpf_unparser::visit_foreach_loop(foreach_loop* s)
   for (unsigned k = 0; k < arraydecl->index_types.size(); k++)
     {
       auto type = arraydecl->index_types[k];
-      if (type != pe_long && type != pe_string)
-        throw SEMANTIC_ERROR(_("unhandled foreach index type"), s->tok);
       int this_column_size;
       // PR23875: foreach should handle string keys
       if (type == pe_long)
@@ -1952,6 +1950,10 @@ bpf_unparser::visit_foreach_loop(foreach_loop* s)
       else if (type == pe_string)
         {
           this_column_size = BPF_MAXSTRINGLEN;
+        }
+      else
+        {
+          throw SEMANTIC_ERROR(_("unhandled foreach index type"), s->tok);
         }
       if (info.sort_column == k + 1) // record sort column
         {
