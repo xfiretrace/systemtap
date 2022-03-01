@@ -23,6 +23,7 @@
 import hashlib
 import os
 import sys
+import time
 from shlex import split
 from subprocess import call
 from tempfile import mkstemp
@@ -416,7 +417,14 @@ def main():
         sha.update(s_filename.encode('utf-8'))
         sha.update(filename.encode('utf-8'))
         fname = ".dtrace-temp." + sha.hexdigest()[:8] + ".c"
-        fdesc = open(fname, mode='w')
+        while True:
+            try:
+                wxmode = 'x' if sys.version_info > (3,0) else 'wx'
+                fdesc = open(fname, mode=wxmode)
+                break
+            except:
+                time.sleep(0.1) # vague estimate of elapsed time for concurrent identical gcc job
+                pass # Try again
         providers.semaphore_write(fdesc)
         fdesc.close()
         cc1 = os.environ.get("CC", "gcc")
