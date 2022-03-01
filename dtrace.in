@@ -20,6 +20,7 @@
 # pylint: disable=R0201
 # pylint: disable=R0904
 
+import hashlib
 import os
 import sys
 from shlex import split
@@ -410,12 +411,12 @@ def main():
         else:
             print("header: " + fname)
 
-        try: # for reproducible-builds purposes, prefer a fixed path name pattern
-            fname = filename + ".dtrace-temp.c"
-            fdesc = open(fname, mode='w')
-        except: # but that doesn't work for  -o /dev/null - see rhbz1504009
-            (ignore,fname) = mkstemp(suffix=".c")
-            fdesc = open(fname, mode='w')
+        # for reproducible-builds purposes, use a predictable tmpfile path
+        sha = hashlib.sha256()
+        sha.update(s_filename.encode('utf-8'))
+        sha.update(filename.encode('utf-8'))
+        fname = ".dtrace-temp." + sha.hexdigest()[:8] + ".c"
+        fdesc = open(fname, mode='w')
         providers.semaphore_write(fdesc)
         fdesc.close()
         cc1 = os.environ.get("CC", "gcc")
