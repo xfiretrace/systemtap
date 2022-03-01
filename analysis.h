@@ -27,7 +27,7 @@ extern void flush_analysis_caches();
 #else
 
 #define liveness(session, target, executable, location, var) (0)
-#define flush_analysis_caches() (0)
+#define flush_analysis_caches() {/* nothing to do */}
 
 #endif // HAVE_DYNINST
 #endif // ANALYSIS_H
