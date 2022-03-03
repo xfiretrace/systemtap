@@ -12,7 +12,11 @@ probe begin
 	printf("systemtap starting probe\n")
 }
 
-probe kprobe.module("stap_kmodule").function("stm_write_cmd")
+%( $# == 1 %?
+probe kprobe.module("stap_kmodule").function("simple_timer_function").$1
+%:
+probe kprobe.module("stap_kmodule").function("simple_timer_function")
+%)
 {
 	++count;
 }
@@ -20,5 +24,5 @@ probe kprobe.module("stap_kmodule").function("stm_write_cmd")
 probe end
 {
 	printf("systemtap ending probe\n")
-	printf("count = %d\n", count)
+	printf("count = %d\n", count ? 1 : 0)
 }

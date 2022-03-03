@@ -57,16 +57,6 @@ proc cleanup_module {} {
     }
 }
 
-proc kmodule_load {} {
-    # Trigger the test module
-    if {[file exists /proc/stap_kmodule_cmd]} {
-	catch {exec echo 0 > /proc/stap_kmodule_cmd}
-	return 0
-    } else {
-	return 1
-    }
-}
-
 proc kmodule_load2 {} {
     global build_dir
 
@@ -81,20 +71,7 @@ proc kmodule_load2 {} {
 	return 1
     }
 
-    # Trigger the test module
-    if {[file exists /proc/stap_kmodule_cmd]} {
-	catch {exec echo 0 > /proc/stap_kmodule_cmd}
-	return 0
-    } else {
-	return 1
-    }
-
-    # Unload the test module
-    set res [as_root [list /sbin/rmmod stap_kmodule]]
-    if { $res != 0 } {
-	verbose -log "$res"
-	return 1
-    }
+    return 0
 }
 
 set output_string "count = 1\r\n"
@@ -108,10 +85,18 @@ if {[build_and_install_module] == 0} {
 }
 
 # Test 'module("foo").function("bar")
-stap_run $test kmodule_load $output_string $srcdir/$subdir/$test.stp
+sleep 1
+stap_run $test "" $output_string $srcdir/$subdir/$test.stp
+# Test 'module("foo").function("bar").return
+sleep 1
+stap_run "$test return" "" $output_string $srcdir/$subdir/$test.stp return
 
 # Test 'kprobe.module("foo").function("bar")
-stap_run $test2 kmodule_load $output_string $srcdir/$subdir/$test2.stp
+sleep 1
+stap_run $test2 "" $output_string $srcdir/$subdir/$test2.stp
+# Test 'kprobe.module("foo").function("bar").return
+sleep 1
+stap_run "$test2 return" "" $output_string $srcdir/$subdir/$test2.stp return
 
 # Now let's test and see if the same scripts work when the test module
 # is loaded *after* the systemtap script starts.
@@ -122,16 +107,19 @@ if {![module_refresh_p]} {
     cleanup_module
     return
 }
+
 as_root [list /sbin/rmmod stap_kmodule]
 
 # Test 'module("foo").function("bar")
 set test_file "$subdir/$test.stp"
-stap_run "$test_file $test_suffix" kmodule_load2 \
+sleep 1
+stap_run "$test $test_suffix" kmodule_load2 \
     $output_string $srcdir/$test_file
 
 # Test 'kprobe.module("foo").function("bar")
 set test_file "$subdir/$test2.stp"
-stap_run "$test_file $test_suffix" kmodule_load2 \
+sleep 1
+stap_run "$test2 $test_suffix" kmodule_load2 \
     $output_string $srcdir/$test_file
 
 cleanup_module
