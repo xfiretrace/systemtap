@@ -24,6 +24,7 @@ import hashlib
 import os
 import sys
 import time
+import atexit
 from shlex import split
 from subprocess import call
 from tempfile import mkstemp
@@ -417,10 +418,17 @@ def main():
         sha.update(s_filename.encode('utf-8'))
         sha.update(filename.encode('utf-8'))
         fname = ".dtrace-temp." + sha.hexdigest()[:8] + ".c"
+        tries = 0
         while True:
+            tries += 1
+            if tries > 100: # if file exists due to previous crash or whatever
+                print("cannot create temporary file \""+fname+"\"")
+                return 1
             try:
                 wxmode = 'x' if sys.version_info > (3,0) else 'wx'
                 fdesc = open(fname, mode=wxmode)
+                if not keep_temps:
+                   atexit.register(os.remove, fname) # delete generated source at exit, even if error
                 break
             except:
                 time.sleep(0.1) # vague estimate of elapsed time for concurrent identical gcc job
@@ -437,9 +445,7 @@ def main():
             print("\"gcc " + fname + "\" failed")
             usage()
             return 1
-        if not keep_temps:
-            os.remove(fname)
-        else:
+        if keep_temps:
             print("source: " + fname)
 
     if use_cpp:
