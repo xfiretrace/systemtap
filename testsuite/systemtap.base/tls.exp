@@ -3,6 +3,10 @@ set stap_path $env(SYSTEMTAP_PATH)/stap
 
 # exp_internal 1
 
+# tls not supported on aarch64: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=97344
+set arch [exec uname -i]
+if {$arch eq "aarch64"} { untested $test; return }
+
 set so_flags "additional_flags=-shared"
 set so_flags "$so_flags additional_flags=-g"
 set so_flags "$so_flags additional_flags=-fPIC"
