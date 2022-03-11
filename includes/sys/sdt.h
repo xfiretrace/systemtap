@@ -100,8 +100,6 @@
 # ifndef STAP_SDT_ARG_CONSTRAINT
 # if defined __powerpc__
 # define STAP_SDT_ARG_CONSTRAINT        nZr
-# elif defined __x86_64__
-# define STAP_SDT_ARG_CONSTRAINT norx
 # elif defined __arm__
 # define STAP_SDT_ARG_CONSTRAINT        g
 # else
