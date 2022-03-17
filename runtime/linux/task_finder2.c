@@ -359,7 +359,7 @@ stap_register_task_finder_target(struct stap_task_finder_target *new_tgt)
 	// target to the task list.
 	if (! found_node) {
 		INIT_LIST_HEAD(&new_tgt->callback_list_head);
-		list_add(&new_tgt->list, &__stp_task_finder_list);
+		list_add_tail(&new_tgt->list, &__stp_task_finder_list);
 		tgt = new_tgt;
 	}
 
