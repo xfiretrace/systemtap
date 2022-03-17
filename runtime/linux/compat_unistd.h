@@ -61,6 +61,9 @@
 #ifndef __NR_compat_bdflush
 #define __NR_compat_bdflush (__NR_syscall_max + 1)
 #endif
+#ifndef __NR_compat_memfd_secret
+#define __NR_compat_memfd_secret (__NR_syscall_max + 1)
+#endif
 #ifndef __NR_connect
 #define __NR_connect (__NR_syscall_max + 1)
 #endif
@@ -192,6 +195,9 @@
 #endif
 #ifndef __NR_membarrier
 #define __NR_membarrier (__NR_syscall_max + 1)
+#endif
+#ifndef __NR_memfd_secret
+#define __NR_memfd_secret (__NR_syscall_max + 1)
 #endif
 #ifndef __NR_migrate_pages
 #define __NR_migrate_pages (__NR_syscall_max + 1)
