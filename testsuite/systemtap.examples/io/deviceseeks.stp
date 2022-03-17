@@ -23,10 +23,10 @@ probe ioblock_trace.request {
   queue =  @defined ($q) ? $q
     : @choose_defined($bio->bi_bdev->bd_disk->queue, $bio->bi_disk->queue)
   sectorsize = (@defined(@q_cast(queue)->limits->logical_block_size) ?
-		queue->limits->logical_block_size :
+		@q_cast(queue)->limits->logical_block_size :
 		(@defined(@q_cast(queue)->logical_block_size) ?
-		 queue->logical_block_size :
-		 queue->hardsect_size ))
+		 @q_cast(queue)->logical_block_size :
+		 @q_cast(queue)->hardsect_size ))
   # printf("%s %s\n", devname, rw ? "w" : "r")
   sec = sector
   seeks[devname] <<< sec - oldsec[devname]
