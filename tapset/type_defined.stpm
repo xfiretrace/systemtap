@@ -3,7 +3,7 @@
 %)
 
 @define type_member_defined(type, member) %(
-    @defined(& @cast(0, @type) -> @member)
+    @defined(& @cast(0, @type , "kernel") -> @member)
 %)
 
 @define module_type_defined(module, type) %(

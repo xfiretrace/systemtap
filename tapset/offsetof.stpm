@@ -1,5 +1,5 @@
 @define offsetof(type, member) %(
-    ( & @cast(0, @type) -> @member )
+    ( & @cast(0, @type, "kernel") -> @member )
 %)
 
 @define module_offsetof(module, type, member) %(
