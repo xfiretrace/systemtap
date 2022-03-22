@@ -13240,6 +13240,7 @@ all_session_groups(systemtap_session& s)
   // unregister (actually run) end probes after every other probe type
   // has be unregistered.  To do the latter,
   // c_unparser::emit_module_exit() will run this list backwards.
+  DOONE(vma_tracker);
   DOONE(be);
   DOONE(generic_kprobe);
   DOONE(uprobe);

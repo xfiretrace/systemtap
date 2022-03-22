@@ -5102,6 +5102,7 @@ translate_bpf_pass (systemtap_session& s)
       if (s.python_derived_probes)
         warn_for_bpf(s, s.python_derived_probes, "python probe");
       // s.task_finder_derived_probes -- synthetic
+      // s.vma_tracker_derived_probes -- synthetic
       // s.dynprobe_derived_probes -- synthetic, dyninst only
 
       output_kernel_version(eo, s.kernel_base_release);

@@ -23,9 +23,9 @@ using namespace __gnu_cxx;
 
 
 // ------------------------------------------------------------------------
-// task_finder derived 'probes': These don't really exist.  The whole
-// purpose of the task_finder_derived_probe_group is to make sure that
-// stap_start_task_finder()/stap_stop_task_finder() get called only
+// task_finder and vma tracker derived 'probes': These don't really exist.
+// The purpose of these is to ensure that _stp_vma_init()/_stp_vma_done()
+// and stap_start_task_finder()/stap_stop_task_finder() get called only
 // once and in the right place.
 // ------------------------------------------------------------------------
 
@@ -33,6 +33,12 @@ struct task_finder_derived_probe: public derived_probe
 {
   // Dummy constructor for gcc 3.4 compatibility
   task_finder_derived_probe (): derived_probe (0, 0) { assert(0); }
+};
+
+struct vma_tracker_derived_probe: public derived_probe
+{
+  // Dummy constructor for gcc 3.4 compatibility
+  vma_tracker_derived_probe (): derived_probe (0, 0) { assert(0); }
 };
 
 
@@ -43,9 +49,14 @@ public:
   void emit_module_init (systemtap_session& s);
   void emit_module_post_init (systemtap_session& s);
   void emit_module_exit (systemtap_session& s);
+};
 
-  // Whether or not to initialize the vma tracker
-  bool need_vma_tracker;
+struct vma_tracker_derived_probe_group: public generic_dpg<vma_tracker_derived_probe>
+{
+public:
+  void emit_module_decls (systemtap_session& ) { }
+  void emit_module_init (systemtap_session& s);
+  void emit_module_exit (systemtap_session& s);
 };
 
 
@@ -53,22 +64,8 @@ void
 task_finder_derived_probe_group::emit_module_init (systemtap_session& s)
 {
   s.op->newline();
-  if (need_vma_tracker)
-    {
-      s.op->newline() << "/* ---- vma tracker ---- */";
-      s.op->newline() << "rc = _stp_vma_init();";
-      s.op->newline();
-    }
-
   s.op->newline() << "/* ---- task finder ---- */";
-  s.op->newline() << "if (rc == 0) {";
-  s.op->newline(1) << "rc = stap_start_task_finder();";
-
-  s.op->newline() << "if (rc) {";
-  s.op->newline(1) << "stap_stop_task_finder();";
-  s.op->newline() << "_stp_vma_done();";
-  s.op->newline(-1) << "}";
-  s.op->newline(-1) << "}";
+  s.op->newline() << "rc = stap_start_task_finder();";
 }
 
 
@@ -86,13 +83,24 @@ task_finder_derived_probe_group::emit_module_exit (systemtap_session& s)
   s.op->newline();
   s.op->newline() << "/* ---- task finder ---- */";
   s.op->newline() << "stap_stop_task_finder();";
+}
 
-  if (need_vma_tracker)
-    {
-      s.op->newline();
-      s.op->newline() << "/* ---- vma tracker ---- */";
-      s.op->newline() << "_stp_vma_done();";
-    }
+
+void
+vma_tracker_derived_probe_group::emit_module_init (systemtap_session& s)
+{
+  s.op->newline();
+  s.op->newline() << "/* ---- vma tracker ---- */";
+  s.op->newline() << "rc = _stp_vma_init();";
+}
+
+
+void
+vma_tracker_derived_probe_group::emit_module_exit (systemtap_session& s)
+{
+  s.op->newline();
+  s.op->newline() << "/* ---- vma tracker ---- */";
+  s.op->newline() << "_stp_vma_done();";
 }
 
 
@@ -101,10 +109,7 @@ void
 enable_task_finder(systemtap_session& s)
 {
   if (! s.task_finder_derived_probes)
-    {
-      s.task_finder_derived_probes = new task_finder_derived_probe_group();
-      s.task_finder_derived_probes->need_vma_tracker = false;
-    }
+    s.task_finder_derived_probes = new task_finder_derived_probe_group();
 }
 
 // Declare that vma tracker is needed in this session,
@@ -113,15 +118,15 @@ void
 enable_vma_tracker(systemtap_session& s)
 {
   enable_task_finder(s);
-  s.task_finder_derived_probes->need_vma_tracker = true;
+  if (! s.vma_tracker_derived_probes)
+    s.vma_tracker_derived_probes = new vma_tracker_derived_probe_group();
 }
 
 // Whether the vma tracker is needed in this session.
 bool
 vma_tracker_enabled(systemtap_session& s)
 {
-  return (s.task_finder_derived_probes
-	  && s.task_finder_derived_probes->need_vma_tracker);
+  return s.vma_tracker_derived_probes;
 }
 
 /* vim: set sw=2 ts=8 cino=>4,n-2,{2,^-2,t0,(0,u0,w1,M1 : */
