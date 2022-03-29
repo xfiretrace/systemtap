@@ -6,6 +6,7 @@
 // Public License (GPL); either version 2, or (at your option) any
 // later version.
 
+#include <vector>
 #include "../nsscommon.h"
 #include "../cscommon.h"
 #include "../util.h"
