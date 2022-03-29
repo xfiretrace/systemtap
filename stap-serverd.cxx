@@ -73,28 +73,6 @@ static PRStatus spawn_and_wait (const vector<string> &argv, int *result,
                                 const char* fd0, const char* fd1, const char* fd2,
 				const char *pwd, const vector<string>& envVec = vector<string> ());
 
-#define MOK_PRIVATE_CERT_NAME "signing_key.priv"
-#define MOK_PRIVATE_CERT_FILE "/" MOK_PRIVATE_CERT_NAME
-#define MOK_CONFIG_FILE "/x509.genkey"
-// MOK_CONFIG_TEXT is the default MOK config text used when creating
-// new MOKs. This text is saved to the MOK config file. Once we've
-// created it, the server administrator can modify it.
-#define MOK_CONFIG_TEXT \
-  "[ req ]\n"						\
-  "default_bits = 4096\n"				\
-  "distinguished_name = req_distinguished_name\n"	\
-  "prompt = no\n"					\
-  "x509_extensions = myexts\n"				\
-  "\n"							\
-  "[ req_distinguished_name ]\n"			\
-  "O = Systemtap\n"					\
-  "CN = Systemtap module signing key\n"			\
-  "\n"							\
-  "[ myexts ]\n"					\
-  "basicConstraints=critical,CA:FALSE\n"		\
-  "keyUsage=digitalSignature\n"				\
-  "subjectKeyIdentifier=hash\n"				\
-  "authorityKeyIdentifier=keyid\n"
 
 /* getopt variables */
 extern int optind;
@@ -365,84 +343,6 @@ setup_signals (sighandler_t handler)
   sigaction (SIGXCPU, &sa, NULL);
 }
 
-// Does the server contain a valid directory for the MOK fingerprint?
-bool
-mok_dir_valid_p (string mok_fingerprint, bool verbose)
-{
-  string mok_dir = mok_path + "/" + mok_fingerprint;
-  DIR *dirp = opendir (mok_dir.c_str());
-  if (dirp == NULL)
-    {
-      // We can't open the directory. Just quit.
-      if (verbose)
-	server_error (_F("Could not open server MOK fingerprint directory %s: %s",
-		      mok_dir.c_str(), strerror(errno)));
-      return false;
-    }
-
-  // Find both the x509 certificate and private key files.
-  bool priv_found = false;
-  bool cert_found = false;
-  struct dirent *direntp;
-  while ((direntp = readdir (dirp)) != NULL)
-    {
-      bool reg_file = false;
-
-      if (direntp->d_type == DT_REG)
-	reg_file = true;
-      else if (direntp->d_type == DT_UNKNOWN)
-        {
-	  struct stat tmpstat;
-
-	  // If the filesystem doesn't support d_type, we'll have to
-	  // call stat().
-	  int rc = stat((mok_dir + "/" + direntp->d_name).c_str (), &tmpstat);
-	  if (rc == 0 && S_ISREG(tmpstat.st_mode))
-	      reg_file = true;
-        }
-      
-      if (! priv_found && reg_file
-	  && strcmp (direntp->d_name, MOK_PRIVATE_CERT_NAME) == 0)
-        {
-	  priv_found = true;
-	  continue;
-	}
-      if (! cert_found && reg_file
-	  && strcmp (direntp->d_name, MOK_PUBLIC_CERT_NAME) == 0)
-        {
-	  cert_found = true;
-	  continue;
-	}
-      if (priv_found && cert_found)
-	break;
-    }
-  closedir (dirp);
-  if (! priv_found || ! cert_found)
-    {
-      // We didn't find one (or both) of the required files. Quit.
-      if (verbose)
-	server_error (_F("Could not find server MOK files in directory %s",
-			 mok_dir.c_str ()));
-      return false;
-    }
-
-  // Grab info from the cert.
-  string fingerprint;
-  if (read_cert_info_from_file (mok_dir + MOK_PUBLIC_CERT_FILE, fingerprint)
-      == SECSuccess)
-    {
-      // Make sure the fingerprint from the certificate matches the
-      // directory name.
-      if (fingerprint != mok_fingerprint)
-        {
-	  if (verbose)
-	      server_error (_F("Server MOK directory name '%s' doesn't match fingerprint from certificate %s",
-			       mok_dir.c_str(), fingerprint.c_str()));
-	  return false;
-	}
-    }
-  return true;
-}
 
 // Get the list of MOK fingerprints on the server. If
 // 'only_one_needed' is true, just return the first MOK.
@@ -520,7 +420,7 @@ get_server_mok_fingerprints(vector<string> &mok_fingerprints, bool verbose,
   vector<string>::const_iterator it;
   for (it = temp.begin (); it != temp.end (); it++)
     {
-      if (mok_dir_valid_p (*it, true))
+      if (mok_dir_valid_p (*it, true, server_error))
         {
 	  // Save the info.
 	  mok_fingerprints.push_back (*it);
@@ -1500,37 +1400,6 @@ get_client_mok_fingerprints (const string &filename,
   regfree(&checkre);
 }
 
-bool
-mok_sign_file (std::string &mok_fingerprint,
-	       const std::string &kernel_build_tree,
-	       const std::string &name,
-	       std::string stapstderr)
-{
-  int rc;
-  string mok_directory = mok_path + "/" + mok_fingerprint;
-
-  vector<string> cmd
-    {
-      kernel_build_tree + "/scripts/sign-file",
-      "sha512",
-      mok_directory + MOK_PRIVATE_CERT_FILE,
-      mok_directory + MOK_PUBLIC_CERT_FILE,
-      name
-    };
-
-  rc = stap_system (0, cmd);
-  if (rc != 0) 
-    {
-      client_error (_F("Running sign-file failed, rc = %d", rc), stapstderr);
-      return false;
-    }
-  else
-    {
-      client_error (_F("Module signed with MOK, fingerprint \"%s\"",
-		       mok_fingerprint.c_str()), stapstderr);
-      return true;
-    }
-}
 
 // Filter paths prefixed with the server's home directory from the given file.
 //
@@ -1614,106 +1483,6 @@ getRequestedPrivilege (const vector<string> &stapargv)
   return privilege;
 }
 
-static void
-generate_mok(string &mok_fingerprint)
-{
-  vector<string> cmd;
-  int rc;
-  char tmpdir[PATH_MAX] = { '\0' };
-  string public_cert_path, private_cert_path, destdir;
-  mode_t old_umask;
-  int retlen;
-
-  mok_fingerprint.clear ();
-
-  // Set umask so that everything is private.
-  old_umask = umask(077);
-
-  // Make sure the config file exists. If not, create it with default
-  // contents.
-  string config_path = mok_path + MOK_CONFIG_FILE;
-  if (! file_exists (config_path))
-    {
-      ofstream config_stream;
-      config_stream.open (config_path.c_str ());
-      if (! config_stream.good ())
-        {
-	  server_error (_F("Could not open MOK config file %s: %s",
-			   config_path.c_str (), strerror (errno)));
-	  goto cleanup;
-	}
-      config_stream << MOK_CONFIG_TEXT;
-      config_stream.close ();
-    }
-
-  // Make a temporary directory to store results in.
-  retlen = snprintf (tmpdir, PATH_MAX, "%s/stap-server.XXXXXX", mok_path.c_str ());
-  if (retlen < 0 || retlen >= PATH_MAX)
-    {
-      server_error (_F("Could not create %s name", "temporary directory"));
-      tmpdir[0] = '\0';
-      goto cleanup;
-    }
-
-  if (mkdtemp (tmpdir) == NULL)
-    {
-      server_error (_F("Could not create temporary directory %s: %s", tmpdir, 
-		       strerror (errno)));
-      tmpdir[0] = '\0';
-      goto cleanup;
-    }
-
-  // Actually generate key using openssl.
-  public_cert_path = tmpdir + string (MOK_PUBLIC_CERT_FILE);
-  private_cert_path = tmpdir + string (MOK_PRIVATE_CERT_FILE);
-
-  cmd =
-    {
-      "openssl", "req", "-new", "-nodes", "-utf8",
-      "-sha256", "-days", "36500", "-batch", "-x509",
-      "-config", config_path,
-      "-outform", "DER",
-      "-out", public_cert_path,
-      "-keyout", private_cert_path
-    };
-  rc = stap_system (0, cmd);
-  if (rc != 0) 
-    {
-      server_error (_F("Generating MOK failed, rc = %d", rc));
-      goto cleanup;
-    }
-
-  // Grab the fingerprint from the cert.
-  if (read_cert_info_from_file (public_cert_path, mok_fingerprint)
-      != SECSuccess)
-    goto cleanup;
-
-  // Once we know the fingerprint, rename the temporary directory.
-  destdir = mok_path + "/" + mok_fingerprint;
-  if (rename (tmpdir, destdir.c_str ()) < 0)
-    {
-      server_error (_F("Could not rename temporary directory %s to %s: %s",
-		       tmpdir, destdir.c_str (), strerror (errno)));
-      goto cleanup;
-    }
-
-  // Restore the old umask.
-  umask(old_umask);
-
-  return;
-
-cleanup:
-  // Remove the temporary directory.
-  cmd = { "rm", "-rf", tmpdir };
-  rc = stap_system (0, cmd);
-  if (rc != 0)
-    server_error (_("Error in tmpdir cleanup"));
-  mok_fingerprint.clear ();
-
-  // Restore the old umask.
-  umask(old_umask);
-  return;
-}
 
 /* Run the translator on the data in the request directory, and produce output
    in the given output directory. */
@@ -1882,7 +1651,7 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
       for (it = client_mok_fingerprints.begin();
 	   it != client_mok_fingerprints.end(); it++)
         {
-	  if (mok_dir_valid_p (*it, false))
+	  if (mok_dir_valid_p (*it, false, server_error))
 	    {
 	      mok_fingerprint = *it;
 	      break;
@@ -1946,9 +1715,15 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
 	      // If we signing the module failed, change the staprc to
 	      // 1, so that the client won't try to run the resulting
 	      // module, which wouldn't work.
-	      if (! mok_sign_file (mok_fingerprint, kernel_build_tree[kernel_version],
-				   globber.gl_pathv[0], stapstderr))
-		staprc = 1;
+	      if (int rc = mok_sign_file (mok_fingerprint, kernel_build_tree[kernel_version],
+					  globber.gl_pathv[0])) 
+		{
+		  client_error (_F("Running sign-file failed, rc = %d", rc), stapstderr);
+		  staprc = 1;
+		}
+	      else
+		cerr << _F("Module signed with MOK, fingerprint \"%s\"", //
+			   mok_fingerprint.c_str()) << endl;
 	    }
 	  else if (! client_mok_fingerprints.empty ())
 	    {
@@ -1972,7 +1747,7 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
 	      if (mok_fingerprints.empty ())
 	        {
 		  // Generate a new MOK.
-		  generate_mok(mok_fingerprint);
+		  generate_mok(mok_fingerprint, server_error);
 		}
 	      else
 	        {
@@ -2048,8 +1823,13 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
       // requires signed modules. The error will have been generated
       // above on the systemtap module itself.
       if (! mok_fingerprint.empty ())
-	mok_sign_file (mok_fingerprint, kernel_build_tree[kernel_version], uprobes_response,
-		       stapstderr);
+	{
+	  if (int rc = mok_sign_file (mok_fingerprint, kernel_build_tree[kernel_version], uprobes_response))
+	    client_error (_F("Running sign-file failed, rc = %d", rc), stapstderr);
+	  else
+	    cerr << _F("Module signed with MOK, fingerprint \"%s\"", //
+		       mok_fingerprint.c_str()) << endl;
+	}
     }
 
   /* Free up all the arg string copies.  Note that the first few were alloc'd

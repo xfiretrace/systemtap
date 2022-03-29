@@ -2,6 +2,9 @@
 #ifndef CSCOMMON_H
 #define CSCOMMON_H 1
 
+#define MOK_PRIVATE_CERT_NAME "signing_key.priv"
+#define MOK_PRIVATE_CERT_FILE "/" MOK_PRIVATE_CERT_NAME
+#define MOK_CONFIG_FILE "/x509.genkey"
 #define MOK_PUBLIC_CERT_NAME "signing_key.x509"
 #define MOK_PUBLIC_CERT_FILE "/" MOK_PUBLIC_CERT_NAME
 
@@ -63,6 +66,14 @@ struct thread_arg
 
 extern int read_from_file (const std::string &fname, cs_protocol_version &data);
 extern std::string get_cert_serial_number (const CERTCertificate *cert);
+extern int mok_sign_file (std::string &mok_fingerprint, 
+			   const std::string &kernel_build_tree,
+			   const std::string &name);
+extern void generate_mok (std::string &mok_fingerprint, void report_error(const std::string &msg, int logit));
+extern void sign_module (std::string tmpdir, std::string module_filename, std::vector<std::string> mok_fingerprints, std::string kernel_build_tree);
+extern bool mok_dir_valid_p (std::string mok_fingerprint, bool verbose, void report_error (const std::string& msg, int logit));
+
+
 #endif
 
 #endif // CSCOMMON_H

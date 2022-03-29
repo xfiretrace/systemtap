@@ -293,6 +293,9 @@ public:
   bool modules_must_be_signed();
   void get_mok_info();
 
+  bool module_sign_given;
+  std::string module_sign_mok_path;
+
   // NB: It is very important for all of the above (and below) fields
   // to be cleared in the systemtap_session ctor (session.cxx).
 

@@ -28,6 +28,7 @@ struct option stap_long_options[] = {
   { "use-server-on-error",         optional_argument, NULL, LONG_OPT_USE_SERVER_ON_ERROR },
   { "use-http-server",             required_argument, NULL, LONG_OPT_USE_HTTP_SERVER },
   { "all-modules",                 no_argument,       NULL, LONG_OPT_ALL_MODULES },
+  { "sign-module",                 optional_argument, NULL, LONG_OPT_SIGN_MODULE },
   { "remote",                      required_argument, NULL, LONG_OPT_REMOTE },
   { "remote-prefix",               no_argument,       NULL, LONG_OPT_REMOTE_PREFIX },
   { "check-version",               no_argument,       NULL, LONG_OPT_CHECK_VERSION },

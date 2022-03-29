@@ -13,6 +13,7 @@
 #if HAVE_NSS
 #include "util.h"
 #include "cscommon.h"
+#include "nsscommon.h"
 
 #include <fstream>
 #include <string>
@@ -25,6 +26,9 @@
 extern "C"
 {
 #include <ssl.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <unistd.h>
 }
 
 using namespace std;
@@ -128,4 +132,262 @@ string get_cert_serial_number (const CERTCertificate *cert)
     }
   return serialNumber.str ();
 }
+
+int
+mok_sign_file (std::string &mok_fingerprint,
+	       const std::string &kernel_build_tree,
+	       const std::string &name)
+{
+  string mok_path = server_cert_db_path() + "/moks";
+  string mok_directory = mok_path + "/" + mok_fingerprint;
+
+  vector<string> cmd
+    {
+      kernel_build_tree + "/scripts/sign-file",
+      "sha512",
+      mok_directory + MOK_PRIVATE_CERT_FILE,
+      mok_directory + MOK_PUBLIC_CERT_FILE,
+      name
+    };
+
+  return stap_system (0, cmd);
+}
+
+
+void
+generate_mok(string &mok_fingerprint, void report_error (const string& msg, int logit))
+{
+  string mok_path = server_cert_db_path() + "/moks";
+  vector<string> cmd;
+  int rc;
+  char tmpdir[PATH_MAX] = { '\0' };
+  string public_cert_path, private_cert_path, destdir;
+  string msg;
+  mode_t old_umask;
+  int retlen;
+// The default MOK config text used when creating new MOKs. This text is 
+// saved to the MOK config file and can be modified by the administrator.
+  const char mok_config_text[] =
+  "[ req ]\n"						
+  "default_bits = 4096\n"				
+  "distinguished_name = req_distinguished_name\n"	
+  "prompt = no\n"					
+  "x509_extensions = myexts\n"				
+  "\n"							
+  "[ req_distinguished_name ]\n"			
+  "O = Systemtap\n"					
+  "CN = Systemtap module signing key\n"			
+  "\n"							
+  "[ myexts ]\n"					
+  "basicConstraints=critical,CA:FALSE\n"		
+  "keyUsage=digitalSignature\n"				
+  "subjectKeyIdentifier=hash\n"				
+  "authorityKeyIdentifier=keyid\n";
+
+  mok_fingerprint.clear ();
+
+  // Set umask so that everything is private.
+  old_umask = umask(077);
+
+  DIR *dirp = opendir (mok_path.c_str());
+  if (dirp == NULL)
+    {
+      if (create_dir (mok_path.c_str (), 0755) != 0)
+	report_error (_F("Unable to find or create the MOK directory %s: %s",
+			 mok_path.c_str (), strerror (errno)), false);
+    }
+  else
+    closedir (dirp);
+
+  // Make sure the config file exists. If not, create it with default
+  // contents.
+  string config_path = mok_path + MOK_CONFIG_FILE;
+  if (! file_exists (config_path))
+    {
+      ofstream config_stream;
+      config_stream.open (config_path.c_str ());
+      if (! config_stream.good ())
+        {
+	  msg = _F("Could not open MOK config file %s: %s",
+		   config_path.c_str (), strerror (errno));
+	  report_error (msg, true);
+	  goto cleanup;
+	}
+      config_stream << mok_config_text;
+      config_stream.close ();
+    }
+
+  // Make a temporary directory to store results in.
+  retlen = snprintf (tmpdir, PATH_MAX, "%s/stap-server.XXXXXX", mok_path.c_str ());
+  if (retlen < 0 || retlen >= PATH_MAX)
+    {
+      msg = _F("Could not create %s name", "temporary directory");
+      report_error (msg, true);
+      tmpdir[0] = '\0';
+      goto cleanup;
+    }
+
+  if (mkdtemp (tmpdir) == NULL)
+    {
+      msg = _F("Could not create temporary directory %s: %s", tmpdir, 
+		       strerror (errno));
+      report_error (msg, true);
+      tmpdir[0] = '\0';
+      goto cleanup;
+    }
+
+  // Actually generate key using openssl.
+  public_cert_path = tmpdir + string (MOK_PUBLIC_CERT_FILE);
+  private_cert_path = tmpdir + string (MOK_PRIVATE_CERT_FILE);
+
+  cmd =
+    {
+      "openssl", "req", "-new", "-nodes", "-utf8",
+      "-sha256", "-days", "36500", "-batch", "-x509",
+      "-config", config_path,
+      "-outform", "DER",
+      "-out", public_cert_path,
+      "-keyout", private_cert_path
+    };
+  rc = stap_system (0, cmd);
+  if (rc != 0) 
+    {
+      msg = _F("Generating MOK failed, rc = %d", rc);
+      report_error (msg, true);
+      goto cleanup;
+    }
+
+  // Grab the fingerprint from the cert.
+  if (read_cert_info_from_file (public_cert_path, mok_fingerprint)
+      != SECSuccess)
+    goto cleanup;
+
+  // Once we know the fingerprint, rename the temporary directory.
+  destdir = mok_path + "/" + mok_fingerprint;
+  if (rename (tmpdir, destdir.c_str ()) < 0)
+    {
+      msg = _F("Could not rename temporary directory %s to %s: %s",
+	       tmpdir, destdir.c_str (), strerror (errno));
+      report_error (msg, true);
+      goto cleanup;
+    }
+
+  // Restore the old umask.
+  umask(old_umask);
+
+  return;
+
+cleanup:
+  // Remove the temporary directory.
+  cmd = { "rm", "-rf", tmpdir };
+  rc = stap_system (0, cmd);
+  if (rc != 0)
+    {
+      msg = _("Error in tmpdir cleanup");
+      report_error (msg, true);
+    }
+  mok_fingerprint.clear ();
+
+  // Restore the old umask.
+  umask(old_umask);
+  return;
+}
+
+
+static void
+client_error (const string &msg, int logit __attribute__ ((unused)) = 0)
+{
+  cerr << _(msg.c_str()) << endl;
+}
+
+void sign_module(std::string tmpdir, std::string module_filename,
+                 std::vector<std::string> mok_fingerprints, std::string kernel_build_tree)
+{
+  string module_src_path = tmpdir + "/" + module_filename;
+
+  PR_Init (PR_SYSTEM_THREAD, PR_PRIORITY_NORMAL, 1);
+  /* Set the cert database password callback. */
+  PK11_SetPasswordFunc (nssPasswordCallback);
+
+  NSSInitContext *context = nssInitContext (server_cert_db_path().c_str());
+  if (!context)
+    cerr << "nssInitContext failed for " << server_cert_db_path();
+
+  bool module_signed = false;
+  int rc;
+  string mok_fingerprint;
+  for (auto it = mok_fingerprints.cbegin(); it != mok_fingerprints.cend(); it++)
+    {
+      mok_fingerprint = *it;
+      if (! mok_dir_valid_p (*it, false, client_error))
+	continue;
+      
+      if ((rc = mok_sign_file (mok_fingerprint, kernel_build_tree, module_src_path)) == 0)
+	{
+	  cerr << (_F("Module signed with MOK, fingerprint \"%s\"", //
+		      mok_fingerprint.c_str())) << endl;
+	  module_signed = true;
+	}
+    }
+
+  if (! module_signed)
+    {
+      generate_mok (mok_fingerprint, client_error);
+      cerr << (_("Running sign-file failed\n"))
+	   << (_F("The server has no machine owner key (MOK) in common with this\nsystem. Use the following command to import a server MOK into this\nsystem, then reboot:\n\n\t# sudo mokutil --import %s/moks/%s/signing_key.x509",
+		  server_cert_db_path().c_str(), mok_fingerprint.c_str())) << endl;
+    }
+  
+  PR_Cleanup ();
+}
+
+
+bool
+mok_dir_valid_p (string mok_fingerprint, bool verbose, void report_error (const string& msg, int logit))
+{
+  string mok_path = server_cert_db_path() + "/moks";
+  string mok_dir = mok_path + "/" + mok_fingerprint;
+  DIR *dirp = opendir (mok_dir.c_str());
+
+  if (dirp == NULL)
+    {
+      // We can't open the directory. Just quit.
+      if (verbose)
+	report_error (_F("Could not open server MOK fingerprint directory %s: %s",
+			 mok_dir.c_str(), strerror(errno)), true);
+      return false;
+    }
+
+  // Find both the x509 certificate and private key files.
+  string mok_private_cert_path = mok_dir + MOK_PRIVATE_CERT_FILE;
+  string mok_public_cert_path = mok_dir + MOK_PUBLIC_CERT_FILE;
+  
+  if (access(mok_private_cert_path.c_str(), R_OK ) != 0 
+      || access(mok_public_cert_path.c_str(), R_OK ) != 0)
+    {
+      if (verbose)
+	report_error (_F("Could not find server MOK files in directory %s",
+			 mok_dir.c_str ()), true);
+      return false;
+    }
+
+  // Grab info from the cert.
+  string fingerprint;
+  if (read_cert_info_from_file (mok_dir + MOK_PUBLIC_CERT_FILE, fingerprint)
+      == SECSuccess)
+    {
+      // Make sure the fingerprint from the certificate matches the
+      // directory name.
+      if (fingerprint != mok_fingerprint)
+        {
+	  if (verbose)
+	      report_error (_F("Server MOK directory name '%s' doesn't match fingerprint from certificate %s",
+			       mok_dir.c_str(), fingerprint.c_str()), true);
+	  return false;
+	}
+    }
+  return true;
+}
+
+
 #endif /* HAVE_NSS */

@@ -167,6 +167,8 @@ systemtap_session::systemtap_session ():
   server_cache = NULL;
   auto_privilege_level_msg = "";
   auto_server_msgs.clear ();
+  module_sign_given = false;
+  module_sign_mok_path = "";
   use_server_on_error = false;
   try_server_status = try_server_unset;
   use_remote_prefix = false;
@@ -1311,6 +1313,12 @@ systemtap_session::parse_cmdline (int argc, char * const argv [])
 	  insert_loaded_modules();
 	  break;
 
+	case LONG_OPT_SIGN_MODULE:
+	  module_sign_given = true;
+	  if (optarg) 
+	    module_sign_mok_path = optarg;
+	  break;
+
 	case LONG_OPT_REMOTE:
 	  if (client_options) {
 	    cerr << _F("ERROR: %s is invalid with %s", "--remote", "--client-options") << endl;
@@ -1994,8 +2002,9 @@ systemtap_session::check_options (int argc, char * const argv [])
         clog << _("This host requires module signing.") << endl;
       
       // Force server use to be on, if not on already.
-      enable_auto_server (
-	_("The kernel on your system requires modules to be signed for loading.\n"
+      if (! module_sign_given)
+	enable_auto_server (
+	  _("The kernel on your system requires modules to be signed for loading.\n"
 	  "The module created by compiling your script must be signed by a systemtap "
 	  "compile-server.  [man stap-server]"));
 
