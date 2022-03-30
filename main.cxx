@@ -21,6 +21,7 @@
 #include "coveragedb.h"
 #include "rpm_finder.h"
 #include "task_finder.h"
+#include "cscommon.h"
 #include "csclient.h"
 #include "client-nss.h"
 #include "remote.h"
