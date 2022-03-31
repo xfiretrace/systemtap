@@ -1305,10 +1305,11 @@ passes_0_4 (systemtap_session &s)
         }
     }
   
+#if HAVE_NSS
   const string module_src_path = s.tmpdir + "/" + s.module_filename();
   if (s.module_sign_given)
     sign_module (s.tmpdir, s.module_filename(), s.mok_fingerprints, s.kernel_build_tree);
-
+#endif
   
   PROBE1(stap, pass4__end, &s);
 

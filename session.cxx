@@ -1313,11 +1313,13 @@ systemtap_session::parse_cmdline (int argc, char * const argv [])
 	  insert_loaded_modules();
 	  break;
 
+#if HAVE_NSS
 	case LONG_OPT_SIGN_MODULE:
 	  module_sign_given = true;
 	  if (optarg) 
 	    module_sign_mok_path = optarg;
 	  break;
+#endif
 
 	case LONG_OPT_REMOTE:
 	  if (client_options) {
