@@ -740,6 +740,9 @@ install -m 644 initscript/logrotate.stap-server $RPM_BUILD_ROOT%{_sysconfdir}/lo
 %if %{with_systemd}
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 touch $RPM_BUILD_ROOT%{_unitdir}/systemtap.service
+# RHBZ2070857
+mkdir -p $RPM_BUILD_ROOT%{_presetdir}
+echo 'enable systemtap.service' > $RPM_BUILD_ROOT%{_presetdir}/42-systemtap.preset
 install -m 644 initscript/systemtap.service $RPM_BUILD_ROOT%{_unitdir}/systemtap.service
 mkdir -p $RPM_BUILD_ROOT%{_sbindir}
 install -m 755 initscript/systemtap $RPM_BUILD_ROOT%{_sbindir}/systemtap-service
@@ -921,7 +924,8 @@ exit 0
 
 %post initscript
 %if %{with_systemd}
-    /bin/systemctl enable systemtap.service >/dev/null 2>&1 || :
+    # RHBZ2070857 - use systemd presets instead
+    # /bin/systemctl enable systemtap.service >/dev/null 2>&1 || :
 %else
     /sbin/chkconfig --add systemtap
 %endif
@@ -1174,6 +1178,7 @@ exit 0
 
 %files initscript
 %if %{with_systemd}
+%{_presetdir}/42-systemtap.preset
 %{_unitdir}/systemtap.service
 %{_sbindir}/systemtap-service
 %else
