@@ -1422,6 +1422,22 @@ function _access_mode_str:string(mode:long)
 			   MAXSTRINGLEN);
 %}
 
+%{
+static const _stp_val_array _stp_faccessat2_flags_list[] = {
+	{0x100, "AT_SYMLINK_NOFOLLOW"},
+	{0x200, "AT_EACCESS"},
+	{0, NULL}
+};
+%}
+
+function _faccessat2_flags_str:string(flags:long)
+%{ /* pure */ /* unprivileged */
+	unsigned int flags = (unsigned int)STAP_ARG_flags;
+	_stp_lookup_or_str(_stp_faccessat2_flags_list, flags, STAP_RETVALUE,
+			   MAXSTRINGLEN);
+%}
+
+
 /* `man 2 open` for more information */
 @__private30 function _sys_open_mode_str(f)
 {
