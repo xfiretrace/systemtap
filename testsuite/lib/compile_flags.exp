@@ -44,7 +44,11 @@ proc arch_compile_init {} {
   set systemtap_arch_compile_flags 0
 
   puts "Checking for 64-bit support..."
-  set flags "additional_flags=-g compiler=gcc additional_flags=-m64"
+  set flags "compiler=gcc additional_flags=-g"
+  # GCC on aarch64 doesn't recognize -m64; But it's the default
+  if { ![regexp "^(aarch64)$" $::tcl_platform(machine)] } {
+      set flags "$flags additional_flags=-m64"
+  }
   set exe "hello-m64"
   set result [target_compile $source $exe executable $flags]
   if { $result != "" } {
@@ -131,7 +135,7 @@ proc arch_compile_flag_bits { INDEX } {
   # Notice that even though s390/s390x is 31 bits, we'll call it 32.
   if { [arch_compile_flags] == 1 } {
     switch -regexp $::tcl_platform(machine) {
-      {^(ia64|aarch64|ppc64le|ppc64|mips64)$} { return 64 }
+      {^(ia64|aarch64|ppc64le|ppc64|mips64|s390x)$} { return 64 }
       default { return 32 }
     }
   }

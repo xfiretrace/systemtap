@@ -82,6 +82,9 @@
 #ifndef __NR_execveat
 #define __NR_execveat (__NR_syscall_max + 1)
 #endif
+#ifndef __NR_faccessat2
+#define __NR_faccessat2 (__NR_syscall_max + 1)
+#endif
 #ifndef __NR_fadvise64_64
 #define __NR_fadvise64_64 (__NR_syscall_max + 1)
 #endif
@@ -620,6 +623,9 @@
 #endif
 #ifndef __NR_ia32_faccessat
 #define __NR_ia32_faccessat 307
+#endif
+#ifndef __NR_ia32_faccessat2
+#define __NR_ia32_faccessat2 439
 #endif
 #ifndef __NR_ia32_fadvise64
 #define __NR_ia32_fadvise64 250
@@ -1558,6 +1564,7 @@
 #define __NR_compat_exit		__NR_ia32_exit
 #define __NR_compat_exit_group		__NR_ia32_exit_group
 #define __NR_compat_faccessat		__NR_ia32_faccessat
+#define __NR_compat_faccessat2		__NR_ia32_faccessat2
 #define __NR_compat_fanotify_init	__NR_ia32_fanotify_init
 #define __NR_compat_fanotify_mark	__NR_ia32_fanotify_mark
 #define __NR_compat_fchdir		__NR_ia32_fchdir
@@ -1908,6 +1915,7 @@
 #endif
 #define __NR_compat_exit_group		__NR_exit_group
 #define __NR_compat_faccessat		__NR_faccessat
+#define __NR_compat_faccessat2		__NR_faccessat2
 #define __NR_compat_fanotify_init	__NR_fanotify_init
 #define __NR_compat_fanotify_mark	__NR_fanotify_mark
 #define __NR_compat_fchdir		__NR_fchdir
