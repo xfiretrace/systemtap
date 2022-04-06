@@ -17,13 +17,20 @@ global size = 0;
 # Notice we're probing "/lib*/*/libpthread.so.*". On RHEL7 ppc64
 # systems, the pthread library that gets used is located in
 # /lib64/power8/.
-probe process("/lib*/libpthread.so.*").function("allocate_stack"),
+probe process("/lib*/libc.so.*").function("allocate_stack")!,
+      process("/lib*/libpthread.so.*").function("allocate_stack"),
       process("/lib*/*/libpthread.so.*").function("allocate_stack")?
 {
-    old_size = @choose_defined($__default_stacksize,
-			       $__default_pthread_attr->stacksize)
+    old_size = @choose_defined($attr->stacksize,
+			       @choose_defined($__default_stacksize,
+			       $__default_pthread_attr->stacksize))
     if ((size != 0) && (old_size != size)) {  /* requested but not yet changed */
 	/* change it and report */
+	if  (@defined($attr->stacksize)) {
+            $attr->stacksize = size
+	    printf("%s[%d] overwrote __default_stacksize@%p (%d->%d)\n",
+		   execname(), tid(), &$attr->stacksize, old_size, size)
+	} else {
 	if (@defined($__default_stacksize)) {
             $__default_stacksize = size
 	    printf("%s[%d] overwrote __default_stacksize@%p (%d->%d)\n",
@@ -35,5 +42,6 @@ probe process("/lib*/libpthread.so.*").function("allocate_stack"),
 		   execname(), tid(), &$__default_pthread_attr->stacksize,
 		   old_size, size)
 	}
+	     }
     }
 }
