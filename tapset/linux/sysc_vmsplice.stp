@@ -51,7 +51,8 @@ probe dw_syscall.vmsplice = kernel.function("sys_vmsplice").call ?
 	@__syscall_gate_compat_simple
 	@_SYSCALL_VMSPLICE_NAME
 	fd = __int32($fd)
-	iov = $iov
+        /* Kernel commit 87a3002af9e30 changed $iov to $uiov */
+	iov = @choose_defined($uiov, $iov)
 	nr_segs = __ulong($nr_segs)
 	flags = $flags
 	flags_str = _stp_splice_flags_str(flags)

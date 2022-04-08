@@ -34,7 +34,12 @@ probe dw_syscall.sigpending = __syscall.sigpending ?,
 	kernel.function("compat_sys_sigpending").call ?
 {
 	@_SYSCALL_SIGPENDING_NAME
-	set = @choose_defined($set, $set32)
+        /* Kernel commit d53238cd51a80f6f changed $set to $uset in kernel/signal.c */
+        if (@defined($set32)) {
+            set = $set32
+        } else {
+            set = @choose_defined($uset, $set)
+        }
 	@_SYSCALL_SIGPENDING_ARGSTR
 }
 probe __syscall.sigpending = kernel.function("sys_sigpending").call ?

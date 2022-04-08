@@ -36,7 +36,8 @@ probe dw_syscall.setns = kernel.function("sys_setns") ?
 {
 	@_SYSCALL_SETNS_NAME
 	fd = __int32($fd)
-	nstype = __int32($nstype)
+        /* Kernel commit 303cc571d107b replaced $nstype with $flags in kernel/nsproxy.c */
+	nstype = __int32(@choose_defined($nstype, $flags))
 	nstype_str = __fork_flags(nstype)
 	@_SYSCALL_SETNS_ARGSTR
 }
