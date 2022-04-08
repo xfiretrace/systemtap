@@ -26,6 +26,40 @@ function print_regs ()
 	}
 %}
 
+function umodbuildid:string (address:long)
+%{  /* pragma:vma */
+  void *ubid_struct = NULL;
+  int i,j;
+  struct _stp_module * p;
+  static const char hex[] = "0123456789abcdef";
+  stap_find_vma_map_info(current, STAP_ARG_address,
+                         NULL, NULL, NULL, NULL, &ubid_struct);
+
+  p = (struct _stp_module*) ubid_struct;
+  if (p == NULL){
+    STAP_ERROR("umodbuildid 0x%llx unknown\n ", STAP_ARG_address);
+  }
+
+  for(i=0,j=0; j < p->build_id_len; ++j && i < MAXSTRINGLEN)
+  {
+    unsigned char temp = p->build_id_bits[j];
+    STAP_RETVALUE[i++] = hex[temp >> 4];
+    STAP_RETVALUE[i++] = hex[temp & 15];
+  }
+%}
+
+
+# Finds the module-relative offset of the given address in the current user process
+function umodaddr:long (address:long)
+%{ /* pragma:vma */
+ long vm_start = -1;
+  stap_find_vma_map_info(current, STAP_ARG_address,
+                         &vm_start, NULL, NULL, NULL,NULL);
+  if(vm_start == -1)
+    STAP_ERROR("umodaddr 0x%llx unknown\n ", STAP_ARG_address);
+  STAP_RETURN(STAP_ARG_address - vm_start);
+%}
+
 /**
  * sfunction pp - Returns the active probe point
  *

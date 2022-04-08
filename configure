@@ -13478,6 +13478,8 @@ ac_config_files="$ac_config_files staprun/guest/stapsh@.service"
 
 ac_config_files="$ac_config_files stap-exporter/Makefile"
 
+ac_config_files="$ac_config_files stap-profile-annotate"
+
 
 
 # Setup "shadow" directory doc/beginners that has the basic directories  setup for
@@ -14383,6 +14385,7 @@ do
     "staprun/guest/stapsh-daemon") CONFIG_FILES="$CONFIG_FILES staprun/guest/stapsh-daemon" ;;
     "staprun/guest/stapsh@.service") CONFIG_FILES="$CONFIG_FILES staprun/guest/stapsh@.service" ;;
     "stap-exporter/Makefile") CONFIG_FILES="$CONFIG_FILES stap-exporter/Makefile" ;;
+    "stap-profile-annotate") CONFIG_FILES="$CONFIG_FILES stap-profile-annotate" ;;
     "doc/beginners") CONFIG_COMMANDS="$CONFIG_COMMANDS doc/beginners" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -15195,6 +15198,7 @@ See \`config.log' for more details" "$LINENO" 5; }
     "staprun/run-staprun":F) chmod +x staprun/run-staprun ;;
     "staprun/guest/stapshd":F) chmod +x staprun/guest/stapshd ;;
     "staprun/guest/stapsh-daemon":F) chmod +x staprun/guest/stapsh-daemon ;;
+    "stap-profile-annotate":F) chmod +x stap-profile-annotate ;;
     "doc/beginners":C) rm -f $ac_abs_top_builddir/doc/beginners/en-US $ac_abs_top_builddir/doc/beginners/build/en-US/testsuite && mkdir -p $ac_abs_top_builddir/doc/beginners/build/en-US && ln -s $ac_abs_top_srcdir/doc/SystemTap_Beginners_Guide/en-US $ac_abs_top_builddir/doc/beginners/en-US && ln -s $ac_abs_top_srcdir/testsuite $ac_abs_top_builddir/doc/beginners/build/en-US/testsuite ;;
 
   esac

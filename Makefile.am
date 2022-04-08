@@ -20,7 +20,7 @@ AM_CPPFLAGS = -DBINDIR='"$(bindir)"' \
 AM_CFLAGS = -D_GNU_SOURCE -fexceptions -Wall -Wextra -Werror -Wunused -Wformat=2 -W
 AM_CXXFLAGS = -Wall -Wextra -Werror
 
-bin_SCRIPTS = stap-report
+bin_SCRIPTS = stap-report stap-profile-annotate
 pkglibexec_SCRIPTS = stap-env
 oldinclude_HEADERS = includes/sys/sdt.h includes/sys/sdt-config.h
 

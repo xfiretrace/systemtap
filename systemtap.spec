@@ -1078,6 +1078,7 @@ exit 0
 %files devel -f systemtap.lang
 %{_bindir}/stap
 %{_bindir}/stap-prep
+%{_bindir}/stap-profile-annotate
 %{_bindir}/stap-report
 %dir %{_datadir}/systemtap
 %{_datadir}/systemtap/runtime

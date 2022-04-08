@@ -1,5 +1,9 @@
 * What's new in version 4.7, PRERELEASE
 
+- Includes new tool stap-profile-annotate, combining systemtap &
+  debuginfod to collect system-wide profiling statistics, and
+  produce annotated source files for all relevant programs/libraries.
+
 - target processes given with the -c/-x parameters are now always
   added to the -d list for possible symbol/unwind data extraction,
   for simplifying profiling invocations.  Consider --ldd.

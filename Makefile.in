@@ -151,7 +151,7 @@ CONFIG_CLEAN_FILES = includes/sys/sdt-config.h \
 	initscript/99stap/check run-stap dtrace \
 	java/org/systemtap/byteman/helper/HelperSDT.java \
 	staprun/guest/stapshd staprun/guest/stapsh-daemon \
-	staprun/guest/stapsh@.service
+	staprun/guest/stapsh@.service stap-profile-annotate
 CONFIG_CLEAN_VPATH_FILES =
 @BUILD_TRANSLATOR_TRUE@am__EXEEXT_1 = stap$(EXEEXT)
 @BUILD_TRANSLATOR_TRUE@@BUILD_VIRT_TRUE@am__EXEEXT_2 =  \
@@ -676,7 +676,8 @@ AM_CPPFLAGS = -DBINDIR='"$(bindir)"' \
 
 AM_CFLAGS = -D_GNU_SOURCE -fexceptions -Wall -Wextra -Werror -Wunused -Wformat=2 -W
 AM_CXXFLAGS = -Wall -Wextra -Werror
-bin_SCRIPTS = stap-report $(am__append_2) $(am__append_5)
+bin_SCRIPTS = stap-report stap-profile-annotate $(am__append_2) \
+	$(am__append_5)
 pkglibexec_SCRIPTS = stap-env $(am__append_6)
 oldinclude_HEADERS = includes/sys/sdt.h includes/sys/sdt-config.h
 @BUILD_TRANSLATOR_TRUE@stap_SOURCES = main.cxx session.cxx parse.cxx \
@@ -875,6 +876,8 @@ staprun/guest/stapshd: $(top_builddir)/config.status $(top_srcdir)/staprun/guest
 staprun/guest/stapsh-daemon: $(top_builddir)/config.status $(top_srcdir)/staprun/guest/stapsh-daemon.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 staprun/guest/stapsh@.service: $(top_builddir)/config.status $(top_srcdir)/staprun/guest/stapsh@.service.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+stap-profile-annotate: $(top_builddir)/config.status $(srcdir)/stap-profile-annotate.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
