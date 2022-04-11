@@ -63,6 +63,9 @@ does.  The '_stp_target' variable will contain the pid for CMD.
 .B \-x PID
 The '_stp_target' variable will be set to PID.
 .TP
+.B \-N PID
+Sets the '_stp_namespaces_pid' variable to PID.
+.TP
 .B \-o FILE
 Send output to FILE. If the module uses bulk mode, the output will
 be in percpu files FILE_x(FILE_cpux in background and bulk mode)
@@ -94,6 +97,9 @@ is assumed. Colors can be modified using the SYSTEMTAP_COLORS environment
 variable. See the
 .IR stap (1)
 manual page for more information on syntax and behaviour.
+.TP
+.B \-M INTERVAL
+Enable monitor mode with INTERVAL seconds between updates.
 .TP
 .B \-d
 Delete a module.  Only detached or unused modules
