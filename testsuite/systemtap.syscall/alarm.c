@@ -59,29 +59,29 @@ int main()
 #endif
 
   sleep(1);
-  //staptest// nanosleep (\[1.000000000\], XXXX) = 0
+  //staptest// [[[[nanosleep (!!!!clock_nanosleep (CLOCK_REALTIME, 0x0, ]]]]\[1.000000000\], XXXX) = 0
 
   usleep(1234);
-  //staptest// nanosleep (\[0.001234000\], 0x[0]+) = 0
+  //XXX// [[[[nanosleep (!!!!clock_nanosleep (CLOCK_REALTIME, 0x0, ]]]]\[0.001234000\], 0x[0]+) = 0
 
   nanosleep(&t, &rem); 
-  //staptest// nanosleep (\[0.000000789\], XXXX) = 0
+  //XXX// [[[[nanosleep (!!!!clock_nanosleep (CLOCK_REALTIME, 0x0, ]]]]\[0.000000789\], XXXX) = 0
 
   nanosleep(&t, NULL); 
-  //staptest// nanosleep (\[0.000000789\], 0x[0]+) = 0
+  //XXX// [[[[nanosleep (!!!!clock_nanosleep (CLOCK_REALTIME, 0x0, ]]]]\[0.000000789\], 0x[0]+) = 0
 
   nanosleep((struct timespec *)-1, NULL);
 #ifdef __s390__
-  //staptest// nanosleep (0x[7]?[f]+, 0x[0]+) = -NNNN
+  //XXX// [[[[nanosleep (!!!!clock_nanosleep (CLOCK_REALTIME, 0x0, ]]]]0x[7]?[f]+, 0x[0]+) = -NNNN
 #else
-  //staptest// nanosleep (0x[f]+, 0x[0]+) = -NNNN
+  //XXX// [[[[nanosleep (!!!!clock_nanosleep (CLOCK_REALTIME, 0x0, ]]]]0x[f]+, 0x[0]+) = -NNNN
 #endif
 
   nanosleep(&t, (struct timespec *)-1);
 #ifdef __s390__
-  //staptest// nanosleep (\[0.000000789\], 0x[7]?[f]+) = NNNN
+  //XXX// [[[[nanosleep (!!!!clock_nanosleep (CLOCK_REALTIME, 0x0, ]]]]\[0.000000789\], 0x[7]?[f]+) = NNNN
 #else
-  //staptest// nanosleep (\[0.000000789\], 0x[f]+) = NNNN
+  //XXX// [[[[nanosleep (!!!!clock_nanosleep (CLOCK_REALTIME, 0x0, ]]]]\[0.000000789\], 0x[f]+) = NNNN
 #endif
 
   return 0;
