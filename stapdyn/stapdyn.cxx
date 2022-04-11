@@ -45,6 +45,7 @@ usage (int rc)
   cout << "Usage: " << program_invocation_short_name
        << " MODULE [-v] [-c CMD | -x PID] [-o FILE] [-C WHEN] [globalname=value ...] [-V] [-h]" << endl
        << "-v              Increase verbosity." << endl
+       << "-w              Suppress warnings from the script." << endl
        << "-c cmd          Command \'cmd\' will be run and " << program_invocation_short_name << " will" << endl
        << "                exit when it does.  The '_stp_target' variable" << endl
        << "                will contain the pid for the command." << endl
