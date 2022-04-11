@@ -64,21 +64,26 @@ probe __syscall.signalfd.return = kernel.function("sys_signalfd").return
 	flags = 0
 	name = "signalfd"
 }
-probe dw_syscall.compat_signalfd = kernel.function("compat_sys_signalfd4").call !,
+probe dw_syscall.compat_signalfd = kernel.function("do_compat_signalfd4") !,
+                                kernel.function("compat_sys_signalfd4").call !,
                                 kernel.function("compat_sys_signalfd").call ?
 {
 	flags = __int32(@choose_defined($flags, 0))
+	__sigmask = 0
+	if (@defined($sigmask))
+		__sigmask = @__pointer($sigmask)
 	if (flags == 0) {
 		name = "signalfd"
-		argstr = sprintf("%d, %p, %d", __int32($ufd), @__pointer($sigmask),
+		argstr = sprintf("%d, %p, %d", __int32($ufd), __sigmask,
 				 $sigsetsize)
 	} else {
 		name = "signalfd4"
-		argstr = sprintf("%d, %p, %d, %s", __int32($ufd), @__pointer($sigmask),
+		argstr = sprintf("%d, %p, %d, %s", __int32($ufd), __sigmask,
 				 $sigsetsize, _signalfd4_flags_str(flags))
 	}
 }
 probe dw_syscall.compat_signalfd.return =
+		kernel.function("do_compat_signalfd4").return !,
 		kernel.function("compat_sys_signalfd4").return !,
 		kernel.function("compat_sys_signalfd").return ?
 {
