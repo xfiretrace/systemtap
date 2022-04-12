@@ -1173,6 +1173,24 @@ passes_0_4 (systemtap_session &s)
 	  if (s.need_uprobes)
 	    rc = uprobes_pass(s);
 
+#if HAVE_NSS
+	  if (s.module_sign_given)
+	    {
+	      // when run on client as --sign-module, mok fingerprints are result of mokutil -l
+	      // when run from server as --sign-module=PATH, mok fingerprint is given by PATH
+	      string mok_path;
+	      if (!s.module_sign_mok_path.empty())
+		{
+		  string mok_fingerprint;
+		  split_path (s.module_sign_mok_path, mok_path, mok_fingerprint);
+		  s.mok_fingerprints.clear();
+		  s.mok_fingerprints.push_back(mok_fingerprint);
+		}
+	      rc =
+		sign_module (s.tmpdir, s.module_filename(), s.mok_fingerprints, mok_path, s.kernel_build_tree);
+	    }
+#endif
+
 	  // If our last pass isn't 5, we're done (since passes 3 and
 	  // 4 just generate what we just pulled out of the cache).
 	  assert_no_interrupts();
@@ -1306,9 +1324,21 @@ passes_0_4 (systemtap_session &s)
     }
   
 #if HAVE_NSS
-  const string module_src_path = s.tmpdir + "/" + s.module_filename();
   if (s.module_sign_given)
-    sign_module (s.tmpdir, s.module_filename(), s.mok_fingerprints, s.kernel_build_tree);
+    {
+      // when run on client as --sign-module, mok fingerprints are result of mokutil -l
+      // when run from server as --sign-module=PATH, mok fingerprint is given by PATH
+      string mok_path;
+      if (!s.module_sign_mok_path.empty())
+	{
+	  string mok_fingerprint;
+	  split_path (s.module_sign_mok_path, mok_path, mok_fingerprint);
+	  s.mok_fingerprints.clear();
+	  s.mok_fingerprints.push_back(mok_fingerprint);
+	}
+
+      rc = sign_module (s.tmpdir, s.module_filename(), s.mok_fingerprints, mok_path, s.kernel_build_tree);
+    }
 #endif
   
   PROBE1(stap, pass4__end, &s);

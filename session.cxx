@@ -1316,8 +1316,14 @@ systemtap_session::parse_cmdline (int argc, char * const argv [])
 #if HAVE_NSS
 	case LONG_OPT_SIGN_MODULE:
 	  module_sign_given = true;
-	  if (optarg) 
-	    module_sign_mok_path = optarg;
+	  if (optarg)
+	    {
+	      module_sign_mok_path = optarg;
+	      if (!client_options) {
+		cerr << _F("ERROR: %s is only valid with %s", "--sign-module=PATH", "--client-options") << endl;
+		return 1;
+	      }
+	    }
 	  break;
 #endif
 

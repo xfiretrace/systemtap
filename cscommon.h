@@ -66,12 +66,15 @@ struct thread_arg
 
 extern int read_from_file (const std::string &fname, cs_protocol_version &data);
 extern std::string get_cert_serial_number (const CERTCertificate *cert);
-extern int mok_sign_file (std::string &mok_fingerprint, 
-			   const std::string &kernel_build_tree,
-			   const std::string &name);
+extern int mok_sign_file (const std::string &mok_fingerprint,
+			  const std::string &mok_path,
+			  const std::string &kernel_build_tree,
+			  const std::string &name);
 extern void generate_mok (std::string &mok_fingerprint, void report_error(const std::string &msg, int logit));
-extern void sign_module (std::string tmpdir, std::string module_filename, std::vector<std::string> mok_fingerprints, std::string kernel_build_tree);
-extern bool mok_dir_valid_p (std::string mok_fingerprint, bool verbose, void report_error (const std::string& msg, int logit));
+extern int sign_module (const std::string &tmpdir, const std::string &module_filename, std::vector<std::string> mok_fingerprints,
+			 const std::string &mok_path, const std::string &kernel_build_tree);
+extern bool mok_dir_valid_p (const std::string &mok_fingerprint, const std::string &mok_path, bool verbose,
+			     void report_error (const std::string &msg, int logit));
 
 
 #endif

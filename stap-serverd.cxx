@@ -420,7 +420,8 @@ get_server_mok_fingerprints(vector<string> &mok_fingerprints, bool verbose,
   vector<string>::const_iterator it;
   for (it = temp.begin (); it != temp.end (); it++)
     {
-      if (mok_dir_valid_p (*it, true, server_error))
+      string mok_path = server_cert_db_path() + "/moks";
+      if (mok_dir_valid_p (*it, mok_path, true, server_error))
         {
 	  // Save the info.
 	  mok_fingerprints.push_back (*it);
@@ -1644,6 +1645,7 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
   // If the client sent us MOK fingerprints, see if we have a matching
   // MOK on the server.
   string mok_fingerprint;
+  string mok_path = server_cert_db_path() + "/moks";
   if (! client_mok_fingerprints.empty())
     {
       // See if any of the client MOK fingerprints exist on the server.
@@ -1651,7 +1653,7 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
       for (it = client_mok_fingerprints.begin();
 	   it != client_mok_fingerprints.end(); it++)
         {
-	  if (mok_dir_valid_p (*it, false, server_error))
+	  if (mok_dir_valid_p (*it, mok_path, false, server_error))
 	    {
 	      mok_fingerprint = *it;
 	      break;
@@ -1665,6 +1667,9 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
       // 'stap -L syscall.open'). So, keep going until we know we need
       // to sign a module.
   }
+
+  if (! mok_fingerprint.empty ())
+    stapargv.push_back("--sign-module=" + mok_path + "/" + mok_fingerprint);
 
   /* All ready, let's run the translator! */
   int staprc;
@@ -1710,22 +1715,7 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
 	    sign_file (cert_db_path, server_cert_nickname(),
 		       globber.gl_pathv[0],
 		       string(globber.gl_pathv[0]) + ".sgn");
-	  if (! mok_fingerprint.empty ())
-	    {
-	      // If we signing the module failed, change the staprc to
-	      // 1, so that the client won't try to run the resulting
-	      // module, which wouldn't work.
-	      if (int rc = mok_sign_file (mok_fingerprint, kernel_build_tree[kernel_version],
-					  globber.gl_pathv[0])) 
-		{
-		  client_error (_F("Running sign-file failed, rc = %d", rc), stapstderr);
-		  staprc = 1;
-		}
-	      else
-		cerr << _F("Module signed with MOK, fingerprint \"%s\"", //
-			   mok_fingerprint.c_str()) << endl;
-	    }
-	  else if (! client_mok_fingerprints.empty ())
+	  if (mok_fingerprint.empty() && ! client_mok_fingerprints.empty ())
 	    {
 	      // If we're here, the client sent us MOK fingerprints
 	      // (since client_mok_fingerprints isn't empty), but we
@@ -1824,7 +1814,10 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
       // above on the systemtap module itself.
       if (! mok_fingerprint.empty ())
 	{
-	  if (int rc = mok_sign_file (mok_fingerprint, kernel_build_tree[kernel_version], uprobes_response))
+	  if (int rc = mok_sign_file (mok_fingerprint,
+				      mok_path,
+				      kernel_build_tree[kernel_version],
+				      uprobes_response))
 	    client_error (_F("Running sign-file failed, rc = %d", rc), stapstderr);
 	  else
 	    cerr << _F("Module signed with MOK, fingerprint \"%s\"", //
@@ -1938,7 +1931,7 @@ check_uncompressed_request_size (const char * zip_file)
   int rc = stap_system_read (0, args, result);
   if (rc != 0)
     {
-    server_error (_F("Unable to check the zipefile size. Error code: %d .", rc));
+    server_error (_F("Unable to check the zipfile size. Error code: %d .", rc));
     return rc;
     }
 

@@ -134,11 +134,11 @@ string get_cert_serial_number (const CERTCertificate *cert)
 }
 
 int
-mok_sign_file (std::string &mok_fingerprint,
+mok_sign_file (const std::string &mok_fingerprint,
+	       const std::string &mok_path,
 	       const std::string &kernel_build_tree,
 	       const std::string &name)
 {
-  string mok_path = server_cert_db_path() + "/moks";
   string mok_directory = mok_path + "/" + mok_fingerprint;
 
   vector<string> cmd
@@ -300,8 +300,11 @@ client_error (const string &msg, int logit __attribute__ ((unused)) = 0)
   cerr << _(msg.c_str()) << endl;
 }
 
-void sign_module(std::string tmpdir, std::string module_filename,
-                 std::vector<std::string> mok_fingerprints, std::string kernel_build_tree)
+int
+sign_module(const string &tmpdir, const string &module_filename,
+	    std::vector<std::string> mok_fingerprints,
+	    const string &mok_root,
+	    const string &kernel_build_tree)
 {
   string module_src_path = tmpdir + "/" + module_filename;
 
@@ -316,17 +319,27 @@ void sign_module(std::string tmpdir, std::string module_filename,
   bool module_signed = false;
   int rc;
   string mok_fingerprint;
+  string mok_path;
+      
+  if (mok_root.empty())
+    // --sign-module
+    mok_path = server_cert_db_path() + "/moks";
+  else
+    // --sign-module=PATH
+    mok_path = mok_root;
+
   for (auto it = mok_fingerprints.cbegin(); it != mok_fingerprints.cend(); it++)
     {
       mok_fingerprint = *it;
-      if (! mok_dir_valid_p (*it, false, client_error))
+      if (! mok_dir_valid_p (*it, mok_path, false, client_error))
 	continue;
       
-      if ((rc = mok_sign_file (mok_fingerprint, kernel_build_tree, module_src_path)) == 0)
+      if ((rc = mok_sign_file (mok_fingerprint, mok_path, kernel_build_tree, module_src_path)) == 0)
 	{
 	  cerr << (_F("Module signed with MOK, fingerprint \"%s\"", //
 		      mok_fingerprint.c_str())) << endl;
 	  module_signed = true;
+	  break;
 	}
     }
 
@@ -334,18 +347,19 @@ void sign_module(std::string tmpdir, std::string module_filename,
     {
       generate_mok (mok_fingerprint, client_error);
       cerr << (_("Running sign-file failed\n"))
-	   << (_F("The server has no machine owner key (MOK) in common with this\nsystem. Use the following command to import a server MOK into this\nsystem, then reboot:\n\n\t# sudo mokutil --import %s/moks/%s/signing_key.x509",
+	   << (_F("There is no machine owner key (MOK) in common with this system.\nUse the following command to import a MOK into this system, then reboot:\n\n\t# sudo mokutil --import %s/moks/%s/signing_key.x509",
 		  server_cert_db_path().c_str(), mok_fingerprint.c_str())) << endl;
     }
   
   PR_Cleanup ();
+  return !module_signed;
 }
 
 
 bool
-mok_dir_valid_p (string mok_fingerprint, bool verbose, void report_error (const string& msg, int logit))
+mok_dir_valid_p (const string &mok_fingerprint, const string &mok_path, bool verbose,
+		 void report_error (const string &msg, int logit))
 {
-  string mok_path = server_cert_db_path() + "/moks";
   string mok_dir = mok_path + "/" + mok_fingerprint;
   DIR *dirp = opendir (mok_dir.c_str());
 
