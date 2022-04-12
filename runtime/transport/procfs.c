@@ -21,19 +21,9 @@
 static struct proc_dir_entry *_stp_procfs_module_dir = NULL;
 static struct path _stp_procfs_module_dir_path;
 
-/*
- * Safely creates '/proc/systemtap' (if necessary) and
- * '/proc/systemtap/{module_name}'.
- *
- * NB: this function is suitable to call from early in the the
- * module-init function, and doesn't rely on any other facilities
- * in our runtime.  PR19833.  See also PR15408.
- */
-static int _stp_mkdir_proc_module(void)
-{	
+static bool _stp_proc_dir_exists(void)
+{
 	int found = 0;
-	int rc;
-	static char proc_root_name[STP_MODULE_NAME_LEN + sizeof("systemtap/")];
 #if defined(STAPCONF_PATH_LOOKUP) || defined(STAPCONF_KERN_PATH_PARENT)
 	struct nameidata nd;
 #else  /* STAPCONF_VFS_PATH_LOOKUP or STAPCONF_KERN_PATH */
@@ -41,10 +31,8 @@ static int _stp_mkdir_proc_module(void)
 #if defined(STAPCONF_VFS_PATH_LOOKUP)
 	struct vfsmount *mnt;
 #endif
+	int rc;
 #endif	/* STAPCONF_VFS_PATH_LOOKUP or STAPCONF_KERN_PATH */
-
-        if (_stp_procfs_module_dir != NULL)
-		return 0;
 
 #if defined(STAPCONF_PATH_LOOKUP) || defined(STAPCONF_KERN_PATH_PARENT)
 	/* Why "/proc/systemtap/foo"?  kern_path_parent() is basically
@@ -74,11 +62,6 @@ static int _stp_mkdir_proc_module(void)
 
 #else  /* STAPCONF_VFS_PATH_LOOKUP */
 	/* See if '/proc/systemtap' exists. */
-	if (! init_pid_ns.proc_mnt) {
-		errk("Unable to create '/proc/systemap':"
-		     " '/proc' doesn't exist.\n");
-		goto done;
-	}
 	mnt = init_pid_ns.proc_mnt;
 	rc = vfs_path_lookup(mnt->mnt_root, mnt, "systemtap", 0, &path);
 	if (rc == 0) {
@@ -87,16 +70,73 @@ static int _stp_mkdir_proc_module(void)
 	}
 #endif	/* STAPCONF_VFS_PATH_LOOKUP */
 
-	/* If we couldn't find "/proc/systemtap", create it. */
-	if (!found) {
-		struct proc_dir_entry *de;
+	return found;
+}
 
-		de = proc_mkdir ("systemtap", NULL);
-		if (de == NULL) {
-			errk("Unable to create '/proc/systemap':"
-			     " proc_mkdir failed.\n");
-			goto done;
- 		}
+/*
+ * Safely creates '/proc/systemtap' (if necessary) and
+ * '/proc/systemtap/{module_name}'.
+ *
+ * NB: this function is suitable to call from early in the the
+ * module-init function, and doesn't rely on any other facilities
+ * in our runtime.  PR19833.  See also PR15408.
+ */
+static int _stp_mkdir_proc_module(void)
+{
+	static char proc_root_name[STP_MODULE_NAME_LEN + sizeof("systemtap/")];
+	int rc;
+
+        if (_stp_procfs_module_dir != NULL)
+		return 0;
+
+	/* If we couldn't find "/proc/systemtap", create it. */
+	if (!_stp_proc_dir_exists()) {
+		/*
+		 * We need some sleepable way to synchronize with other stap
+		 * modules which are also being loaded for the first time on
+		 * this system. The `/proc/systemtap` directory is never removed
+		 * after it's made, so this race only happens briefly the first
+		 * time stap is used on the current boot. On 3.19+ kernels, the
+		 * race results in only a WARN and proc_mkdir() failing; nothing
+		 * more than that. However, on kernels <3.19, proc_mkdir()
+		 * doesn't error out when a duplicate directory is made, and
+		 * instead there are leaks in addition to the WARN (see kernel
+		 * commit b208d54b7539 for details). We'd like to fix the leak
+		 * and ideally not scare sysadmins with WARNs, so we abuse
+		 * `module_mutex` in the kernel for mutual exclusion between all
+		 * stap modules. Since `module_mutex` isn't ours to abuse
+		 * freely, we elide it by checking if `/proc/systemtap` exists
+		 * first, and if it doesn't, then we check again after taking
+		 * the lock. This means we'll only use `module_mutex` and
+		 * redundantly check for the existence of `/proc/systemtap` just
+		 * once for each of the first stap modules loaded on the system,
+		 * and only for those stap modules which encounter the race.
+		 * After the race window, we're back to just the single check
+		 * for `/proc/systemtap` and nothing more.
+		 *
+		 * This doesn't work on 5.12+ kernels though, as `module_mutex`
+		 * is no longer exported, but that isn't a big deal. Since
+		 * there's no risk of a leak on 5.12+ kernels, the worst that
+		 * can happen is a cosmetic WARN.
+		 *
+		 * We never need to check proc_mkdir() for an error because, if
+		 * it fails on 5.12+ without `module_mutex` due to the directory
+		 * already existing, then it's guaranteed that the directory
+		 * will be immediately available to use since procfs serializes
+		 * the existence check and the registration under the same hold
+		 * of a global lock. And if there's a proc_mkdir() error even
+		 * with `module_mutex`, then the other proc_mkdir() attempt
+		 * below which *is* checked for errors will fail anyway and
+		 * produce a fatal error message.
+		 */
+#ifdef STAPCONF_MODULE_MUTEX
+		mutex_lock(&module_mutex);
+		if (!_stp_proc_dir_exists())
+			proc_mkdir("systemtap", NULL);
+		mutex_unlock(&module_mutex);
+#else
+		proc_mkdir("systemtap", NULL);
+#endif
 	}
 
 	/* Create the "systemtap/{module_name} directory in procfs. */
