@@ -662,6 +662,11 @@ the user will be prompted to confirm the trust to be granted or revoked before
 the operation is performed.
 
 .TP
+.BI \-\-sign-module
+Sign the module with a MOK (Machine Owner Key) on UEFI/SecureBoot systems.
+See the SECUREBOOT section for more details.
+
+.TP
 .BI \-\-dump-probe-types
 Dumps a list of supported probe types and exits. If
 .IR \-\-privilege=stapusr
@@ -2364,9 +2369,37 @@ groups.
 If the current system has SecureBoot turned on in the UEFI firmware,
 all kernel modules must be signed.  (Some kernels may allow disabling
 SecureBoot long after booting with a key sequence such as SysRq-X,
-making it unnecessary to sign modules.)  The systemtap compile server
+making it unnecessary to sign modules.)  There are two ways to sign a
+systemtap module.  The systemtap compile server
 can sign modules with a MOK (Machine Owner Key) that it has in common
-with a client system. See the following wiki page for more details:
+with a client system.  For example:
+.SAMPLE
+stap \-\-use-server=HOSTNAME:PORT \-e 'SCRIPT'
+# If there is no mok key in common with the server's systemtap mok key
+# list and the client's mok database then the user is directed by stap
+# to invoke: 
+sudo mokutil --import signing_key.x509
+# then after rebooting the system:
+stap \-\-use-server=HOSTNAME:PORT \-e 'SCRIPT'
+# will use the server to build and sign the module and the module will run
+# on the client
+.ESAMPLE
+Another way to sign modules is to use the stap
+\FI\-\-sign-module\FR option, which uses a MOK on the client system
+without using a server.
+For example:
+.SAMPLE
+stap \-\-sign-module \-e 'SCRIPT'
+# If there is no systemtap mok key in the system mok database
+# then the user is directed by stap to invoke:
+sudo mokutil --import \
+/home/USER/.systemtap/ssl/server/moks/FINGERPRINT/signing_key.x509
+# then after rebooting the system:
+stap \-\-sign-module \-e 'SCRIPT'
+# will sign and run the module
+.ESAMPLE
+
+See the following wiki page for more details: 
 .PP
 .RS
 .nh

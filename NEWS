@@ -1,5 +1,12 @@
 * What's new in version 4.7, PRERELEASE
 
+- SystemTap now supports an additional method to sign modules on
+  UEFI/SecureBoot systems.  In addition to the existing method of
+  using a trusted stap-server, the module can also be signed without
+  using a server by specifying the "stap --sign-module" option.  (Key
+  enrollment still requires a one-time reboot and BIOS conversation.)
+  https://sourceware.org/systemtap/wiki/SecureBoot
+
 - Includes new tool stap-profile-annotate, combining systemtap &
   debuginfod to collect system-wide profiling statistics, and
   produce annotated source files for all relevant programs/libraries.
