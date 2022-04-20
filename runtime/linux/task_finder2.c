@@ -1718,6 +1718,9 @@ static struct utrace_engine_ops __stp_utrace_task_finder_ops = {
 	.report_death = stap_utrace_task_finder_report_death,
 };
 
+static void
+stap_stop_task_finder(void);
+
 static int
 stap_start_task_finder(void)
 {
@@ -1732,19 +1735,17 @@ stap_start_task_finder(void)
 		return EBUSY;
 	}
 
-	rc = utrace_init();
-        if (rc != 0) { /* PR14781, handle utrace alloc failure. */
-                /* Decrement this back down to UNITIALIZED, to keep
-                   a stap_stop_task_finder() from trying to clean up. */
-		atomic_dec(&__stp_task_finder_state);
-		_stp_error("Failed to initialize utrace hooks");
-                return ENOMEM; /* XXX: or some other one. */
-        }
-
 	mmpath_buf = _stp_kmalloc(PATH_MAX);
 	if (mmpath_buf == NULL) {
 		_stp_error("Unable to allocate space for path");
 		return ENOMEM;
+	}
+
+	rc = utrace_init();
+	if (rc) { /* PR14781, handle utrace alloc failure. */
+		_stp_kfree(mmpath_buf);
+		_stp_error("Failed to initialize utrace hooks");
+		return ENOMEM; /* XXX: or some other one. */
 	}
 
         __stp_tf_map_initialize();
@@ -1877,6 +1878,12 @@ stf_err:
 	rcu_read_unlock();
 	_stp_kfree(mmpath_buf);
 	debug_task_finder_report(); // report at end for utrace engine counting
+	/*
+	 * We need to do our own cleanup if something failed. A full task finder
+	 * stop is needed because utrace is guaranteed to be live by this point.
+	 */
+	if (rc)
+		stap_stop_task_finder();
 	return rc;
 }
 
