@@ -43,9 +43,9 @@ int main()
 
     syscall(__NR_timer_gettime, tid, -1);
 #ifdef __s390__
-    //staptest// timer_gettime (NNNN, 0x[7]?[f]+) = NNNN (EINVAL)
+    //staptest// timer_gettime (NNNN, 0x[7]?[f]+) = NNNN ([[[[EINVAL!!!!EFAULT]]]])
 #else
-    //staptest// timer_gettime (NNNN, 0x[f]+) = NNNN (EINVAL)
+    //staptest// timer_gettime (NNNN, 0x[f]+) = NNNN ([[[[EINVAL!!!!EFAULT]]]])
 #endif
 
     timer_gettime(tid, &val);
@@ -74,9 +74,9 @@ int main()
 
     syscall(__NR_timer_settime, tid, 0, &val, -1);
 #ifdef __s390__
-    //staptest// timer_settime (NNNN, 0, \[0.000000,0.000000\], 0x[7]?[f]+) = NNNN (EINVAL)
+    //staptest// timer_settime (NNNN, 0, \[0.000000,0.000000\], 0x[7]?[f]+) = NNNN ([[[[EINVAL!!!!EFAULT]]]])
 #else
-    //staptest// timer_settime (NNNN, 0, \[0.000000,0.000000\], 0x[f]+) = NNNN (EINVAL)
+    //staptest// timer_settime (NNNN, 0, \[0.000000,0.000000\], 0x[f]+) = NNNN ([[[[EINVAL!!!!EFAULT]]]])
 #endif
 
     timer_settime(tid, -1, &val, &oval);

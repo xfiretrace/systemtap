@@ -41,9 +41,9 @@ int main() {
 
     readahead(fd, 0, -1);
 #if __WORDSIZE == 64
-    //staptest// readahead (NNNN, 0, 18446744073709551615) = 0
+    //staptest// readahead (NNNN, 0, 18446744073709551615) = NNNN
 #else
-    //staptest// readahead (NNNN, 0, 4294967295) = 0
+    //staptest// readahead (NNNN, 0, 4294967295) = NNNN
 #endif
 #endif
 

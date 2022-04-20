@@ -1,6 +1,8 @@
 /* COVERAGE: getitimer */
 
 #include <sys/time.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
 int main()
 {
@@ -18,7 +20,7 @@ int main()
     getitimer(-1, &value);
     //staptest// getitimer (0xffffffff, XXXX) = -NNNN (EINVAL)
 
-    getitimer(ITIMER_REAL, (struct itimerval *)-1);
+    syscall(__NR_getitimer, ITIMER_REAL, (struct itimerval *)-1);
 #ifdef __s390__
     //staptest// getitimer (ITIMER_REAL, 0x[7]?[f]+) = -NNNN (EFAULT)
 #else
