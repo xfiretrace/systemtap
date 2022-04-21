@@ -4,9 +4,12 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <sys/inotify.h>
+#include <sys/mman.h>
 
 int main()
 {
+  mlockall(MCL_CURRENT);
+
   int fd = inotify_init();
   //staptest// [[[[inotify_init (!!!!inotify_init1 (0x0]]]]) = NNNN
 

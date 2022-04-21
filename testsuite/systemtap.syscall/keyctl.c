@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/syscall.h>
 #include <linux/keyctl.h>
+#include <sys/mman.h>
 
 typedef int32_t key_serial_t;
 
@@ -31,6 +32,8 @@ key_serial_t __request_key(const char *type, const char *description,
 }
 
 int main() {
+    mlockall(MCL_CURRENT);
+
     key_serial_t ring_id, ring_id_2, ring_id_3, key_id, key_id_2;
 
     // --- test normal operation for keyctl manpage scenarios

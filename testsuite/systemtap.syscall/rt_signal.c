@@ -9,6 +9,7 @@
 #include <string.h>
 #include <signal.h>
 #include <linux/version.h>
+#include <sys/mman.h>
 
 // Calling rt_tgsigqueueinfo() from a 32-bit executable on RHEL6 s390x
 // (2.6.32-554.el6.s390x) causes a kernel crash. So, don't test
@@ -41,6 +42,8 @@ __rt_tgsigqueueinfo(pid_t tgid, pid_t tid, int sig, siginfo_t *siginfo)
 
 int main()
 {
+  mlockall(MCL_CURRENT);
+
   sigset_t mask, mask2, omask, omask2;
   siginfo_t siginfo;
   struct sigaction sa;
@@ -81,7 +84,7 @@ int main()
   sigaction(SIGUSR1, &sa, NULL);
   //staptest// rt_sigaction (SIGUSR1, {SIG_DFL}, 0x[0]+, 8) = 0
   
-  sigaction(-1, &sa, NULL);
+  syscall(__NR_sigaction, -1, &sa, NULL);
   //staptest// rt_sigaction (0x[f]+, {SIG_DFL}, 0x[0]+, 8) = -NNNN
 
   // Causes a SIGSEGV

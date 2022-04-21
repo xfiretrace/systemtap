@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/syscall.h>
+#include <sys/mman.h>
 
 #ifdef __NR_mlock2
 
@@ -23,6 +24,8 @@ static inline int __mlock2(const void *start, size_t len, int flags)
 
 int main()
 {
+	mlockall(MCL_CURRENT);
+
 	int fd, ret;
 	struct stat fs;
 	void * r;
@@ -45,7 +48,7 @@ int main()
 
 	/* stat for file size */
 	ret = fstat(fd, &fs);
-	//staptest// fstat (NNNN, XXXX) = 0
+	//staptest// [[[[[[[[fstat (NNNN, XXXX)!!!!fstatat (3, "", XXXX, AT_EMPTY_PATH)]]]]!!!!statx (3, "", AT_NO_AUTOMOUNT|AT_EMPTY_PATH, XXXX, XXXX)]]]] = 0
 
 	r = mmap(NULL, 4096, PROT_READ, MAP_SHARED, fd, 0);
 	//staptest// mmap[2]* (0x0, 4096, PROT_READ, MAP_SHARED, NNNN, 0) = XXXX

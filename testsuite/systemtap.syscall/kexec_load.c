@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <linux/version.h>
+#include <sys/mman.h>
 
 #define capget(x,y) syscall(__NR_capget,x,y)
 #define capset(x,y) syscall(__NR_capset,x,y)
@@ -64,6 +65,8 @@ static inline int __kexec_file_load(int kernel_fd, int initrd_fd,
 
 int main()
 {
+    mlockall(MCL_CURRENT);
+
 #ifdef __NR_kexec_file_load
     int fd;
     char *cmdline = "KEYTABLE=us LANG=en_US.UTF-8";

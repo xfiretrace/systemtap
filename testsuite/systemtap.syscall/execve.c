@@ -1,8 +1,11 @@
 /* COVERAGE: execve */
 #include <unistd.h>
+#include <sys/mman.h>
 
 int main()
 {
+    mlockall(MCL_CURRENT);
+
     char *newargv[] = { "/bin/true", "a", "b", "cde", NULL };
     char *newenv[] = { "FOO=10", "BAR=20", NULL };
 

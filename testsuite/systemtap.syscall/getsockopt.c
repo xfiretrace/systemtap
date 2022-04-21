@@ -7,9 +7,12 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/mman.h>
 
 int main()
 {
+    mlockall(MCL_CURRENT);
+
     int sock_stream;
     int fd_null;
     struct sockaddr_in sin0, sin1;

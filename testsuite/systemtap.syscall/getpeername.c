@@ -6,9 +6,12 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <netinet/in.h>
+#include <sys/mman.h>
 
 int main()
 {
+    mlockall(MCL_CURRENT);
+
     int s;
     int fd_null;
     int sv[2];

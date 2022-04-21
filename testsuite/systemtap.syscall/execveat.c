@@ -6,6 +6,7 @@
 #if !defined(SYS_execveat) && defined(__NR_execveat)
 #define SYS_execveat __NR_execveat
 #endif
+#include <sys/mman.h>
 
 #ifdef SYS_execveat
 static inline int
@@ -19,6 +20,8 @@ __execveat(int dirfd, const char *filename, char *const argv[],
 int main()
 {
 #ifdef SYS_execveat
+    mlockall(MCL_CURRENT);
+
     char *newargv[] = { "/bin/true", "a", "b", "cde", NULL };
     char *newenv[] = { "FOO=10", "BAR=20", NULL };
 
