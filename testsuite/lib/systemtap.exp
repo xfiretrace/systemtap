@@ -760,7 +760,12 @@ proc systemtap_finish {args} {
     }
 }
 
-proc systemtap_version {} {}
+proc systemtap_version {} {
+    set location [exec /usr/bin/which stap]
+    regexp {version [^)]*} [exec stap -V 2>@ stdout] version
+
+    clone_output "$location $version"
+}
 
 proc stap_run_batch {filename args} {
     if {[string length $filename]} {
