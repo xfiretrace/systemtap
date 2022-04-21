@@ -366,7 +366,7 @@ static int _stp_handle_kallsyms_lookups(void)
                 goto err0;
         }
 #endif
-#if !defined(STAPCONF_GET_MM_EXE_FILE_EXPORTED) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
+#if !defined(STAPCONF_GET_MM_EXE_FILE_EXPORTED) && (defined(get_file_rcu) || LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
         kallsyms_get_mm_exe_file = (void*) kallsyms_lookup_name ("get_mm_exe_file");
         if (kallsyms_get_mm_exe_file == NULL) {
                 _stp_error("Can't resolve get_mm_exe_file!");

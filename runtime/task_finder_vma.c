@@ -420,14 +420,23 @@ stap_find_exe_file(struct mm_struct* mm)
 	// still use our own code. The original get_mm_exe_file() can
 	// sleep (since it calls down_read()), so we'll have to roll
 	// our own.
-#if defined(STAPCONF_GET_MM_EXE_FILE_EXPORTED) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
+	//
+	// Some old kernels have the above kernel commit backported, in which
+	// case it's preferable to make use of the RCU optimization to avoid the
+	// failure-prone down_read_trylock(). The commit that adds the RCU
+	// optimization also adds a get_file_rcu() macro, so we can just check
+	// for the existence of that on kernels < 4.1. A false negative this way
+	// just leads to using the down_read_trylock() fallback as usual.
+#if defined(get_file_rcu) || LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0)
+#ifdef STAPCONF_GET_MM_EXE_FILE_EXPORTED
 	return get_mm_exe_file(mm);
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
+#else
         typedef typeof(&get_mm_exe_file) get_mm_exe_file_fn;
         if (kallsyms_get_mm_exe_file == NULL)
           return NULL; /* can't happen; _stp_handle_start would abort before this point */
         else
           return (* (get_mm_exe_file_fn) kallsyms_get_mm_exe_file)(mm);
+#endif
 #else
 	struct file *exe_file = NULL;
 
