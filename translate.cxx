@@ -2176,6 +2176,10 @@ c_unparser::emit_module_init ()
   // Free up the context memory after an error too
   o->newline() << "_stp_runtime_contexts_free();";
 
+  // Free up any timing Stats in case STP_TIMING was used
+  if (!session->runtime_usermode_p())
+    o->newline() << "stp_session_exit();";
+
   o->newline() << "return rc;";
   o->newline(-1) << "}\n";
 }

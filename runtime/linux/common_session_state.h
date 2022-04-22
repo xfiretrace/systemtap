@@ -90,3 +90,15 @@ static int stp_session_init(void)
 #endif
 	return 0;
 }
+
+static void stp_session_exit(void)
+{
+#ifdef STP_TIMING
+	size_t i;
+
+	// Free each Stat on error in systemtap_module_init()
+	for (i = 0; i < STP_PROBE_COUNT; ++i)
+		_stp_stat_del(g_probe_timing[i]);
+	_stp_stat_del(g_refresh_timing);
+#endif
+}
