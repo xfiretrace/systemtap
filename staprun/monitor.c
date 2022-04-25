@@ -364,7 +364,7 @@ void monitor_render(void)
       int printed;
       int col;
       int i;
-      size_t width[num_attributes] = {0};
+      int width[num_attributes] = {0};
       json_object *jso_uptime, *jso_uid, *jso_mem,
                   *jso_name, *jso_globals, *jso_probe_list;
       struct json_object_iterator it, it_end;
@@ -428,19 +428,19 @@ void monitor_render(void)
           probe = json_object_array_get_idx(jso_probe_list, i);
 
           json_object_object_get_ex(probe, "index", &field);
-          width[p_index] = MAX(width[p_index], strlen(json_object_get_string(field)));
+          width[p_index] = MAX(width[p_index], (int) strlen(json_object_get_string(field)));
           json_object_object_get_ex(probe, "state", &field);
-          width[p_state] = MAX(width[p_state], strlen(json_object_get_string(field)));
+          width[p_state] = MAX(width[p_state], (int) strlen(json_object_get_string(field)));
           json_object_object_get_ex(probe, "hits", &field);
-          width[p_hits] = MAX(width[p_hits], strlen(json_object_get_string(field)));
+          width[p_hits] = MAX(width[p_hits], (int) strlen(json_object_get_string(field)));
           json_object_object_get_ex(probe, "min", &field);
-          width[p_min] = MAX(width[p_min], strlen(json_object_get_string(field)));
+          width[p_min] = MAX(width[p_min], (int) strlen(json_object_get_string(field)));
           json_object_object_get_ex(probe, "avg", &field);
-          width[p_avg] = MAX(width[p_avg], strlen(json_object_get_string(field)));
+          width[p_avg] = MAX(width[p_avg], (int) strlen(json_object_get_string(field)));
           json_object_object_get_ex(probe, "max", &field);
-          width[p_max] = MAX(width[p_max], strlen(json_object_get_string(field)));
+          width[p_max] = MAX(width[p_max], (int) strlen(json_object_get_string(field)));
           json_object_object_get_ex(probe, "name", &field);
-          width[p_name] = MAX(width[p_name], strlen(json_object_get_string(field)));
+          width[p_name] = MAX(width[p_name], (int) strlen(json_object_get_string(field)));
         }
 
       json_object_array_sort(jso_probe_list, comp_fn[comp_fn_index]);
