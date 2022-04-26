@@ -10,7 +10,11 @@
 
 %{
 #include <linux/bio.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,18,0)
 #include <linux/genhd.h>
+#else
+#include <linux/blkdev.h>
+#endif
 #ifdef STAPCONF_BLK_TYPES
 #include <linux/blk_types.h>
 #endif
