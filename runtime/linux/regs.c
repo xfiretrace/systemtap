@@ -20,7 +20,12 @@
  * @param ri Pointer to the struct kretprobe_instance.
  * @return The return address
  */
-#define _stp_ret_addr_r(ri) (ri->ret_addr)
+// PR29028, ret_addr field may be located in a another struct
+#ifdef CONFIG_KRETPROBE_ON_RETHOOK
+#define _stp_ret_addr_r(ri) ((ri)->node.ret_addr)
+#else
+#define _stp_ret_addr_r(ri) ((ri)->ret_addr)
+#endif
 
 /** Get the probe address for a kprobe.
  * Call from a kprobe. This will return the

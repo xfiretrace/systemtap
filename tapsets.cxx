@@ -6381,7 +6381,7 @@ generic_kprobe_derived_probe_group::emit_module_decls (systemtap_session& s)
   s.op->newline() << "if (entry)";
   s.op->newline(1) << "SET_REG_IP(regs, (unsigned long) get_kretprobe(inst)->kp.addr);";
   s.op->newline(-1) << "else";
-  s.op->newline(1) << "SET_REG_IP(regs, (unsigned long)inst->ret_addr);";
+  s.op->newline(1) << "SET_REG_IP(regs, (unsigned long) _stp_ret_addr_r(inst));";
   s.op->newline(-1) << "(sp->ph) (c);";
   s.op->newline() << "SET_REG_IP(regs, kprobes_ip);";
   s.op->newline(-1) << "}";
