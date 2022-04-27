@@ -219,8 +219,11 @@ int stp_tracepoint_probe_register(const char *name, void *probe, void *data)
 	}
 	/* add (probe, data) to entry */
 	ret = add_probe(e, probe, data);
-	if (ret)
+	if (ret) {
+		if (!e->refcount)
+			remove_tracepoint(e);
 		goto end;
+	}
 	e->refcount++;
 	dbug_tp(2, "added probe on '%s'\n", name);
 	if (e->tp) {
