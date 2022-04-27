@@ -11524,6 +11524,25 @@ $as_echo "$as_me: WARNING: cannot find librpmio" >&2;}
   fi
 fi
 
+for ac_header in rpm/rpmcrypto.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "rpm/rpmcrypto.h" "ac_cv_header_rpm_rpmcrypto_h" "$ac_includes_default"
+if test "x$ac_cv_header_rpm_rpmcrypto_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_RPM_RPMCRYPTO_H 1
+_ACEOF
+
+
+$as_echo "#define HAVE_RPMCRYPTO_H 1" >>confdefs.h
+
+                      have_rpmcrypto_h=yes
+		      { $as_echo "$as_me:${as_lineno-$LINENO}: separate rpm/rpmcrypto.h" >&5
+$as_echo "$as_me: separate rpm/rpmcrypto.h" >&6;}
+fi
+
+done
+
+
 LIBS_no_readline=$LIBS
 
 have_libreadline="no"

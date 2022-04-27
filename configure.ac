@@ -490,6 +490,12 @@ if test "$with_rpm" != "no"; then
   fi
 fi
 
+dnl Look for rpmcrypto.h
+AC_CHECK_HEADERS([rpm/rpmcrypto.h], [
+		    AC_DEFINE([HAVE_RPMCRYPTO_H],[1],[have rpmcrypto_h])
+                      have_rpmcrypto_h=yes
+		      AC_MSG_NOTICE([separate rpm/rpmcrypto.h])])
+
 dnl Look for readline.
 dnl
 dnl First save the orignal value of LIBS.

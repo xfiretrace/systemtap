@@ -88,6 +88,9 @@
 /* have librpm */
 #undef HAVE_LIBRPM
 
+/* have rpmcrypto.h */
+#undef HAVE_RPMCRYPTO_H
+
 /* have librpmio */
 #undef HAVE_LIBRPMIO
 

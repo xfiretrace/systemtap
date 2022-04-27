@@ -26,6 +26,9 @@ extern "C" {
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmdb.h>
+#ifdef HAVE_RPMCRYPTO_H
+#include <rpm/rpmcrypto.h>
+#endif
 #include <rpm/header.h>
 
 #ifndef xfree
