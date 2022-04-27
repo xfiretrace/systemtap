@@ -457,51 +457,6 @@ stap_utrace_detach(struct task_struct *tsk,
 	return rc;
 }
 
-static void
-stap_utrace_detach_ops(struct utrace_engine_ops *ops)
-{
-	struct task_struct *grp, *tsk;
-	struct utrace_engine *engine;
-	pid_t pid = 0;
-	int rc = 0;
-
-	// Notice we're not calling get_task_mm() in this loop. In
-	// every other instance when calling do_each_thread, we avoid
-	// tasks with no mm, because those are kernel threads.  So,
-	// why is this function different?  When a thread is in the
-	// process of dying, its mm gets freed.  Then, later the
-	// thread gets in the dying state and the thread's
-	// UTRACE_EVENT(DEATH) event handler gets called (if any).
-	//
-	// If a thread is in this "mortally wounded" state - no mm
-	// but not dead - and at that moment this function is called,
-	// we'd miss detaching from it if we were checking to see if
-	// it had an mm.
-
-	rcu_read_lock();
-	do_each_thread(grp, tsk) {
-#ifdef PF_KTHREAD
-		// Ignore kernel threads.  On systems without
-		// PF_KTHREAD, we're ok, since kernel threads won't be
-		// matched by the stap_utrace_detach() call.
-		if (tsk->flags & PF_KTHREAD)
-			continue;
-#endif
-
-		/* Notice we're purposefully ignoring errors from
-		 * stap_utrace_detach().  Even if we got an error on
-		 * this task, we need to keep detaching from other
-		 * tasks.  But warn, we might be unloading and dangling
-		 * engines are bad news. */
-		rc = stap_utrace_detach(tsk, ops);
-		if (rc != 0)
-			_stp_error("stap_utrace_detach returned error %d on pid %d", rc, tsk->pid);
-		WARN_ON(rc != 0);
-	} while_each_thread(grp, tsk);
-	rcu_read_unlock();
-	debug_task_finder_report();
-}
-
 static char *
 __stp_get_mm_path(struct mm_struct *mm, char *buf, int buflen)
 {

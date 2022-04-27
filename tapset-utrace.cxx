@@ -1269,6 +1269,9 @@ utrace_derived_probe_group::emit_module_linux_exit (systemtap_session& s)
 {
   if (probes_by_path.empty() && probes_by_pid.empty()) return;
 
+  // Only runtime/linux/task_finder.c uses stap_utrace_detach_ops()
+  if (s.kernel_config["CONFIG_UTRACE"] != string("y")) return;
+
   s.op->newline();
   s.op->newline() << "/* ---- utrace probes ---- */";
   s.op->newline() << "for (i=0; i<ARRAY_SIZE(stap_utrace_probes); i++) {";
