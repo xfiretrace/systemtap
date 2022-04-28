@@ -1049,6 +1049,8 @@ make_tracequeries(systemtap_session& s, const map<string,string>& contents)
   omf << "CONFIG_MODULE_SIG := n" << endl;
   // PR23488: need to override this kconfig, else we get no useful struct decls
   omf << "CONFIG_DEBUG_INFO_REDUCED := " << endl;
+  // objtool is slow and uses a lot of memory, skip it since these modules aren't loaded
+  omf << "CONFIG_STACK_VALIDATION := " << endl;
   // PR18389: disable GCC's Identical Code Folding, since the stubs may look identical
   omf << "EXTRA_CFLAGS += $(call cc-option,-fno-ipa-icf)" << endl;
 
@@ -1128,6 +1130,9 @@ make_typequery_kmod(systemtap_session& s, const vector<string>& headers, string&
 
   // PR23488: need to override this kconfig, else we get no useful struct decls
   omf << "CONFIG_DEBUG_INFO_REDUCED := " << endl;
+
+  // objtool is slow and uses a lot of memory, skip it since these modules aren't loaded
+  omf << "CONFIG_STACK_VALIDATION := " << endl;
   
   // NB: We use -include instead of #include because that gives us more power.
   // Using #include searches relative to the source's path, which in this case
