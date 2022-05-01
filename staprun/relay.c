@@ -229,20 +229,22 @@ static void *reader_thread(void *data)
                         bufread += rc;
                 }
 
-                /* Wait until the bufhdr.sequence number indicates it's OUR TURN to go ahead. */
-                struct timespec ts = {.tv_sec=time(NULL)+2, .tv_nsec=0}; /* wait 1-2 seconds */
-                pthread_mutex_lock(& last_sequence_number_mutex);
-                while ((last_sequence_number+1 != bufhdr.sequence) && /* normal case */
-                       (last_sequence_number < bufhdr.sequence)) { /* we're late!!! */
-                        int rc = pthread_cond_timedwait (& last_sequence_number_changed,
-                                                         & last_sequence_number_mutex,
-                                                         & ts);
-                        if (rc == ETIMEDOUT) {
-                                /* _perr("message sequencing timeout"); */
-                                break;
+                if (! bulkmode) {
+                        /* Wait until the bufhdr.sequence number indicates it's OUR TURN to go ahead. */
+                        struct timespec ts = {.tv_sec=time(NULL)+2, .tv_nsec=0}; /* wait 1-2 seconds */
+                        pthread_mutex_lock(& last_sequence_number_mutex);
+                        while ((last_sequence_number+1 != bufhdr.sequence) && /* normal case */
+                               (last_sequence_number < bufhdr.sequence)) { /* we're late!!! */
+                                int rc = pthread_cond_timedwait (& last_sequence_number_changed,
+                                                                 & last_sequence_number_mutex,
+                                                                 & ts);
+                                if (rc == ETIMEDOUT) {
+                                        /* _perr("message sequencing timeout"); */
+                                        break;
+                                }
                         }
+                        pthread_mutex_unlock(& last_sequence_number_mutex);
                 }
-                pthread_mutex_unlock(& last_sequence_number_mutex);
                 
                 int wbytes = rc;
                 char *wbuf = buf;
@@ -262,7 +264,7 @@ static void *reader_thread(void *data)
                         wsize = 0;
                 }
                 pthread_mutex_unlock(&mutex[cpu]);
-                
+
                 /* Copy loop.  Must repeat write(2) in case of a pipe overflow
                    or other transient fullness. */
                 while (wbytes > 0) {
@@ -294,7 +296,9 @@ static void *reader_thread(void *data)
                                         fd = out_fd[cpu];
                                 else
                                         fd = out_fd[avail_cpus[0]];
-                                rc = write(fd, wbuf, wbytes);
+                                if (bulkmode)
+                                        (void) write(fd, &bufhdr, sizeof(bufhdr)); // write header
+                                rc = write(fd, wbuf, wbytes); // write payload
                                 if (rc <= 0) {
                                         perr("Couldn't write to output %d for cpu %d, exiting.",
                                              fd, cpu);
