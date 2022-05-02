@@ -296,9 +296,10 @@ static void *reader_thread(void *data)
                                         fd = out_fd[cpu];
                                 else
                                         fd = out_fd[avail_cpus[0]];
+                                rc = 0;
                                 if (bulkmode)
-                                        (void) write(fd, &bufhdr, sizeof(bufhdr)); // write header
-                                rc = write(fd, wbuf, wbytes); // write payload
+                                        rc = write(fd, &bufhdr, sizeof(bufhdr)); // write header
+                                rc |= write(fd, wbuf, wbytes); // write payload
                                 if (rc <= 0) {
                                         perr("Couldn't write to output %d for cpu %d, exiting.",
                                              fd, cpu);
