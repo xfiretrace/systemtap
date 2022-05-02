@@ -312,6 +312,18 @@ sign_module(const string &tmpdir, const string &module_filename,
   /* Set the cert database password callback. */
   PK11_SetPasswordFunc (nssPasswordCallback);
 
+  struct stat file_info;
+  if(stat(server_cert_db_path().c_str(), &file_info) != 0)
+    {
+      vector<string> cmd;
+      int rc;
+      cmd = { "mkdir", "-p", server_cert_db_path().c_str() };
+      rc = stap_system (0, cmd);
+      if (rc != 0)
+          cerr << (_F("Error creating server cert db path \"%s\"", //
+                   server_cert_db_path().c_str())) << endl;
+    }
+
   NSSInitContext *context = nssInitContext (server_cert_db_path().c_str());
   if (!context)
     cerr << "nssInitContext failed for " << server_cert_db_path();
