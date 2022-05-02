@@ -34,8 +34,8 @@
 #include "relay_compat.h"
 
 #ifndef STP_RELAY_TIMER_INTERVAL
-/* Wakeup timer interval in jiffies (default 10 ms) */
-#define STP_RELAY_TIMER_INTERVAL		((HZ + 99) / 100)
+/* Wakeup timer interval in jiffies (default 1 ms) */
+#define STP_RELAY_TIMER_INTERVAL		((HZ + 999) / 1000)
 #endif
 
 /* Note: if struct _stp_relay_data_type changes, staplog.c might need

@@ -427,7 +427,7 @@ static void _stp_cleanup_and_exit(int send_exit)
 
 		failures = atomic_read(&_stp_transport_failures);
 		if (failures)
-			_stp_warn("There were %d transport failures. Try stap -s to increase the buffer size.\n", failures);
+			_stp_warn("There were %d transport failures. Try stap -s to increase the buffer size from %d.\n", failures, _stp_bufsize);
 
 		dbug_trans(1, "*** calling _stp_transport_data_fs_stop ***\n");
 		_stp_transport_data_fs_stop();
@@ -623,6 +623,7 @@ static int _stp_transport_init(void)
 		_stp_nsubbufs = size / _stp_subbuf_size;
 	}
 
+        _stp_bufsize = (long)_stp_subbuf_size * (long)_stp_nsubbufs / 1024 / 1024; // for diagnostics later
         dbug_trans(1, "Using %d subbufs of size %d * %d CPUs\n",
                    _stp_nsubbufs, _stp_subbuf_size, num_online_cpus());
         
