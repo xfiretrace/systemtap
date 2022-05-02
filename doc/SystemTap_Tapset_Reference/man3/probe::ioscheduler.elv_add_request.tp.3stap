@@ -2,12 +2,12 @@
 .\"     Title: probe::ioscheduler.elv_add_request.tp
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: IO Scheduler and block IO Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::IOSCHEDULER\&" "3stap" "November 2021" "SystemTap Tapset Reference" "IO Scheduler and block IO Taps"
+.TH "PROBE::IOSCHEDULER\&" "3stap" "May 2022" "SystemTap Tapset Reference" "IO Scheduler and block IO Taps"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,9 +36,14 @@ ioscheduler\&.elv_add_request\&.tp
 .fi
 .SH "VALUES"
 .PP
-\fIelevator_name\fR
+\fIq\fR
 .RS 4
-The type of I/O elevator currently enabled\&.
+Pointer to request queue\&.
+.RE
+.PP
+\fIrq\fR
+.RS 4
+Address of request\&.
 .RE
 .PP
 \fIname\fR
@@ -51,11 +56,6 @@ Name of the probe point
 Disk major no of request\&.
 .RE
 .PP
-\fIq\fR
-.RS 4
-Pointer to request queue\&.
-.RE
-.PP
 \fIrq_flags\fR
 .RS 4
 Request flags\&.
@@ -66,9 +66,9 @@ Request flags\&.
 Disk minor number of request\&.
 .RE
 .PP
-\fIrq\fR
+\fIelevator_name\fR
 .RS 4
-Address of request\&.
+The type of I/O elevator currently enabled\&.
 .RE
 .SH SEE ALSO\n 
 .IR tapset::ioscheduler (3stap)

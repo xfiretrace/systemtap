@@ -2,12 +2,12 @@
 .\"     Title: probe::socket.readv
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Socket Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SOCKET\&.READ" "3stap" "November 2021" "SystemTap Tapset Reference" "Socket Tapset"
+.TH "PROBE::SOCKET\&.READ" "3stap" "May 2022" "SystemTap Tapset Reference" "Socket Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,19 +36,9 @@ socket\&.readv
 .fi
 .SH "VALUES"
 .PP
-\fIfamily\fR
+\fIsize\fR
 .RS 4
-Protocol family value
-.RE
-.PP
-\fIname\fR
-.RS 4
-Name of this probe
-.RE
-.PP
-\fIstate\fR
-.RS 4
-Socket state value
+Message size in bytes
 .RE
 .PP
 \fIflags\fR
@@ -61,14 +51,24 @@ Socket flags value
 Socket type value
 .RE
 .PP
-\fIsize\fR
+\fIname\fR
 .RS 4
-Message size in bytes
+Name of this probe
+.RE
+.PP
+\fIstate\fR
+.RS 4
+Socket state value
 .RE
 .PP
 \fIprotocol\fR
 .RS 4
 Protocol value
+.RE
+.PP
+\fIfamily\fR
+.RS 4
+Protocol family value
 .RE
 .SH "CONTEXT"
 .PP

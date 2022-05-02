@@ -1,4 +1,4 @@
-* What's new in version 4.7, PRERELEASE
+* What's new in version 4.7, 2022-05-02
 
 - SystemTap now supports an additional method to sign modules on
   UEFI/SecureBoot systems.  In addition to the existing method of

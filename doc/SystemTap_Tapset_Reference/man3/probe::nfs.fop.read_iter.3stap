@@ -2,12 +2,12 @@
 .\"     Title: probe::nfs.fop.read_iter
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Network File Storage Tapsets
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::NFS\&.FOP\&.R" "3stap" "November 2021" "SystemTap Tapset Reference" "Network File Storage Tapsets"
+.TH "PROBE::NFS\&.FOP\&.R" "3stap" "May 2022" "SystemTap Tapset Reference" "Network File Storage Tapsets"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,24 +36,9 @@ nfs\&.fop\&.read_iter
 .fi
 .SH "VALUES"
 .PP
-\fIcount\fR
-.RS 4
-read bytes
-.RE
-.PP
-\fIdev\fR
-.RS 4
-device identifier
-.RE
-.PP
 \fIino\fR
 .RS 4
 inode number
-.RE
-.PP
-\fIcache_time\fR
-.RS 4
-when we started read\-caching this inode
 .RE
 .PP
 \fIcache_valid\fR
@@ -61,14 +46,14 @@ when we started read\-caching this inode
 cache related bit mask flag
 .RE
 .PP
-\fIpos\fR
-.RS 4
-current position of file
-.RE
-.PP
 \fIfile_name\fR
 .RS 4
 file name
+.RE
+.PP
+\fIpos\fR
+.RS 4
+current position of file
 .RE
 .PP
 \fIattrtimeo\fR
@@ -76,9 +61,24 @@ file name
 how long the cached information is assumed to be valid\&. We need to revalidate the cached attrs for this inode if jiffies \- read_cache_jiffies > attrtimeo\&.
 .RE
 .PP
+\fIcount\fR
+.RS 4
+read bytes
+.RE
+.PP
 \fIparent_name\fR
 .RS 4
 parent dir name
+.RE
+.PP
+\fIcache_time\fR
+.RS 4
+when we started read\-caching this inode
+.RE
+.PP
+\fIdev\fR
+.RS 4
+device identifier
 .RE
 .SH SEE ALSO\n 
 .IR tapset::nfs (3stap)

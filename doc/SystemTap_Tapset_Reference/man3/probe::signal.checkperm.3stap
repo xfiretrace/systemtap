@@ -2,12 +2,12 @@
 .\"     Title: probe::signal.checkperm
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Signal Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SIGNAL\&.CHEC" "3stap" "November 2021" "SystemTap Tapset Reference" "Signal Tapset"
+.TH "PROBE::SIGNAL\&.CHEC" "3stap" "May 2022" "SystemTap Tapset Reference" "Signal Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,29 +36,19 @@ signal\&.checkperm
 .fi
 .SH "VALUES"
 .PP
-\fIsig_pid\fR
-.RS 4
-The PID of the process receiving the signal
-.RE
-.PP
-\fIname\fR
-.RS 4
-Name of the probe point
-.RE
-.PP
-\fIsig_name\fR
-.RS 4
-A string representation of the signal
-.RE
-.PP
 \fItask\fR
 .RS 4
 A task handle to the signal recipient
 .RE
 .PP
-\fIsig\fR
+\fIsig_pid\fR
 .RS 4
-The number of the signal
+The PID of the process receiving the signal
+.RE
+.PP
+\fIsinfo\fR
+.RS 4
+The address of the siginfo structure
 .RE
 .PP
 \fIsi_code\fR
@@ -66,9 +56,19 @@ The number of the signal
 Indicates the signal type
 .RE
 .PP
-\fIsinfo\fR
+\fIsig_name\fR
 .RS 4
-The address of the siginfo structure
+A string representation of the signal
+.RE
+.PP
+\fIsig\fR
+.RS 4
+The number of the signal
+.RE
+.PP
+\fIname\fR
+.RS 4
+Name of the probe point
 .RE
 .PP
 \fIpid_name\fR

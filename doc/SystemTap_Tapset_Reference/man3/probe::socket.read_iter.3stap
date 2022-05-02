@@ -2,12 +2,12 @@
 .\"     Title: probe::socket.read_iter
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Socket Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SOCKET\&.READ" "3stap" "November 2021" "SystemTap Tapset Reference" "Socket Tapset"
+.TH "PROBE::SOCKET\&.READ" "3stap" "May 2022" "SystemTap Tapset Reference" "Socket Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -51,6 +51,16 @@ Name of this probe
 Socket state value
 .RE
 .PP
+\fIprotocol\fR
+.RS 4
+Protocol value
+.RE
+.PP
+\fIsize\fR
+.RS 4
+Message size in bytes
+.RE
+.PP
 \fIflags\fR
 .RS 4
 Socket flags value
@@ -59,16 +69,6 @@ Socket flags value
 \fItype\fR
 .RS 4
 Socket type value
-.RE
-.PP
-\fIsize\fR
-.RS 4
-Message size in bytes
-.RE
-.PP
-\fIprotocol\fR
-.RS 4
-Protocol value
 .RE
 .SH "CONTEXT"
 .PP

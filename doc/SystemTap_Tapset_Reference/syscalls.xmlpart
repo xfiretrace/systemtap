@@ -63,7 +63,7 @@ same convenience variables.
 <row><entry>
     bdflush
 </entry><entry>
-    data, data_str, func
+    $id, $regs, data, data_str, func, int, pt_regs*
 </entry></row>
 <row><entry>
     bind

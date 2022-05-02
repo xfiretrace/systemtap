@@ -2,12 +2,12 @@
 .\"     Title: probe::nfs.proc.write_done
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Network File Storage Tapsets
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::NFS\&.PROC\&." "3stap" "November 2021" "SystemTap Tapset Reference" "Network File Storage Tapsets"
+.TH "PROBE::NFS\&.PROC\&." "3stap" "May 2022" "SystemTap Tapset Reference" "Network File Storage Tapsets"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,9 +36,9 @@ nfs\&.proc\&.write_done
 .fi
 .SH "VALUES"
 .PP
-\fIserver_ip\fR
+\fIvalid\fR
 .RS 4
-IP address of server
+fattr\->valid, indicates which fields are valid
 .RE
 .PP
 \fIcount\fR
@@ -51,14 +51,9 @@ number of bytes written
 result of last operation
 .RE
 .PP
-\fIvalid\fR
+\fIprot\fR
 .RS 4
-fattr\->valid, indicates which fields are valid
-.RE
-.PP
-\fIversion\fR
-.RS 4
-NFS version
+transfer protocol
 .RE
 .PP
 \fItimestamp\fR
@@ -66,9 +61,14 @@ NFS version
 V4 timestamp, which is used for lease renewal
 .RE
 .PP
-\fIprot\fR
+\fIversion\fR
 .RS 4
-transfer protocol
+NFS version
+.RE
+.PP
+\fIserver_ip\fR
+.RS 4
+IP address of server
 .RE
 .SH "DESCRIPTION"
 .PP

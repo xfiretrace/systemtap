@@ -2,12 +2,12 @@
 .\"     Title: probe::softirq.exit
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Interrupt Request (IRQ) Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SOFTIRQ\&.EXI" "3stap" "November 2021" "SystemTap Tapset Reference" "Interrupt Request (IRQ) Tapset"
+.TH "PROBE::SOFTIRQ\&.EXI" "3stap" "May 2022" "SystemTap Tapset Reference" "Interrupt Request (IRQ) Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,14 +36,14 @@ softirq\&.exit
 .fi
 .SH "VALUES"
 .PP
+\fIvec\fR
+.RS 4
+softirq_action vector
+.RE
+.PP
 \fIaction\fR
 .RS 4
 pointer to softirq handler that just finished execution
-.RE
-.PP
-\fIh\fR
-.RS 4
-struct softirq_action* for just executed softirq
 .RE
 .PP
 \fIvec_nr\fR
@@ -51,9 +51,9 @@ struct softirq_action* for just executed softirq
 softirq vector number
 .RE
 .PP
-\fIvec\fR
+\fIh\fR
 .RS 4
-softirq_action vector
+struct softirq_action* for just executed softirq
 .RE
 .SH SEE ALSO\n 
 .IR tapset::irq (3stap)

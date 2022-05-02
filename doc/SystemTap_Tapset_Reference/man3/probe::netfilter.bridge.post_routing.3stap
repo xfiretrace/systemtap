@@ -2,12 +2,12 @@
 .\"     Title: probe::netfilter.bridge.post_routing
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Networking Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::NETFILTER\&.B" "3stap" "November 2021" "SystemTap Tapset Reference" "Networking Tapset"
+.TH "PROBE::NETFILTER\&.B" "3stap" "May 2022" "SystemTap Tapset Reference" "Networking Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,19 +36,29 @@ netfilter\&.bridge\&.post_routing
 .fi
 .SH "VALUES"
 .PP
-\fIbr_type\fR
+\fIindev_name\fR
 .RS 4
-BPDU type
+Name of network device packet was received on (if known)
 .RE
 .PP
-\fInf_repeat\fR
+\fInf_accept\fR
 .RS 4
-Constant used to signify a \*(Aqrepeat\*(Aq verdict
+Constant used to signify an \*(Aqaccept\*(Aq verdict
 .RE
 .PP
-\fIbr_flags\fR
+\fIbr_fd\fR
 .RS 4
-BPDU flags
+Forward delay in 1/256 secs
+.RE
+.PP
+\fIllcproto_stp\fR
+.RS 4
+Constant used to signify Bridge Spanning Tree Protocol packet
+.RE
+.PP
+\fIbr_rmac\fR
+.RS 4
+Root bridge MAC address
 .RE
 .PP
 \fIbr_msg\fR
@@ -61,9 +71,9 @@ Message age in 1/256 secs
 Identity of bridge
 .RE
 .PP
-\fIbr_vid\fR
+\fIbr_rid\fR
 .RS 4
-Protocol version identifier
+Identity of root bridge
 .RE
 .PP
 \fIlength\fR
@@ -71,84 +81,10 @@ Protocol version identifier
 The length of the packet buffer contents, in bytes
 .RE
 .PP
-\fIoutdev_name\fR
+\fIpf\fR
 .RS 4
-Name of network device packet will be routed to (if known)
-.RE
-.PP
-\fIbr_mac\fR
-.RS 4
-Bridge MAC address
-.RE
-.PP
-\fIdata_str\fR
-.RS 4
-A string representing the packet buffer contents
-.RE
-.PP
-\fIbrhdr\fR
-.RS 4
-Address of bridge header
-.RE
-.PP
-\fInf_drop\fR
-.RS 4
-Constant used to signify a \*(Aqdrop\*(Aq verdict
-.RE
-.PP
-\fIindev_name\fR
-.RS 4
-Name of network device packet was received on (if known)
-.RE
-.PP
-\fIprotocol\fR
-.RS 4
-Packet protocol
-.RE
-.PP
-\fInf_queue\fR
-.RS 4
-Constant used to signify a \*(Aqqueue\*(Aq verdict
-.RE
-.PP
-\fIbr_fd\fR
-.RS 4
-Forward delay in 1/256 secs
-.RE
-.PP
-\fInf_accept\fR
-.RS 4
-Constant used to signify an \*(Aqaccept\*(Aq verdict
-.RE
-.PP
-\fIbr_rmac\fR
-.RS 4
-Root bridge MAC address
-.RE
-.PP
-\fIoutdev\fR
-.RS 4
-Address of net_device representing output device, 0 if unknown
-.RE
-.PP
-\fIbr_rid\fR
-.RS 4
-Identity of root bridge
-.RE
-.PP
-\fIllcproto_stp\fR
-.RS 4
-Constant used to signify Bridge Spanning Tree Protocol packet
-.RE
-.PP
-\fIbr_prid\fR
-.RS 4
-Protocol identifier
-.RE
-.PP
-\fInf_stop\fR
-.RS 4
-Constant used to signify a \*(Aqstop\*(Aq verdict
+Protocol family \-\- always
+\(lqbridge\(rq
 .RE
 .PP
 \fIbr_cost\fR
@@ -156,29 +92,9 @@ Constant used to signify a \*(Aqstop\*(Aq verdict
 Total cost from transmitting bridge to root
 .RE
 .PP
-\fIllcpdu\fR
+\fInf_stop\fR
 .RS 4
-Address of LLC Protocol Data Unit
-.RE
-.PP
-\fInf_stolen\fR
-.RS 4
-Constant used to signify a \*(Aqstolen\*(Aq verdict
-.RE
-.PP
-\fIdata_hex\fR
-.RS 4
-A hexadecimal string representing the packet buffer contents
-.RE
-.PP
-\fIbr_poid\fR
-.RS 4
-Port identifier
-.RE
-.PP
-\fIbr_max\fR
-.RS 4
-Max age in 1/256 secs
+Constant used to signify a \*(Aqstop\*(Aq verdict
 .RE
 .PP
 \fIindev\fR
@@ -186,10 +102,94 @@ Max age in 1/256 secs
 Address of net_device representing input device, 0 if unknown
 .RE
 .PP
-\fIpf\fR
+\fIoutdev_name\fR
 .RS 4
-Protocol family \-\- always
-\(lqbridge\(rq
+Name of network device packet will be routed to (if known)
+.RE
+.PP
+\fIbr_max\fR
+.RS 4
+Max age in 1/256 secs
+.RE
+.PP
+\fIbr_type\fR
+.RS 4
+BPDU type
+.RE
+.PP
+\fIbrhdr\fR
+.RS 4
+Address of bridge header
+.RE
+.PP
+\fIdata_str\fR
+.RS 4
+A string representing the packet buffer contents
+.RE
+.PP
+\fIprotocol\fR
+.RS 4
+Packet protocol
+.RE
+.PP
+\fIllcpdu\fR
+.RS 4
+Address of LLC Protocol Data Unit
+.RE
+.PP
+\fIbr_flags\fR
+.RS 4
+BPDU flags
+.RE
+.PP
+\fIbr_vid\fR
+.RS 4
+Protocol version identifier
+.RE
+.PP
+\fIbr_poid\fR
+.RS 4
+Port identifier
+.RE
+.PP
+\fIoutdev\fR
+.RS 4
+Address of net_device representing output device, 0 if unknown
+.RE
+.PP
+\fIbr_mac\fR
+.RS 4
+Bridge MAC address
+.RE
+.PP
+\fInf_queue\fR
+.RS 4
+Constant used to signify a \*(Aqqueue\*(Aq verdict
+.RE
+.PP
+\fInf_drop\fR
+.RS 4
+Constant used to signify a \*(Aqdrop\*(Aq verdict
+.RE
+.PP
+\fIbr_prid\fR
+.RS 4
+Protocol identifier
+.RE
+.PP
+\fIdata_hex\fR
+.RS 4
+A hexadecimal string representing the packet buffer contents
+.RE
+.PP
+\fInf_repeat\fR
+.RS 4
+Constant used to signify a \*(Aqrepeat\*(Aq verdict
+.RE
+.PP
+\fInf_stolen\fR
+.RS 4
+Constant used to signify a \*(Aqstolen\*(Aq verdict
 .RE
 .PP
 \fIbr_htime\fR

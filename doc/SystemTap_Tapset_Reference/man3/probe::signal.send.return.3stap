@@ -2,12 +2,12 @@
 .\"     Title: probe::signal.send.return
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Signal Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SIGNAL\&.SEND" "3stap" "November 2021" "SystemTap Tapset Reference" "Signal Tapset"
+.TH "PROBE::SIGNAL\&.SEND" "3stap" "May 2022" "SystemTap Tapset Reference" "Signal Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,16 +36,6 @@ signal\&.send\&.return
 .fi
 .SH "VALUES"
 .PP
-\fIretstr\fR
-.RS 4
-The return value to either __group_send_sig_info, specific_send_sig_info, or send_sigqueue
-.RE
-.PP
-\fIname\fR
-.RS 4
-The name of the function used to send out the signal
-.RE
-.PP
 \fIsend2queue\fR
 .RS 4
 Indicates whether the sent signal was sent to an existing sigqueue
@@ -54,6 +44,16 @@ Indicates whether the sent signal was sent to an existing sigqueue
 \fIshared\fR
 .RS 4
 Indicates whether the sent signal is shared by the thread group\&.
+.RE
+.PP
+\fIname\fR
+.RS 4
+The name of the function used to send out the signal
+.RE
+.PP
+\fIretstr\fR
+.RS 4
+The return value to either __group_send_sig_info, specific_send_sig_info, or send_sigqueue
 .RE
 .SH "CONTEXT"
 .PP

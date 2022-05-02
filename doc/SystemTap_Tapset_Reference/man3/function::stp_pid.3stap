@@ -2,12 +2,12 @@
 .\"     Title: function::stp_pid
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Context Functions
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "FUNCTION::STP_PID" "3stap" "November 2021" "SystemTap Tapset Reference" "Context Functions"
+.TH "FUNCTION::STP_PID" "3stap" "May 2022" "SystemTap Tapset Reference" "Context Functions"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------

@@ -2,12 +2,12 @@
 .\"     Title: probe::syscall_any.return
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Syscall Any Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SYSCALL_ANY\&" "3stap" "November 2021" "SystemTap Tapset Reference" "Syscall Any Tapset"
+.TH "PROBE::SYSCALL_ANY\&" "3stap" "May 2022" "SystemTap Tapset Reference" "Syscall Any Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,11 +36,6 @@ syscall_any\&.return
 .fi
 .SH "VALUES"
 .PP
-\fIsyscall_nr\fR
-.RS 4
-number of the syscall
-.RE
-.PP
 \fIname\fR
 .RS 4
 name of the syscall
@@ -49,6 +44,11 @@ name of the syscall
 \fIretval\fR
 .RS 4
 return value of the syscall
+.RE
+.PP
+\fIsyscall_nr\fR
+.RS 4
+number of the syscall
 .RE
 .SH "CONTEXT"
 .PP

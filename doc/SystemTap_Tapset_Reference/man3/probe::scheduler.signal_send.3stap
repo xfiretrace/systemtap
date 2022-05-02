@@ -2,12 +2,12 @@
 .\"     Title: probe::scheduler.signal_send
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Scheduler Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SCHEDULER\&.S" "3stap" "November 2021" "SystemTap Tapset Reference" "Scheduler Tapset"
+.TH "PROBE::SCHEDULER\&.S" "3stap" "May 2022" "SystemTap Tapset Reference" "Scheduler Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,6 +36,11 @@ scheduler\&.signal_send
 .fi
 .SH "VALUES"
 .PP
+\fIname\fR
+.RS 4
+name of the probe point
+.RE
+.PP
 \fIpid\fR
 .RS 4
 pid of the process sending signal
@@ -44,11 +49,6 @@ pid of the process sending signal
 \fIsignal_number\fR
 .RS 4
 signal number
-.RE
-.PP
-\fIname\fR
-.RS 4
-name of the probe point
 .RE
 .SH SEE ALSO\n 
 .IR tapset::scheduler (3stap)

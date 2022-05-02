@@ -1,5 +1,5 @@
 .\" -*- nroff -*-
-.TH TAPSET::CONVERSIONS 3stap "November 2021" "SystemTap Tapset Reference"
+.TH TAPSET::CONVERSIONS 3stap "May 2022" "SystemTap Tapset Reference"
 .SH NAME
 tapset::conversions \- systemtap conversions tapset
  
@@ -28,6 +28,14 @@ Retrieves and quotes string from kernel memory
 .IP
 See 
 .IR function::kernel_string_quoted (3stap)
+ for details.
+.P
+.TP
+.B kernel_or_user_string_quoted 
+Retrieves and quotes string from kernel or user memory
+.IP
+See 
+.IR function::kernel_or_user_string_quoted (3stap)
  for details.
 .P
 .TP
@@ -63,6 +71,14 @@ See
  for details.
 .P
 .TP
+.B kernel_or_user_string_quoted_utf32 
+Retrieves and quotes UTF-32 string from kernel or user memory
+.IP
+See 
+.IR function::kernel_or_user_string_quoted_utf32 (3stap)
+ for details.
+.P
+.TP
 .B kernel_string_utf16 
 Retrieves UTF-16 string from kernel memory
 .IP
@@ -84,6 +100,14 @@ Quote given kernel UTF-16 string.
 .IP
 See 
 .IR function::kernel_string_quoted_utf16 (3stap)
+ for details.
+.P
+.TP
+.B kernel_or_user_string_quoted_utf16 
+Retrieves and quotes UTF-16 string from kernel or user memory
+.IP
+See 
+.IR function::kernel_or_user_string_quoted_utf16 (3stap)
  for details.
 .P
 .TP
@@ -156,15 +180,21 @@ See
 .BR
 .IR \%function::kernel_string_quoted (3stap),
 .BR
+.IR \%function::kernel_or_user_string_quoted (3stap),
+.BR
 .IR \%function::kernel_string_n (3stap),
 .BR
 .IR \%function::kernel_string_utf32 (3stap),
 .BR
 .IR \%function::kernel_string_quoted_utf32 (3stap),
 .BR
+.IR \%function::kernel_or_user_string_quoted_utf32 (3stap),
+.BR
 .IR \%function::kernel_string_utf16 (3stap),
 .BR
 .IR \%function::kernel_string_quoted_utf16 (3stap),
+.BR
+.IR \%function::kernel_or_user_string_quoted_utf16 (3stap),
 .BR
 .IR \%function::kernel_long (3stap),
 .BR

@@ -2,12 +2,12 @@
 .\"     Title: probe::sunrpc.clnt.restart_call
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Networking Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SUNRPC\&.CLNT" "3stap" "November 2021" "SystemTap Tapset Reference" "Networking Tapset"
+.TH "PROBE::SUNRPC\&.CLNT" "3stap" "May 2022" "SystemTap Tapset Reference" "Networking Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,11 +36,6 @@ sunrpc\&.clnt\&.restart_call
 .fi
 .SH "VALUES"
 .PP
-\fIxid\fR
-.RS 4
-the transmission id
-.RE
-.PP
 \fIservername\fR
 .RS 4
 the server machine name
@@ -51,14 +46,14 @@ the server machine name
 the task run status
 .RE
 .PP
+\fIxid\fR
+.RS 4
+the transmission id
+.RE
+.PP
 \fItk_priority\fR
 .RS 4
 the task priority
-.RE
-.PP
-\fItk_pid\fR
-.RS 4
-the debugging aid of task
 .RE
 .PP
 \fIprog\fR
@@ -69,6 +64,11 @@ the RPC program number
 \fItk_flags\fR
 .RS 4
 the task flags
+.RE
+.PP
+\fItk_pid\fR
+.RS 4
+the debugging aid of task
 .RE
 .SH SEE ALSO\n 
 .IR tapset::rpc (3stap)

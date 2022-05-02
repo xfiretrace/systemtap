@@ -2,12 +2,12 @@
 .\"     Title: probe::sunrpc.sched.delay
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Networking Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SUNRPC\&.SCHE" "3stap" "November 2021" "SystemTap Tapset Reference" "Networking Tapset"
+.TH "PROBE::SUNRPC\&.SCHE" "3stap" "May 2022" "SystemTap Tapset Reference" "Networking Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -41,6 +41,11 @@ sunrpc\&.sched\&.delay
 the flags of the task
 .RE
 .PP
+\fIvers\fR
+.RS 4
+the program version in the RPC call
+.RE
+.PP
 \fItk_pid\fR
 .RS 4
 the debugging id of the task
@@ -54,11 +59,6 @@ the program number in the RPC call
 \fIxid\fR
 .RS 4
 the transmission id in the RPC call
-.RE
-.PP
-\fIvers\fR
-.RS 4
-the program version in the RPC call
 .RE
 .PP
 \fIdelay\fR

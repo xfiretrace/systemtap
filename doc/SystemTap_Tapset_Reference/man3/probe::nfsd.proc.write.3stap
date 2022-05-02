@@ -2,12 +2,12 @@
 .\"     Title: probe::nfsd.proc.write
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: Network File Storage Tapsets
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::NFSD\&.PROC\&" "3stap" "November 2021" "SystemTap Tapset Reference" "Network File Storage Tapsets"
+.TH "PROBE::NFSD\&.PROC\&" "3stap" "May 2022" "SystemTap Tapset Reference" "Network File Storage Tapsets"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,31 +36,6 @@ nfsd\&.proc\&.write
 .fi
 .SH "VALUES"
 .PP
-\fIoffset\fR
-.RS 4
-the offset of file
-.RE
-.PP
-\fIuid\fR
-.RS 4
-requester\*(Aqs user id
-.RE
-.PP
-\fIversion\fR
-.RS 4
-nfs version
-.RE
-.PP
-\fIvlen\fR
-.RS 4
-read blocks
-.RE
-.PP
-\fIgid\fR
-.RS 4
-requester\*(Aqs group id
-.RE
-.PP
 \fIcount\fR
 .RS 4
 read bytes
@@ -69,6 +44,31 @@ read bytes
 \fIvec\fR
 .RS 4
 struct kvec, includes buf address in kernel address and length of each buffer
+.RE
+.PP
+\fIversion\fR
+.RS 4
+nfs version
+.RE
+.PP
+\fIuid\fR
+.RS 4
+requester\*(Aqs user id
+.RE
+.PP
+\fIgid\fR
+.RS 4
+requester\*(Aqs group id
+.RE
+.PP
+\fIclient_ip\fR
+.RS 4
+the ip address of client
+.RE
+.PP
+\fIsize\fR
+.RS 4
+read bytes
 .RE
 .PP
 \fIproto\fR
@@ -81,19 +81,19 @@ transfer protocol
 argp\->stable
 .RE
 .PP
-\fIsize\fR
-.RS 4
-read bytes
-.RE
-.PP
-\fIclient_ip\fR
-.RS 4
-the ip address of client
-.RE
-.PP
 \fIfh\fR
 .RS 4
 file handle (the first part is the length of the file handle)
+.RE
+.PP
+\fIvlen\fR
+.RS 4
+read blocks
+.RE
+.PP
+\fIoffset\fR
+.RS 4
+the offset of file
 .RE
 .SH SEE ALSO\n 
 .IR tapset::nfsd (3stap)

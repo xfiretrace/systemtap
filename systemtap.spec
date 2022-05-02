@@ -1275,6 +1275,10 @@ exit 0
 
 # PRERELEASE
 %changelog
+* Mon May 02 2022 Frank Ch. Eigler <fche@redhat.com> - 4.7-1
+- Upstream release, see wiki page below for detailed notes.
+  https://sourceware.org/systemtap/wiki/SystemTapReleases
+
 * Mon Nov 15 2021 Serhei Makarov <me@serhei.io> - 4.6-1
 - Upstream release, see wiki page below for detailed notes.
   https://sourceware.org/systemtap/wiki/SystemTapReleases

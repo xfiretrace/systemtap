@@ -2,12 +2,12 @@
 .\"     Title: probe::scsi.set_state
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: November 2021
+.\"      Date: May 2022
 .\"    Manual: SCSI Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SCSI\&.SET_ST" "3stap" "November 2021" "SystemTap Tapset Reference" "SCSI Tapset"
+.TH "PROBE::SCSI\&.SET_ST" "3stap" "May 2022" "SystemTap Tapset Reference" "SCSI Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -46,19 +46,9 @@ The current state of the device, as a string
 The channel number
 .RE
 .PP
-\fIold_state\fR
-.RS 4
-The current state of the device
-.RE
-.PP
 \fIdev_id\fR
 .RS 4
 The scsi device id
-.RE
-.PP
-\fIhost_no\fR
-.RS 4
-The host number
 .RE
 .PP
 \fIstate_str\fR
@@ -66,14 +56,24 @@ The host number
 The new state of the device, as a string
 .RE
 .PP
-\fIlun\fR
+\fIold_state\fR
 .RS 4
-The lun number
+The current state of the device
 .RE
 .PP
 \fIstate\fR
 .RS 4
 The new state of the device
+.RE
+.PP
+\fIlun\fR
+.RS 4
+The lun number
+.RE
+.PP
+\fIhost_no\fR
+.RS 4
+The host number
 .RE
 .SH SEE ALSO\n 
 .IR tapset::scsi (3stap)
