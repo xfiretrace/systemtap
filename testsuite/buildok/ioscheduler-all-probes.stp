@@ -2,6 +2,6 @@
 
 // Tests if all probes in the ioscheduler tapset are resolvable.
 
-probe ioscheduler.*, ioscheduler.*.return {}
+probe ioscheduler.* ?, ioscheduler.*.return ? {}
 
 probe ioscheduler_trace.* ? {}

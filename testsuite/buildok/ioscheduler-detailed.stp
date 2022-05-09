@@ -6,24 +6,24 @@
 # test the kprobes aliases (*.kp).  This could cause them to get out
 # of sync with the kprobed functions.  So, we test them explicitly.
 
-probe ioscheduler.elv_next_request
+probe ioscheduler.elv_next_request ?
 {
 	printf("%s: %s\n", name, elevator_name)
 }
-probe ioscheduler.elv_next_request.return
+probe ioscheduler.elv_next_request.return ?
 {
 	printf("name: %s, %d, %d, %p, %d", name, disk_major,
 	       disk_minor, rq, rq_flags)
 }
 
-probe ioscheduler.elv_completed_request
+probe ioscheduler.elv_completed_request ?
 {
 	printf("name: %s, elv_name: %s, %d, %d, %p, %d", name, elevator_name,
 	       disk_major, disk_minor, rq, rq_flags)
 }
 
-probe ioscheduler.elv_add_request,
-      ioscheduler.elv_add_request.kp,
+probe ioscheduler.elv_add_request ?,
+      ioscheduler.elv_add_request.kp ?,
       ioscheduler.elv_add_request.tp ?
 {
 	printf("name: %s, elv_name: %s, %d, %d, %p, %d", name, elevator_name,
