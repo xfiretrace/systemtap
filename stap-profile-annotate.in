@@ -29,6 +29,7 @@ parser.add_argument("-v", "--verbose", help="Increase verbosity.", action='count
 
 args = parser.parse_args()
 verbosity = args.verbose
+DB_URLS = os.getenv("DEBUGINFOD_URLS")
 
 def vprint(level,*args):
     if (verbosity >= level):
@@ -99,7 +100,7 @@ class BuildIDProfile:
 
     # Get the Find the sources of relative addresses from self.counts.keys()
     def get_sources(self):
-        vprint(1,"Computing addr2line for %s" % (self.buildid,))
+        vprint(1,"Computing addr2line for %s" % (self.buildid))
         # Used to maintain order of writing
         ordered_keys = list(self.counts.keys())
         # create addr file in /tmp/
@@ -150,13 +151,16 @@ class BuildIDProfile:
             p = subprocess.Popen(['debuginfod-find', 'debuginfo', self.buildid],stdout=subprocess.PIPE)
             dbg_file,err = p.communicate()
             dbg_file = dbg_file.decode('utf-8').rstrip()
+            if dbg_file == '' or dbg_file == None:
+                raise Exception("No debug file for bid %s from debuginfod servers: %s" % (self.bid, DB_URLS))
+            elif err != '' and err != None:
+                raise Exception(err.decode('utf-8').rstrip())
             vprint(2, "Stored debuginfod-find debuginfo file as %s" % (dbg_file))
             #Use the debuginfo attained from the above process
             process = subprocess.Popen(['sh','-c', 'eu-addr2line -A -e '  + dbg_file + ' < /tmp/' + self.filename],  stdout=subprocess.PIPE)
             out,err = process.communicate()
         except Exception as e:
             print (e)
-            pass
         return out.decode('utf-8')
 
 
@@ -181,7 +185,7 @@ class SourceLineProfile:
             sourcefile,err = p.communicate()
             sourcefile = sourcefile.decode('utf-8').rstrip()
             if sourcefile == '' or sourcefile == None:
-                raise Exception("No source file for bid %s, source %s from debuginfod servers: %s" % (self.bid, self.source, os.getenv("DEBUGINFOD_URLS")))
+                raise Exception("No source file for bid %s, source %s from debuginfod servers: %s" % (self.bid, self.source, DB_URL))
             elif err != '' and err != None:
                 raise Exception(err.decode('utf-8').rstrip())
             vprint(2, "Stored debuginfod-find source file as %s" % (sourcefile))
@@ -206,55 +210,100 @@ class SourceLineProfile:
         # Try creating the appropriate directory
         if not args.print:
             try:
-                os.makedirs(os.path.dirname(outfile))
-                # XXX: what if outfile has lots of ../../../../../'s in it?
-            except:
-                pass
+                # Begins at -1 so that when the for loop counts the profile-buildid directory the
+                # above_profile_dir is set to 0 (the intended beginning position)
+                # This saves having to either remove profile-buildid or check for it each iteration
+                # This variable represents how many directories we are above the profile-buildid
+                # directory
+                above_profile_dir = -1
+                for word in '/'.split(outfile):
+                    if word == "..":
+                        above_profile_dir -=1
+                    else:
+                        above_profile_dir += 1
+                    if above_profile_dir < 0:
+                        raise Exception(outfile + " descends beyond its intended root directory, profile-"+self.bid+".\nEnsuring the directory remains above profile-"+self.bid+" ... ")
+                outfile = re.sub("\/\.\.","/dotdot", outfile)
+                if not os.path.isfile(outfile):
+                    os.makedirs(os.path.dirname(outfile))
+            except Exception as e:
+                print(e)
 
         # Output source code to 'outfile' and if a line has associated hits (read out of sourcefile)
         # then add the line number and hit count before that line. If a context_width is present use
         # print the surrounding lines for context in accordance with context_width
         vprint(0,"%07d (%.2f%%) hits in %s over %d lines." % (filehits, filehits/totalhits*100,
                                                              outfile, len(self.counts)))
-        with open(sourcefile,'r') as f:
-            of = sys.stdout if args.print else open(outfile, 'w')
+        class blob:
+            def __init__(self, lower, upper, hit):
+                self.lower = lower
+                self.upper = upper
+                self.hits = []
+                self.hits.append(hit)
+            def __str__(self):
+                if self.lower != self.upper:
+                    return ("Hits: " + ', '.join(str(i) for i in self.hits) + ". Context from lines %s to %s") % (self.lower, self.upper)
+                else:
+                    return ("Hits: " + ', '.join(str(i) for i in self.hits) + ". Context of line %s") % (self.upper)
 
+            def get_context(self):
+                return "//" + str(self) +"\n"
+
+        num_lines = sum(1 for line in open(sourcefile,'r')) - 1
+        with open(sourcefile,'r') as f, open(outfile, 'w') as of:
             hitlines = sorted( list(self.counts.keys()) )
-            width = args.context_width
-            vprint(2, "Writing with width %d." % (width))
-            # Set the first upper bound 
-            upper_bound = sys.maxsize if width == -1 else hitlines[0]+width
-            lower_bound = 0 if width == -1 else hitlines[0] - width
-
+            width = -1
+            if args.context_width >= 0:
+                width = int(args.context_width)
+            else:
+                width = sys.maxsize
+            upper_bound = sys.maxsize if width == sys.maxsize else hitlines[0]+width
+            lower_bound = -1 if width == sys.maxsize else hitlines[0] - width
+            # Set the first upper and lower bounds
+            context_blobs = []
+            context_blobs.append(blob(lower_bound, upper_bound, hitlines[0]))
+            blob_num = 0
+            for i in hitlines[1:]:
+                lower = i-width
+                upper = i+width
+                # - 1 to connect blobs bordering one another
+                if context_blobs[blob_num].upper >= lower-1:
+                    context_blobs[blob_num].upper = upper
+                    context_blobs[blob_num].hits.append(i)
+                else:
+                    blob_num = blob_num+1
+                    context_blobs.append(blob(lower, upper, i))
+            context_blobs[-1].upper = num_lines if context_blobs[-1].upper > num_lines else context_blobs[-1].upper
             for linenum, line, in list(enumerate(f)):
-                # The lines by default have a new line at the end, remove those
-                line = line.rstrip()
-
-                # Adjust upper bound and next key if necessary. When there is only one
-                # key left there is no need to adjust, it also causes an error
-                if upper_bound <= linenum and len(hitlines) > 1:
-                    hitlines.pop(0)
-                    upper_bound = sys.maxsize if width == -1 else hitlines[0] + width 
-                    lower_bound = 0 if width == -1 else hitlines[0] - width
+                # Convenience variable
+                hits = context_blobs[0].hits
+                # If we've passed this blobs area of context, pop it
+                if context_blobs and context_blobs[0].upper < linenum:
+                    context_blobs.pop(0)
+                if not context_blobs:
+                    break
+                # If we have reached the beginning of a blob's context,
+                # print_context()
+                if context_blobs and linenum == context_blobs[0].lower:
+                    of.write(context_blobs[0].get_context())
 
                 # If we have found a line with hits, output info
                 # otherwise if there is no width, don't take it into account
                 # otherwise if the current line is within the desired width
                 #  print it for context
-                if hitlines and linenum == hitlines[0]:
-                    of.write("%07d %s\n" % (self.counts[linenum], line)) 
-                    hitlines.pop(0)
+                if linenum in hits:
+                    of.write("%07d %s\n" % ( self.counts[linenum], line.rstrip()))
                 elif width == -1:
                     of.write("%7s %s\n" % ("", line))
-                elif lower_bound <= linenum and linenum <= upper_bound:
-                    of.write("%7s %s\n" % ("", line))
+                elif context_blobs[0].lower <= linenum and linenum <= context_blobs[0].upper:
+                    of.write("%7s %s\n" % ("" , line.rstrip()))
 
             if not args.print: # don't close stdout
                 of.close()
 
 def __main__():
     # We require $DEBUGINFOD_URLS
-    if (not os.getenv("DEBUGINFOD_URLS")):
+    if (not DB_URLS):
         raise Exception("Required DEBUGINFOD_URLS is unset.")
     
     # Run SystemTap
