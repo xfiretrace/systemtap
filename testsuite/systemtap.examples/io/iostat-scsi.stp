@@ -2,12 +2,18 @@
 
 global devices, reads, writes
 
+/* kernel commit f3fa33acca9f0058157214800f68b10d8e71ab7a */
+@define __disk_name(__request)
+%(
+    ( @choose_defined(@__request->rq_disk->disk_name, @__request->q->disk->disk_name ) )
+%)
+
 /* data collection: SCSI disk */
 %(kernel_v < "2.6.24" %?
 probe module("sd_mod").function("sd_init_command") !,
       kernel.function("sd_init_command")
 {
-  device = kernel_string($SCpnt->request->rq_disk->disk_name)
+  device = kernel_string(@__disk_name($SCpnt->request))
   sector_size = $SCpnt->device->sector_size
   nr_sectors = $SCpnt->request->nr_sectors
   devices[device] = 1
@@ -38,7 +44,7 @@ function get_nr_sectors:long(rq:long)
 probe sd_prep_fn = module("sd_mod").function("sd_prep_fn") !,
 		   kernel.function("sd_prep_fn")
 {
-  device = kernel_string($rq->rq_disk->disk_name)
+  device = kernel_string(@__disk_name($rq))
   sector_size = @cast($q->queuedata, "scsi_device", "kernel<scsi/scsi_device.h>")->sector_size
 %(kernel_v>="2.6.31" %?
   nr_sectors = get_nr_sectors($rq)
@@ -58,11 +64,11 @@ probe sd_init_command = module("sd_mod").function("sd_init_command") !,
     sector_size = @choose_defined($cmd, $SCpnt)->device->sector_size
     # Kernel commits aa8e25e5006aac52c943c84e9056ab488630ee19 2266a2def97ce11ec979b6c58a1b637a16eca7dd
     if (@defined(@choose_defined($cmd, $SCpnt)->request)) {
-      device = kernel_string(@choose_defined($cmd, $SCpnt)->request->rq_disk->disk_name)
+      device = kernel_string(@__disk_name(@choose_defined($cmd, $SCpnt)->request))
       nr_sectors = get_nr_sectors(@choose_defined($cmd, $SCpnt)->request)
       _cmd_flags = @choose_defined($cmd, $SCpnt)->request->cmd_flags
     } else {
-      device = kernel_string(@cast(scsi_cmd_to_rq(@choose_defined($cmd, $SCpnt)), "request", "kernel")->rq_disk->disk_name)
+      device = kernel_string(@__disk_name(@cast(scsi_cmd_to_rq(@choose_defined($cmd, $SCpnt)), "request", "kernel")))
       nr_sectors = get_nr_sectors(scsi_cmd_to_rq(@choose_defined($cmd, $SCpnt)))
       _cmd_flags = @cast(scsi_cmd_to_rq(@choose_defined($cmd, $SCpnt)), "request", "kernel")->cmd_flags
   }
