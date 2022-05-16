@@ -12,10 +12,10 @@ $foo->bar: 42
 @var("foo")->bar: 42
 }
 
-set result_string2 {$utimes$$: {.tv_sec=1, .tv_usec=2}
-$utimes[1]$$: {.tv_sec=3, .tv_usec=4}
-@var("utimes")$$: {.tv_sec=1, .tv_usec=2}
-@var("utimes")[1]$$: {.tv_sec=3, .tv_usec=4}
+set result_string2 {$times$$: {.tv_sec=1, .tv_nsec=2000}
+$times[1]$$: {.tv_sec=3, .tv_nsec=4000}
+@var("times")$$: {.tv_sec=1, .tv_nsec=2000}
+@var("times")[1]$$: {.tv_sec=3, .tv_nsec=4000}
 }
 
 set result_string3 {user_int(&$foo->bar): 40

@@ -19,12 +19,14 @@ probe process.function("sub")
 %(arch != "s390" %?
   // On s390x, the utimes() wrapper and function both just get longs,
   // so we'll have to use @cast().
-probe kernel.function("SYSC_utimes")!, kernel.function("sys_utimes")!, kernel.function("do_futimesat")
+# The previous "SYSC_utimes", "sys_utimes", "do_futimesat" was no longer hit on 5.xx kernel
+# do_utimes seems to work with 4.xx and 5.xx kernel
+probe kernel.function("do_utimes")?
 {
-  printf("$utimes$$: %s\n", $utimes$$);
-  printf("$utimes[1]$$: %s\n", $utimes[1]$$);
-  printf("@var(\"utimes\")$$: %s\n", @var("utimes")$$);
-  printf("@var(\"utimes\")[1]$$: %s\n", @var("utimes")[1]$$);
+  printf("$times$$: %s\n", $times$$);
+  printf("$times[1]$$: %s\n", $times[1]$$);
+  printf("@var(\"times\")$$: %s\n", @var("times")$$);
+  printf("@var(\"times\")[1]$$: %s\n", @var("times")[1]$$);
 }
 %)
 
