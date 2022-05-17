@@ -9,7 +9,7 @@ probe begin
 
 probe kernel.trace("sched_switch")
 {
-  sys_tz_str = @var("sys_tz@time.c")$$
+  sys_tz_str = @var("sys_tz@time.c", "kernel")$$
   exit()
 }
 
