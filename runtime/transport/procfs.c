@@ -294,8 +294,10 @@ static int _stp_procfs_transport_fs_init(const char *module_name)
              (unsigned long) _stp_procfs_module_dir_path.dentry,
              (unsigned long) _stp_procfs_module_dir);
   
-  if (_stp_transport_data_fs_init() != 0)
+  if (_stp_transport_data_fs_init() != 0) {
+          _stp_rmdir_proc_module();
           return -1;
+  }
   
   return 0;
 }
