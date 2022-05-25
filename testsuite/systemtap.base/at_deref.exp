@@ -9,7 +9,7 @@ if { $res != "" } {
     verbose "target_compile failed: $res" 2
     fail "${test}: unable to compile ${test}.c"
 } else {
-    stap_run  $subtest2 no_load $all_pass_string $srcdir/$subdir/at_deref2.stp -c ./${test} -w
+    stap_run  $subtest2 wait_5_secs $all_pass_string $srcdir/$subdir/at_deref2.stp -c ./${test} -w
 }
 
 # Cleanup
