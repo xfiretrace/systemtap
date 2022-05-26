@@ -7144,9 +7144,9 @@ static int
 skippable_arch_symbol (GElf_Half e_machine, const char *name, GElf_Sym *sym)
 {
   /* Filter out ARM mapping symbols */
-  if (e_machine == EM_ARM
+  if ((e_machine == EM_ARM || e_machine == EM_AARCH64)
       && GELF_ST_TYPE (sym->st_info) == STT_NOTYPE
-      && (! strcmp(name, "$a") || ! strcmp(name, "$t")
+      && (! strcmp(name, "$a") || ! strcmp(name, "$t") || ! strcmp(name, "$x")
 	  || ! strcmp(name, "$t.x") || ! strcmp(name, "$d")
 	  || ! strcmp(name, "$v") || ! strcmp(name, "$d.realdata")))
     return 1;
