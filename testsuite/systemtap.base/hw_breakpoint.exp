@@ -114,6 +114,8 @@ if { $no_hardware_support == 1 } {
     xfail "$test - addr (kernel support, but no hardware support)"
 } elseif { $rc == 0 && $found == 1 } {
     pass "$test - addr (hw breakpoint support)"
+} elseif { $res == 0 } {
+    xfail "$test - addr {no module data address}"
 } else {
     fail "$test - addr ($rc, $found)"
 }

@@ -9,6 +9,7 @@
  */
 
 #include <linux/kernel.h>
+#include <linux/version.h>
 #include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <linux/compiler.h>
@@ -69,11 +70,18 @@ static ssize_t stm_read_cmd(struct file *file, char __user *buffer,
 	return bytes;
 }
 
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(5,6,0)
 static struct file_operations stm_fops_cmd = {
-	.owner = THIS_MODULE,
-	.write = stm_write_cmd,
+        .owner = THIS_MODULE,
+        .write = stm_write_cmd,
 	.read = stm_read_cmd,
 };
+#else
+static struct proc_ops stm_fops_cmd = {
+  .proc_write = stm_write_cmd,
+  .proc_read = stm_read_cmd,
+};
+#endif
 
 #define CMD_FILE "stap_hwbkpt_cmd"
 
