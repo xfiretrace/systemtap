@@ -114,30 +114,38 @@ foreach runtime [get_runtime_list] {
     # Check errno
 
     set ok 0
+    set nodb 0
     spawn $stap_path --runtime=$runtime  -e "probe process(\"$libc_path\").function(\"*stat*\").return { printf(\"errno=%d %s\\n\", @var(\"errno@errno.c\"),errno_str(@var(\"errno@errno.c\"))) }" -c "/usr/bin/ls /file/does/not/exist"
     expect {
 	-timeout 180
+	-re {Missing separate debuginfos} { incr nodb }
 	-re {errno=2 (ENOENT)} { incr ok; exp_continue }
 	eof { }
     }
     catch {close}; catch {wait}
     if {$ok >= 1} {
 	pass "$test_type errno"
+    } elseif {$nodb > 0} {
+	xfail "$test_type errno (no glibc debuginfo)"
     } else {
 	fail "$test_type errno ($ok/>=1)"
     }
 
     set ok 0
+    set nodb 0
     spawn $stap_path --runtime=$runtime -e "probe process(\"$errno_exepath\").function(\"main\").return {println (\"In Stap errno=\",@errno) }" -c "$errno_exepath"
 
     expect {
 	-timeout 180
+	-re {Missing separate debuginfos} { incr nodb }
 	-re {In Stap errno=2} { incr ok; exp_continue }
 	eof { }
     }
     catch {close}; catch {wait}
     if {$ok >= 1} {
 	pass "$test_type @errno"
+    } elseif {$nodb > 0} {
+	xfail "$test_type errno (no glibc debuginfo)"
     } else {
 	fail "$test_type @errno ($ok/>=1)"
     }

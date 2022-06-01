@@ -58,9 +58,6 @@ extern "C" {
 #define STAP_T_06 _("\"empty aggregate\";")
 #define STAP_T_07 _("\"histogram index out of range\";")
 
-// This matches MAX_NAME_LEN in linux objtool/elf.c used by kbuild
-#define MAX_NAME_LEN 128
-
 using namespace std;
 
 class var;
@@ -3407,12 +3404,16 @@ c_unparser::c_globalname (const string& e)
 string
 c_unparser::c_funcname (const string& e, bool& funcname_shortened)
 {
-    const string function_prefix = "function_";
+  const string function_prefix = "function_";
+  // This matches MAX_NAME_LEN in linux objtool/elf.c used by kbuild
+  // The kernel objtool used by kbuild has a hardcoded function length limit
+  const unsigned max_name_len = 128;
+  // Add padding to allow for gcc function attribute suffixes like constprop or cold
+  const unsigned func_attr_suffix_padding = 32;
   // XXX uncomment to test custom mangling:
   // return function_prefix + e + "_" + lex_cast(do_hash(e.c_str()));
 
-  // The kernel objtool used by kbuild has a hardcoded function length limit
-  if (e.length() > MAX_NAME_LEN - function_prefix.length())
+  if (e.length() > max_name_len - function_prefix.length() - func_attr_suffix_padding)
     {
       long function_index = 0;
       for (map<string,functiondecl*>::iterator it = session->functions.begin();
