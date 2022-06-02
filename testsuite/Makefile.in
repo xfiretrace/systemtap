@@ -166,7 +166,6 @@ build_alias = @build_alias@
 builddir = @builddir@
 datadir = @datadir@
 datarootdir = @datarootdir@
-dejazilla = @dejazilla@
 docdir = @docdir@
 dvidir = @dvidir@
 enable_testapps = @enable_testapps@
@@ -191,6 +190,7 @@ py3execdir = @py3execdir@
 pyexecdir = @pyexecdir@
 python = @python@
 python3 = @python3@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -200,7 +200,6 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = dejagnu no-dist subdir-objects
-DEJAZILLA = @dejazilla@
 TESTAPPS = @enable_testapps@
 TOOL_OPTS = 
 
@@ -485,7 +484,6 @@ uninstall-am:
 
 all-local:
 	@echo Run \"make check\" or \"make installcheck\".
-	@if test -n "$(DEJAZILLA)"; then echo Test results will be sent to $(DEJAZILLA); fi
 
 clean-local:
 	-rm -f ./stap site.exp systemtap.sum systemtap.log
@@ -501,11 +499,6 @@ clean-local:
 # That's why we need to add "execrc" to $(RUNTEST) - to ensure that this
 # subtarget gets run even if runtest per se exits with a failure.
 check-local:
-	if test `( expr "$(DEJAZILLA)" : '.*://.*' )` -ne 0; then \
-	  curl -F file=@systemtap.sum $(DEJAZILLA); \
-	elif test `( expr "$(DEJAZILLA)" : '.*@.*' )` -ne 0; then \
-	  mail $(DEJAZILLA) < systemtap.sum; \
-	fi
 
 # but installcheck does not follow an implicit check-DEJAGNU, go figure
 installcheck: site.exp
@@ -523,11 +516,6 @@ installcheck: site.exp
 	  rm -f systemtap.temp1.log systemtap.temp1.sum systemtap.temp2.log systemtap.temp2.sum; \
 	fi
 	-sed -ne '/systemtap.Summary/,$$ p' < systemtap.sum
-	if test `( expr "$(DEJAZILLA)" : '.*://.*' )` -ne 0; then \
-	  curl -F file=@systemtap.sum $(DEJAZILLA); \
-	elif test `( expr "$(DEJAZILLA)" : '.*@.*' )` -ne 0; then \
-	  mail $(DEJAZILLA) < systemtap.sum; \
-	fi
 
 # In the parallel mode, the dg-extract-results.sh generates common .sum and .log
 # files for all the tests, plus separate logs per testcase are kept in the artifacts

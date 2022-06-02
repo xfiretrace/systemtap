@@ -70,9 +70,6 @@ Build steps:
   Add env LDFLAGS=-L/path/ CPPFLAGS=-I/path/ before configure
   to locate libraries in non-system directories.
 
-  Consider configuring with "--enable-dejazilla" to automatically
-  contribute to our public test result database.
-
   Consider configuring with "--prefix=DIRECTORY" to specify an
   installation directory other than /usr/local.  It can be an ordinary
   personal directory.

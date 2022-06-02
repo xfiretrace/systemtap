@@ -5,7 +5,6 @@ AUTOMAKE_OPTIONS = dejagnu no-dist subdir-objects
 
 all-local:
 	@echo Run \"make check\" or \"make installcheck\".
-	@if test -n "$(DEJAZILLA)"; then echo Test results will be sent to $(DEJAZILLA); fi
 
 clean-local:
 	-rm -f ./stap site.exp systemtap.sum systemtap.log
@@ -17,7 +16,6 @@ clean-local:
 	-rm -f uprobe_*
 	-rm -rf artifacts
 
-DEJAZILLA=@dejazilla@
 TESTAPPS=@enable_testapps@
 TOOL_OPTS=
 
@@ -46,11 +44,6 @@ SKIPTESTS=--ignore \'$(shell \
 # That's why we need to add "execrc" to $(RUNTEST) - to ensure that this
 # subtarget gets run even if runtest per se exits with a failure.
 check-local:
-	if test `( expr "$(DEJAZILLA)" : '.*://.*' )` -ne 0; then \
-	  curl -F file=@systemtap.sum $(DEJAZILLA); \
-	elif test `( expr "$(DEJAZILLA)" : '.*@.*' )` -ne 0; then \
-	  mail $(DEJAZILLA) < systemtap.sum; \
-	fi
 
 # but installcheck does not follow an implicit check-DEJAGNU, go figure
 installcheck: site.exp
@@ -68,11 +61,6 @@ installcheck: site.exp
 	  rm -f systemtap.temp1.log systemtap.temp1.sum systemtap.temp2.log systemtap.temp2.sum; \
 	fi
 	-sed -ne '/systemtap.Summary/,$$ p' < systemtap.sum
-	if test `( expr "$(DEJAZILLA)" : '.*://.*' )` -ne 0; then \
-	  curl -F file=@systemtap.sum $(DEJAZILLA); \
-	elif test `( expr "$(DEJAZILLA)" : '.*@.*' )` -ne 0; then \
-	  mail $(DEJAZILLA) < systemtap.sum; \
-	fi
 
 
 # In the parallel mode, the dg-extract-results.sh generates common .sum and .log
