@@ -29,8 +29,8 @@ set ok 0
 set compile_errors 0
 expect {
     -timeout 180
-    -re {^towers_n=0x[0-9a-f]{2,}\r\n} { incr ok; exp_continue }
-    -re {^XXX_n=0x0\r\n} { incr ok; exp_continue }
+    -re {^towers_n=[0-9a-f]{2,}\r\n} { incr ok; exp_continue }
+    -re {^XXX_n=0\r\n} { incr ok; exp_continue }
     -re {^parse error[^\r\n]*\r\n} { incr compile_errors 1; exp_continue }
     -re {^[^\r\n]*compilation failed[^\r\n]*\r\n} {
 	incr compile_errors 1; exp_continue }
@@ -54,7 +54,7 @@ set ok 0
 set compile_errors 0
 expect {
     -timeout 180
-    -re {^towers_n=0x[0-9a-f]{2,}\r\n} { incr ok; exp_continue }
+    -re {^towers_n=[0-9a-f]{2,}\r\n} { incr ok; exp_continue }
     -re {^parse error[^\r\n]*\r\n} { incr compile_errors 1; exp_continue }
     -re {^[^\r\n]*compilation failed[^\r\n]*\r\n} {
 	incr compile_errors 1; exp_continue }
@@ -172,7 +172,7 @@ set ok 0
 set compile_errors 0
 expect {
     -timeout 180
-    -re {^hit=0x1\r\n} { incr ok; exp_continue }
+    -re {^hit=1\r\n} { incr ok; exp_continue }
     -re {^parse error[^\r\n]*\r\n} { incr compile_errors 1; exp_continue }
     -re {^[^\r\n]*compilation failed[^\r\n]*\r\n} {
 	incr compile_errors 1; exp_continue }
