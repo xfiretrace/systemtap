@@ -23,7 +23,6 @@ proc error_handler { res test message } {
 
 set ::result_string \
 {__cxa_finalize 2
-__libc_start_main 1
 __xpg_basename 1
 asctime 1
 asprintf 3
@@ -105,7 +104,6 @@ if {[prelink_p]} {
 # test .plt.return: .plt/.plt.return should cancel out
 set ::result_string \
 {__cxa_finalize 0
-__libc_start_main 0
 __xpg_basename 0
 asctime 0
 asprintf 0
