@@ -156,7 +156,7 @@ foreach runtime [get_runtime_list] {
 	eof { }
     }
     catch {close}; catch {wait}
-    error_handler [expr {$ok == 4}] "$test_name ($ok) ($ok != 4)"
+    error_handler [expr {$ok >= 4}] "$test_name ($ok) ($ok != 4)"
 }
 
 # Test .exported. Notice we're only testing exported functions in our

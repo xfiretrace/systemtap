@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 #ifdef LOOP
 static struct timespec req = {0, 200000000};
@@ -55,6 +56,8 @@ bar (int i)
 void
 baz (int i, char* s)
 {
+  static char ss [32];
+  strcpy(ss, s);
   if (SDT_MISC_TEST_PROBE_0_ENABLED())
      STAP_PROBE1(sdt_misc,test_probe_0,i);
   if (i == 0)
