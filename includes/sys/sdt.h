@@ -251,27 +251,21 @@ __extension__ extern unsigned long long __sdt_unsp;
 #define _SDT_DEF_MACROS							     \
 	_SDT_ASM_1(.altmacro)						     \
 	_SDT_ASM_1(.macro _SDT_SIGN x)				     	     \
-	_SDT_ASM_3(.pushsection .note.stapsdt,"","note")		     \
 	_SDT_ASM_1(.iflt \\x)						     \
 	_SDT_ASM_1(.ascii "-")						     \
 	_SDT_ASM_1(.endif)						     \
-	_SDT_ASM_1(.popsection)						     \
 	_SDT_ASM_1(.endm)						     \
 	_SDT_ASM_1(.macro _SDT_SIZE_ x)					     \
-	_SDT_ASM_3(.pushsection .note.stapsdt,"","note")		     \
 	_SDT_ASM_1(.ascii "\x")						     \
-	_SDT_ASM_1(.popsection)						     \
 	_SDT_ASM_1(.endm)						     \
 	_SDT_ASM_1(.macro _SDT_SIZE x)					     \
 	_SDT_ASM_1(_SDT_SIZE_ %%((-(-\\x*((-\\x>0)-(-\\x<0))))>>8))	     \
 	_SDT_ASM_1(.endm)						     \
 	_SDT_ASM_1(.macro _SDT_TYPE_ x)				             \
-	_SDT_ASM_3(.pushsection .note.stapsdt,"","note")		     \
 	_SDT_ASM_2(.ifc 8,\\x)					     	     \
 	_SDT_ASM_1(.ascii "f")						     \
 	_SDT_ASM_1(.endif)						     \
 	_SDT_ASM_1(.ascii "@")						     \
-	_SDT_ASM_1(.popsection)						     \
 	_SDT_ASM_1(.endm)						     \
 	_SDT_ASM_1(.macro _SDT_TYPE x)				     	     \
 	_SDT_ASM_1(_SDT_TYPE_ %%((\\x)&(0xff)))			     \

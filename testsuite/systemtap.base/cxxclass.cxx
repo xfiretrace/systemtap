@@ -1,5 +1,5 @@
 #include "sys/sdt.h"
-
+#include "string.h"
 #include <stdio.h>
 
 class ProbeClass
@@ -11,18 +11,24 @@ private:
 public:
   ProbeClass(int& v, const char *n) : ref(v), name(n)
   {
-    STAP_PROBE2(_test_, cons, name, ref);
+    char nm [32];
+    strcpy (nm, name);
+    STAP_PROBE2(_test_, cons, nm, ref);
   }
 
   void method(int min)
   {
-    STAP_PROBE3(_test_, meth, name, ref, min);
+    char nm [32];
+    strcpy (nm, name);
+    STAP_PROBE3(_test_, meth, nm, ref, min);
     ref -= min;
   }
   
   ~ProbeClass()
   {
-    STAP_PROBE2(_test_, dest, name, ref);
+    char nm [32];
+    strcpy (nm, name);
+    STAP_PROBE2(_test_, dest, nm, ref);
   }
 }; 
 
