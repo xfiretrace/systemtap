@@ -90,25 +90,25 @@ done
 (cd $postgresdir/../src/test/regress/
  make installcheck >> $pgdata.log 2>&1)
 
-ACQUIRE=\$(grep 'lwlock__acquire 0x\[0-9\]* 0x\[0-9\]*' $pgdata-markers.log | wc -l)
-RELEASE=\$(grep 'lwlock__release 0x\[0-9\]*' $pgdata-markers.log | wc -l)
-START=\$(grep 'transaction__start 0x\[0-9\]*' $pgdata-markers.log | wc -l)
-COMMIT=\$(grep 'transaction__commit' $pgdata-markers.log | wc -l)
-OKAY=\$(grep 'test .*ok' $pgdata.log | wc -l)
+ACQUIRE=\$(grep -a 'lwlock__acquire 0x\[0-9a-z\]* 0x\[0-9a-z\]*' $pgdata-markers.log | wc -l)
+RELEASE=\$(grep -a 'lwlock__release 0x\[0-9a-z\]*' $pgdata-markers.log | wc -l)
+START=\$(grep -a 'transaction__start 0x\[0-9a-z\]*' $pgdata-markers.log | wc -l)
+COMMIT=\$(grep -a 'transaction__commit' $pgdata-markers.log | wc -l)
+OKAY=\$(grep -a 'test .*ok' $pgdata.log | wc -l)
 
 echo lwlock__acquire=\$ACQUIRE lwlock__release=\$RELEASE transaction__start=\$START transaction__commit=\$COMMIT test-ok=\$OKAY
 : 44873 75325 591 489 0
 
-if \[ \$ACQUIRE -ge 0 -a \$RELEASE -gt 7300000 -a \$START -gt 17000 -a \$COMMIT -gt 14000 \] ; then
-   echo PASS: postgres tests \$ACQUIRE/\$RELEASE/\$START/\$COMMIT
+if \[ \$ACQUIRE -ge 100000 -a \$RELEASE -gt 100000 -a \$START -gt 1000 -a \$COMMIT -gt 1000 \] ; then
+   echo PASS: postgres probe hits \$ACQUIRE/\$RELEASE/\$START/\$COMMIT
 else
-   echo FAIL: postgres tests \$ACQUIRE/\$RELEASE/\$START/\$COMMIT
+   echo FAIL: postgres probe hits \$ACQUIRE/\$RELEASE/\$START/\$COMMIT
 fi
 
 if \[ \$OKAY -gt 100 \] ; then
-   echo PASS: postgres markers \$1 \$OKAY
+   echo PASS: postgres testsuite \$1 \$OKAY
 else
-   echo FAIL: postgres markers \$1 \$OKAY
+   echo FAIL: postgres testsuite \$1 \$OKAY
 fi
 
 mv $pgdata.log $pgdata-\$1.log

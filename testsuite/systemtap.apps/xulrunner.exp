@@ -4,6 +4,10 @@ set test "xulrunner"
 
 global env
 
+# deprecate as xulrunner is no longer supported
+untested "$test test is deprecated"
+return
+
 if {! [info exists env(SYSTEMTAP_TESTAPPS)] || (
     ! [string match "xulrunner" $env(SYSTEMTAP_TESTAPPS)] &&
     ! [string match "all" $env(SYSTEMTAP_TESTAPPS)])} {
