@@ -676,6 +676,11 @@ make %{?_smp_mflags} V=1
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install
+
+%if ! (%{with_python3})
+rm -v $RPM_BUILD_ROOT%{_bindir}/stap-profile-annotate
+%endif
+
 %find_lang %{name}
 for dir in $(ls -1d $RPM_BUILD_ROOT%{_mandir}/{??,??_??}) ; do
     dir=$(echo $dir | sed -e "s|^$RPM_BUILD_ROOT||")
@@ -1078,7 +1083,9 @@ exit 0
 %files devel -f systemtap.lang
 %{_bindir}/stap
 %{_bindir}/stap-prep
+%if %{with_python3}
 %{_bindir}/stap-profile-annotate
+%endif
 %{_bindir}/stap-report
 %dir %{_datadir}/systemtap
 %{_datadir}/systemtap/runtime
