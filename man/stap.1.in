@@ -331,12 +331,16 @@ start with FILE_ (FILE_cpu with \-F) followed by the cpu number.
 This supports strftime(3) formats for FILE.
 .TP
 .BI \-c " CMD"
-Start the probes, run CMD, and exit when CMD finishes.  This also has the
-effect of setting target() to the pid of the command ran.
+Start the probes, run CMD, and exit when CMD finishes.  This also has
+the effect of setting target() to the pid of that process.  Note that
+many probe types trigger independently of this setting.  Consider
+including something like this to focus your script.
+.SAMPLE
+   probe FOO { if (pid() != target()) next; .... }
+.ESAMPLE
 .TP
 .BI \-x " PID"
-Sets target() to PID. This allows scripts to be written that filter on
-a specific process. Scripts run independent of the PID's lifespan.
+Sets target() to PID.  The script runs independently of the PID's lifespan.
 .TP
 .BI \-e " SCRIPT"
 Run the given SCRIPT specified on the command line.
