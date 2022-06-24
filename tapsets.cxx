@@ -3726,7 +3726,8 @@ dwarf_pretty_print::recurse_struct_members (Dwarf_Die* type, target_symbol* e,
               pf->raw_components.append("<struct>");
             pf->raw_components.append("=");
 
-            if (dwarf_hasattr_integrate (&child, DW_AT_bit_offset))
+            if (dwarf_hasattr_integrate (&child, DW_AT_bit_offset)
+		|| dwarf_hasattr_integrate (&child, DW_AT_data_bit_offset))
               recurse_bitfield (&childtype, e2, pf);
             else
               recurse (&childtype, e2, pf);

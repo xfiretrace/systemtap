@@ -37,6 +37,19 @@
 #endif
 
 
+#define write_uleb128(ptr,val) ({	\
+  uint32_t valv = (val);		\
+  do					\
+    {					\
+      unsigned char c = valv & 0x7f;	\
+      valv >>= 7;			\
+      if (valv)				\
+	c |= 0x80;			\
+      *(ptr)++ = c;			\
+    }					\
+  while (valv);				\
+})
+
 
 extern "C" {
 #include <elfutils/libdwfl.h>
@@ -105,6 +118,9 @@ typedef std::unordered_map<void*, srcfile_lines_cache_t*> cu_lines_cache_t;
 // cu die -> {entry pcs}
 typedef std::unordered_set<Dwarf_Addr> entry_pc_cache_t;
 typedef std::unordered_map<void*, entry_pc_cache_t*> cu_entry_pc_cache_t;
+
+// cache DW_AT_data_bit_offset converted to DW_AT_data_member_location
+typedef std::unordered_map<Dwarf_Word, unsigned char *> dw_at_member_location_cache_t;
 
 typedef std::vector<base_func_info> base_func_info_map_t;
 typedef std::vector<func_info> func_info_map_t;
@@ -558,6 +574,9 @@ private:
   // Cache for all entry_pc in each cu
   cu_entry_pc_cache_t cu_entry_pc_cache;
   bool check_cu_entry_pc(Dwarf_Die *cu, Dwarf_Addr pc);
+
+  // Cache for all the sythesized DW_AT_data_member_location attributes
+  dw_at_member_location_cache_t dw_at_member_location_cache;
 
   Dwarf_Die* get_parent_scope(Dwarf_Die* die);
 

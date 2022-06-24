@@ -71,6 +71,15 @@ using namespace __gnu_cxx;
 
 static string TOK_KERNEL("kernel");
 
+// Function take the DW_AT_data_bit_offset and produces
+// what would be expected for the DW_AT_data_member_location.
+// This assume the containing type has natural alignment.
+static Dwarf_Word
+data_bit_to_byte_offset(Dwarf_Word byte_size, Dwarf_Word bit_offset)
+{
+	return  (((bit_offset/8) / byte_size) * byte_size);
+}
+
 
 dwflpp::dwflpp(systemtap_session & session, const string& name, bool kernel_p, bool debuginfo_needed):
   sess(session), module(NULL), module_bias(0), mod_info(NULL),
@@ -115,6 +124,7 @@ dwflpp::~dwflpp()
   delete_map(cu_lines_cache);
 
   delete_map(cu_entry_pc_cache);
+  delete_map(dw_at_member_location_cache);
 
   if (dwfl)
     dwfl_end(dwfl);
@@ -3472,6 +3482,43 @@ success:
       dies.insert(dies.begin(), die);
       locs.insert(locs.begin(), attr);
     }
+  else if (dwarf_attr_integrate (&die, DW_AT_data_bit_offset, &attr))
+    {
+      /* dwarf_getlocation_addr doesn't understand DW_AT_data_bit offset,
+       * so generate an equivalent DW_AT_data_member_location attr.
+       */
+      Dwarf_Attribute attr_mem;
+      Dwarf_Die typedie;
+      Dwarf_Word bit_offset, byte_size, member_location;
+      if (dwarf_attr_integrate (&die, DW_AT_data_bit_offset, &attr_mem) == NULL
+	  || dwarf_formudata (&attr_mem, &bit_offset) != 0
+          || dwarf_attr_die (&die, DW_AT_type, &typedie) == NULL
+	  || dwarf_aggregate_size (&typedie, &byte_size) != 0)
+	  throw SEMANTIC_ERROR (_F("cannot get bit field parameters: %s",
+				       dwarf_errmsg(-1)), c.tok);
+
+      member_location = data_bit_to_byte_offset(byte_size, bit_offset);
+      if (sess.verbose > 2)
+	clog << _F("member_location=%lu, bit_offset=%lu, byte_size=%lu\n",
+		 member_location, bit_offset, byte_size);
+      unsigned char *loc;
+      if (dw_at_member_location_cache.find(member_location) != dw_at_member_location_cache.end()) {
+	      loc = dw_at_member_location_cache[member_location];
+      }else {
+	      loc = new unsigned char[16];
+	      dw_at_member_location_cache[member_location] = loc;
+	      // write_uleb128 modifies loc, so do after the cache assignment
+	      write_uleb128(loc, member_location);
+      }
+
+      Dwarf_Attribute data_member_location = {
+	      .code = DW_AT_data_member_location, .form = DW_FORM_udata,
+	      .valp = loc, .cu = attr.cu
+      };
+
+      dies.insert(dies.begin(), die);
+      locs.insert(locs.begin(), data_member_location);
+    }
 
   /* Union members don't usually have a location,
    * but just use the containing union's location.
@@ -3669,16 +3716,37 @@ get_bitfield (const target_symbol *e, Dwarf_Die *die, Dwarf_Word byte_size,
               Dwarf_Word *bit_offset, Dwarf_Word *bit_size)
 {
   Dwarf_Attribute attr_mem;
-  if (dwarf_attr_integrate (die, DW_AT_bit_offset, &attr_mem) == NULL
+
+  if (dwarf_hasattr_integrate (die, DW_AT_bit_offset)) {
+    if (dwarf_attr_integrate (die, DW_AT_bit_offset, &attr_mem) == NULL
+        || dwarf_formudata (&attr_mem, bit_offset) != 0
+        || dwarf_attr_integrate (die, DW_AT_bit_size, &attr_mem) == NULL
+        || dwarf_formudata (&attr_mem, bit_size) != 0)
+      throw SEMANTIC_ERROR (_F("cannot get bit field parameters: %s",
+			       dwarf_errmsg(-1)), e->tok);
+
+    /* Convert the big-bit-endian numbers from Dwarf to little-endian.
+       This means we can avoid having to propagate byte_size further.  */
+    *bit_offset = byte_size * 8 - *bit_offset - *bit_size;
+  } else {
+    /* must be a DW_AT_data_bit_offset */
+    if (dwarf_attr_integrate (die, DW_AT_data_bit_offset, &attr_mem) == NULL
       || dwarf_formudata (&attr_mem, bit_offset) != 0
       || dwarf_attr_integrate (die, DW_AT_bit_size, &attr_mem) == NULL
       || dwarf_formudata (&attr_mem, bit_size) != 0)
     throw SEMANTIC_ERROR (_F("cannot get bit field parameters: %s",
 			  dwarf_errmsg(-1)), e->tok);
 
-  /* Convert the big-bit-endian numbers from Dwarf to little-endian.
-     This means we can avoid having to propagate byte_size further.  */
-  *bit_offset = byte_size * 8 - *bit_offset - *bit_size;
+    /* Convert the bit_offset from start of struct to start of field. */
+    Dwarf_Word member_location = data_bit_to_byte_offset(byte_size, *bit_offset);
+    *bit_offset = *bit_offset - member_location;
+#if __BYTE_ORDER == __BIG_ENDIAN
+    /* Convert the big-bit-endian bit offset to little-endian
+       suitable for shifts and masking.  */
+    *bit_offset = byte_size * 8 - *bit_offset - *bit_size;
+#endif
+
+  }
 }
 
 void
@@ -3997,7 +4065,8 @@ dwflpp::translate_final_fetch_or_store (location_context &ctx,
 
         translate_base_ref (ctx, byte_size, signed_p, lvalue);
 
-	if (dwarf_hasattr_integrate (vardie, DW_AT_bit_offset))
+	if (dwarf_hasattr_integrate (vardie, DW_AT_bit_offset)
+	    || dwarf_hasattr_integrate (vardie, DW_AT_data_bit_offset))
 	  {
 	    Dwarf_Word bit_offset = 0;
 	    Dwarf_Word bit_size = 0;
