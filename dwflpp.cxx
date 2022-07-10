@@ -3499,7 +3499,7 @@ success:
 
       member_location = data_bit_to_byte_offset(byte_size, bit_offset);
       if (sess.verbose > 2)
-	clog << _F("member_location=%lu, bit_offset=%lu, byte_size=%lu\n",
+	clog << _F("member_location=%" PRIu64 ", bit_offset=%" PRIu64 ", byte_size=%" PRIu64 "\n",
 		 member_location, bit_offset, byte_size);
       unsigned char *loc;
       if (dw_at_member_location_cache.find(member_location) != dw_at_member_location_cache.end()) {
