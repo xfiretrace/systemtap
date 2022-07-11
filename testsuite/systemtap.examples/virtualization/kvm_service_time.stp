@@ -25,7 +25,7 @@ global e_time, reason, stats
 probe kernel.trace("kvm_exit")
 {
   e_time[tid()] = gettimeofday_us()
-  reason[tid()] = $exit_reason;
+  reason[tid()] = @choose_defined($exit_reason, $vcpu->run->exit_reason);
   kvm_isa = @defined($isa) ? $isa : 0  
 }
 
