@@ -14,7 +14,13 @@
 // PR25841: ensure that the libHelperSDT.so file contains debuginfo
 // for the tapset helper functions, so they don't have to look into libpython*
 #include <frameobject.h>
+// python 3.11 removed direct access to PyFrameObject members
+// https://docs.python.org/3.11/whatsnew/3.11.html#c-api-changes
+#if PY_MAJOR_VERSION <= 3 && PY_MINOR_VERSION < 11
 PyFrameObject _dummy_frame;
+#else
+//PyFrameObject *_dummy_frame;
+#endif
 #include <object.h>
 PyVarObject _dummy_var;
 #include <dictobject.h>
