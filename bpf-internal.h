@@ -171,6 +171,35 @@ bool is_ldst(opcode c);
 bool is_binary(opcode c);
 bool is_commutative(opcode c);
 
+/* PR29307: BPF opcode categories for the embedded-code assembler: */
+#define BPF_UNKNOWN_ARI 0
+#define BPF_MEMORY_ARI4 1
+#define BPF_BRANCH_ARI4 2
+#define BPF_MEMORY_ARI34_SRCOFF 3
+// -> can take [src+off]
+#define BPF_MEMORY_ARI34_DSTOFF 4
+// -> can take [dst+off]
+#define BPF_ALU_ARI3 5
+// -> takes dst+src/imm
+#define BPF_MEMORY_ARI3 6
+// -> takes dst+imm
+#define BPF_ALU_ARI2 7
+// -> takes dst
+#define BPF_BRANCH_ARI2 8
+// -> takes jmp_target
+#define BPF_CALL_ARI2 9
+// -> takes imm
+#define BPF_EXIT_ARI1 10
+
+/* PR29307: BPF opcode lookup for the embedded-code assembler: */
+void init_bpf_opcode_tables();
+const char *bpf_opcode_name (opcode code);
+opcode bpf_opcode_id (const std::string &name);
+opcode bpf_opcode_variant_imm(opcode op);
+unsigned bpf_opcode_category (opcode code);
+const char *bpf_expected_args (unsigned cat);
+
+/* BPF helper lookup for the translator: */
 void init_bpf_helper_tables();
 const char *bpf_function_name (unsigned id);
 bpf_func_id bpf_function_id (const std::string &name);

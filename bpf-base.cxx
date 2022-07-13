@@ -135,7 +135,109 @@ is_commutative(opcode code)
     }
 }
 
-/* Various functions for eBPF helper lookup: */
+/* PR29307: BPF opcode lookup for the embedded-code assembler: */
+
+std::map<opcode, const char *> bpf_opcode_name_map;
+std::map<std::string, opcode> bpf_src_opcode_map; // when operation takes SRC
+std::map<std::string, opcode> bpf_imm_opcode_map; // when operation takes IMM
+std::map<opcode, unsigned> bpf_opcode_category_map;
+
+// XXX: Follows https://github.com/iovisor/bpf-docs/blob/master/eBPF.md rather than
+// kernel linux/bpf_exp.y to avoid getting into weird addressing-mode syntax.
+// Perhaps later, expanding the above bpf_{src,imm}_opcode_map scheme.
+//
+// XXX: Does not have to be complete, just complete enough for the needs of the tapsets.
+// Will gradually add opcodes over the following patches.
+#ifndef __BPF_OPCODE_MAPPER
+#define __BPF_OPCODE_MAPPER(FN_SRC,FN_IMM) \
+    ;
+#endif
+//    TODO FN_SRC(op_name, raw_opcode, opcode, category),
+//    TODO FN_IMM(op_name, raw_opcode, opcode, category),
+
+void
+init_bpf_opcode_tables()
+{
+#define __BPF_SET_OPCODE_NAME(name, x, _x, _cat) bpf_opcode_name_map[(x)] = #name
+#define __BPF_SET_OPCODE_SRC(name, x, _x, _cat) bpf_src_opcode_map[#name] = (x)
+#define __BPF_SET_OPCODE_IMM(name, x, _x, _cat) bpf_imm_opcode_map[#name] = (x)
+#define __BPF_SET_OPCODE_CATEGORY(name, x, _x, cat) bpf_opcode_category_map[(x)] = (cat)
+#define __BPF_CHECK_OPCODE(name, x, y, _cat) assert((x)==(y))
+    __BPF_OPCODE_MAPPER(__BPF_SET_OPCODE_NAME,__BPF_SET_OPCODE_NAME)
+    __BPF_OPCODE_MAPPER(__BPF_SET_OPCODE_SRC,__BPF_SET_OPCODE_IMM)
+    __BPF_OPCODE_MAPPER(__BPF_SET_OPCODE_CATEGORY,__BPF_SET_OPCODE_CATEGORY)
+    __BPF_OPCODE_MAPPER(__BPF_CHECK_OPCODE,__BPF_CHECK_OPCODE)
+    (void)0;
+}
+
+/* Convert opcode code to name. */
+const char *
+bpf_opcode_name(opcode code)
+{
+    auto it = bpf_opcode_name_map.find(code);
+    if (it == bpf_opcode_name_map.end())
+        return "unknown";
+    return it->second;
+}
+
+/* Convert opcode name to code. In ambiguous cases
+   e.g. add (0x07 vs 0x0f), prefer the variant that takes a
+   register. */
+opcode
+bpf_opcode_id(const std::string &name)
+{
+    auto it = bpf_src_opcode_map.find(name);
+    if (it == bpf_src_opcode_map.end())
+        return 0;
+    return it->second;
+}
+
+/* If op is an ALU/branch opcode taking src,
+   return the equivalent opcode taking imm. */
+opcode
+bpf_opcode_variant_imm(opcode op)
+{
+    // TODO add,sub,mul,div,or,and,lsh,rsh,mod,xor,mov,arsh
+    // TODO add32,sub32,mul32,div32,or32,and32,lsh32,rsh32,mod32,xor32,mov32,arsh32
+    // TODO jeq,jgt,jge,jlt,jle,jset,jne,jsgt,jsge,jslt,jsle
+    return op;
+}
+
+unsigned
+bpf_opcode_category(opcode code)
+{
+    auto it = bpf_opcode_category_map.find(code);
+    if (it == bpf_opcode_category_map.end())
+        return BPF_UNKNOWN_ARI;
+    return it->second;
+}
+
+const char *
+bpf_expected_args (unsigned cat)
+{
+    switch (cat) {
+    case BPF_MEMORY_ARI4:
+    case BPF_BRANCH_ARI4:
+        return "3-4";
+    case BPF_MEMORY_ARI34_SRCOFF:
+    case BPF_MEMORY_ARI34_DSTOFF:
+        return "2-4";
+    case BPF_ALU_ARI3:
+    case BPF_MEMORY_ARI3:
+        return "2/4";
+    case BPF_ALU_ARI2:
+    case BPF_BRANCH_ARI2:
+    case BPF_CALL_ARI2:
+        return "1/4";
+    case BPF_EXIT_ARI1:
+        return "0/4";
+    case BPF_UNKNOWN_ARI:
+    default:
+        return "4";
+    }
+}
+
+/* BPF helper lookup for the translator: */
 
 std::map<unsigned, const char *> bpf_func_name_map;
 std::map<std::string, bpf_func_id> bpf_func_id_map;

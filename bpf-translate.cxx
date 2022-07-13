@@ -269,7 +269,15 @@ struct bpf_unparser : public throwing_visitor
                            const token *tok = NULL);
 
   // Used for the embedded-code assembler:
+  opcode parse_opcode_tentative (const asm_stmt &stmt, const std::string &str,
+                                 /*OUT*/bool &numeric_opcode);
+  bool parse_imm_optional (const asm_stmt &stmt, const std::string &str,
+                           /*OUT*/int64_t &val);
   int64_t parse_imm (const asm_stmt &stmt, const std::string &str);
+  void parse_reg_offset (const asm_stmt &stmt, const std::string &str,
+                         /*OUT*/std::string &reg, /*OUT*/int64_t &off);
+  void parse_asm_opcode (const std::vector<std::string> &args,
+                         /*OUT*/asm_stmt &stmt);
   size_t parse_asm_stmt (embeddedcode *s, size_t start,
                            /*OUT*/asm_stmt &stmt);
   value *emit_asm_arg(const asm_stmt &stmt, const std::string &arg,
@@ -789,26 +797,41 @@ bpf_unparser::emit_store(expression *e, value *val)
    reserve stack memory, allocate virtual registers or signal errors.
 
    The assembler syntax will probably take a couple of attempts to get
-   just right. This attempt keeps things as close as possible to the
+   just right. The first attempt keeps things as close as possible to the
    first embedded-code assembler, with a few more features and a
-   disgustingly lenient parser that allows things like
+   disgustingly lenient parser that allows* things like
      $ this is        all one "**identifier**" believe-it!-or-not
+
+   (* Asterisk: except in the first opcode / operator keyword.)
 
    Ahh for the days of 1960s FORTRAN.
 
-   ??? It might make more sense to implement an assembler based on
-   the syntax used in official eBPF subsystem docs. */
+   PR29307: The second attempt adds support for the assembler syntax
+   from iovisor's docs
+   i.e. https://github.com/iovisor/bpf-docs/blob/master/eBPF.md
+
+   Comma after opcode now optional, semicolons can be replaced with
+   newline.
+
+   I also considered the syntax from
+   kernel Documentation/networking/filter.rst or bpfc(8),
+   also implemented in kernel tools/bpf/bpf_exp.y,
+   but the addressing-mode syntax seems a bit too baroque to bother
+   for the time being.
+
+   */
 
 /* Supported assembly statement types include:
 
-   <stmt> ::= label, <dest=label>;
-   <stmt> ::= alloc, <dest=reg>, <imm=imm> [, align|noalign];
-   <stmt> ::= call, <dest=optreg>, <param[0]=function name>, <param[1]=arg>, ...;
-   <stmt> ::= jump_to_catch, <param[0]=error message>; 
-   <stmt> ::= register_error, <param[0]=error message>; 
+   <stmt> ::= label <dest=label>
+   <stmt> ::= <dest=label>:
+   <stmt> ::= alloc <dest=reg>, <imm=imm> [, align|noalign];
+   <stmt> ::= call <dest=optreg>, <param[0]=function name>, <param[1]=arg>, ...;
+   <stmt> ::= jump_to_catch <param[0]=error message>;
+   <stmt> ::= register_error <param[0]=error message>;
    <stmt> ::= terminate;
-   <stmt> ::= <code=integer opcode>, <dest=reg>, <src1=reg>,
-              <off/jmp_target=off>, <imm=imm>;
+   <stmt> ::= <code=integer or symbolic opcode>
+              <dest=reg>, [<src1=reg>,] [<off/jmp_target=off>,] [<imm=imm>];
 
    Supported argument types include:
 
@@ -820,6 +843,13 @@ bpf_unparser::emit_store(expression *e, value *val)
    <off>    ::= <imm> | <jump label>
 
 */
+
+/* TODO PR29307 Suggested further improvements for the assembler syntax:
+
+   1. dest argument of call is optional
+   2. jump_to_catch and register_error error msg support formats
+
+ */
 
 // #define BPF_ASM_DEBUG
 
@@ -852,7 +882,12 @@ operator << (std::ostream& o, const asm_stmt& stmt)
     o << "label, " << stmt.dest << ";";
   else if (stmt.kind == "opcode")
     {
-      o << std::hex << stmt.code << ", "
+      o << std::hex << stmt.code;
+      // TODO std::hex is sticky? need to verify
+      std::string opcode_name(bpf_opcode_name(stmt.code));
+      if (opcode_name != "unknown")
+        o << "(" << opcode_name << ")";
+      o << ", "
         << stmt.dest << ", "
         << stmt.src1 << ", ";
       if (stmt.off != 0 || stmt.jmp_target == "")
@@ -902,10 +937,28 @@ is_numeric (const std::string &str)
   return (pos == str.size());
 }
 
-int64_t
-bpf_unparser::parse_imm (const asm_stmt &stmt, const std::string &str)
+opcode
+bpf_unparser::parse_opcode_tentative (const asm_stmt &stmt, const std::string &str, /*OUT*/bool &numeric_opcode)
 {
-  int64_t val;
+  opcode code;
+  try {
+    code = stoul(str, 0, 0);
+    numeric_opcode = true;
+  } catch (std::exception &e) { // XXX: invalid_argument, out_of_range
+    code = bpf_opcode_id(str);
+    numeric_opcode = false;
+    if (code == 0)
+        throw SEMANTIC_ERROR (_F("invalid bpf embeddedcode opcode '%s'",
+                                 str.c_str()), stmt.tok);
+  }
+  return code;
+}
+
+bool
+bpf_unparser::parse_imm_optional (const asm_stmt &stmt, const std::string &str, /*OUT*/int64_t &val)
+{
+  (void)stmt; /* XXX unused; could report errors, but we don't */
+
   if (str == "BPF_MAXSTRINGLEN")
     val = BPF_MAXSTRINGLEN;
   else if (str == "BPF_F_CURRENT_CPU")
@@ -915,10 +968,191 @@ bpf_unparser::parse_imm (const asm_stmt &stmt, const std::string &str)
   else try {
       val = stol(str, 0, 0);
     } catch (std::exception &e) { // XXX: invalid_argument, out_of_range
+      val = 0;
+      return false;
+    }
+  return true;
+}
+
+int64_t
+bpf_unparser::parse_imm (const asm_stmt &stmt, const std::string &str)
+{
+  int64_t val;
+  if (!parse_imm_optional(stmt, str, val))
+    {
       throw SEMANTIC_ERROR (_F("invalid bpf embeddedcode operand '%s'",
                                str.c_str()), stmt.tok);
     }
   return val;
+}
+
+/* Parse an argument of the form [reg+off] or [reg-off]. */
+void
+bpf_unparser::parse_reg_offset (const asm_stmt &stmt, const std::string &str,
+                                /*OUT*/std::string &reg, /*OUT*/int64_t &off)
+{
+  {
+    if (str.length() < 3 || str[0] != '[' || str[str.size()-1] != ']')
+      goto error;
+    size_t separator = str.find_first_of("+-", 0);
+    if (separator == std::string::npos)
+      goto error;
+    reg = str.substr(1,separator-1);
+    char sep_chr = str[separator];
+    std::string off_str = str.substr(separator+1,str.size()-1-separator-1);
+    off = parse_imm(stmt, off_str);
+    if (sep_chr == '-')
+      off = -off;
+    return;
+  }
+ error:
+  throw SEMANTIC_ERROR (_F("invalid bpf embeddedcode operand '%s', expected [reg+off] or [reg-off]",
+                           str.c_str()), stmt.tok);
+}
+
+/* Parse an assembly opcode, then write the output in stmt. */
+void
+bpf_unparser::parse_asm_opcode (const std::vector<std::string> &args, /*OUT*/asm_stmt &stmt)
+{
+  stmt.kind = "opcode";
+  bool numeric_opcode;
+  stmt.code = parse_opcode_tentative(stmt, args[0], numeric_opcode);
+  opcode tentative_code = stmt.code;
+  stmt.has_jmp_target =
+    BPF_CLASS(stmt.code) == BPF_JMP
+    && BPF_OP(stmt.code) != BPF_EXIT
+    && BPF_OP(stmt.code) != BPF_CALL;
+  stmt.has_fallthrough = // only for jcond
+    stmt.has_jmp_target
+    && BPF_OP(stmt.code) != BPF_JA;
+  // XXX: stmt.fallthrough is computed by visit_embeddedcode
+
+  unsigned cat = bpf_opcode_category(stmt.code);
+  if (args.size() == 5) // op dest src jmp_target/off imm
+    {
+      stmt.dest = args[1];
+      stmt.src1 = args[2];
+      if (stmt.has_jmp_target)
+        {
+          stmt.off = 0;
+          stmt.jmp_target = args[3];
+        }
+      else
+        stmt.off = parse_imm(stmt, args[3]);
+      stmt.imm = parse_imm(stmt, args[4]);
+    }
+  else if (cat == BPF_MEMORY_ARI4 && args.size() == 4) // op src dest imm
+    {
+      stmt.src1 = args[1];
+      stmt.dest = args[2];
+      stmt.imm = parse_imm(stmt, args[3]);
+    }
+  else if (cat == BPF_BRANCH_ARI4 && args.size() == 4 && stmt.has_jmp_target) // op dest imm jmp_target, op dest jmp_target imm, op dest src jmp_target
+    {
+      stmt.dest = args[1];
+
+      // disambiguate opcode taking imm vs src
+      if (parse_imm_optional(stmt, args[2], stmt.imm))
+        {
+          stmt.code = bpf_opcode_variant_imm(stmt.code);
+          stmt.jmp_target = args[3];
+        }
+      else if (parse_imm_optional(stmt, args[3], stmt.imm))
+        {
+          stmt.code = bpf_opcode_variant_imm(stmt.code);
+          stmt.jmp_target = args[2];
+        }
+      else
+        {
+          stmt.src1 = args[2];
+          stmt.jmp_target = args[3];
+        }
+
+      // error if stmt.code was specified numerically and doesn't match
+      if (numeric_opcode && stmt.code != tentative_code)
+        throw SEMANTIC_ERROR (_F("numeric opcode '%x' given argument types for '%x'",
+                                 tentative_code, stmt.code), stmt.tok); // TODO convert opcode to string
+    }
+  else if (cat == BPF_MEMORY_ARI34_SRCOFF && args.size() == 4) // op dest src off
+    {
+      stmt.dest = args[1];
+      stmt.src1 = args[2];
+      stmt.off = parse_imm(stmt, args[3]);
+    }
+  else if (cat == BPF_MEMORY_ARI34_SRCOFF && args.size() == 3) // op dest [src+off]
+    {
+      stmt.dest = args[1];
+      parse_reg_offset(stmt, args[2], stmt.dest, stmt.off);
+    }
+  else if (cat == BPF_MEMORY_ARI34_DSTOFF && args.size() == 4) // op dest off src, op dest src off
+    {
+      stmt.dest = args[1];
+
+      // allow off/src to be ordered according to either convention
+      if (parse_imm_optional(stmt, args[2], stmt.off))
+        {
+          stmt.src1 = args[3];
+        }
+      else
+        {
+          stmt.src1 = args[2];
+          stmt.off = parse_imm(stmt, args[3]);
+        }
+    }
+  else if (cat == BPF_MEMORY_ARI34_DSTOFF && args.size() == 3) // op [dest+off] src
+    {
+      parse_reg_offset(stmt, args[1], stmt.dest, stmt.off);
+      stmt.src1 = args[2];
+    }
+  else if (cat == BPF_ALU_ARI3 && args.size() == 3) // op dest src, op dest imm
+    {
+      stmt.dest = args[1];
+
+      // disambiguate opcode taking imm vs src
+      if (parse_imm_optional(stmt, args[2], stmt.imm))
+        {
+          stmt.code = bpf_opcode_variant_imm(stmt.code);
+        }
+      else
+        {
+          stmt.src1 = args[2];
+        }
+
+      // error if stmt.code was specified numerically and doesn't match
+      if (numeric_opcode && stmt.code != tentative_code)
+        throw SEMANTIC_ERROR (_F("numeric opcode '%x' given argument types for '%x'",
+                                 tentative_code, stmt.code), stmt.tok); // TODO convert opcode to string
+    }
+  else if (cat == BPF_MEMORY_ARI3 && args.size() == 3) // op dest imm
+    {
+      stmt.dest = args[1];
+      stmt.imm = parse_imm(stmt, args[2]);
+    }
+  else if (cat == BPF_ALU_ARI2 && args.size() == 2) // op dest
+    {
+      stmt.dest = args[1];
+    }
+  else if (cat == BPF_BRANCH_ARI2 && args.size() == 2) // op jmp_target
+    {
+      stmt.jmp_target = args[1];
+    }
+  else if (cat == BPF_CALL_ARI2 && args.size() == 2) // op imm/helper_name
+    {
+      if (!parse_imm_optional(stmt, args[2], stmt.imm))
+        {
+          // TODO: handle helper_name by convering stmt to a "call" directive?
+          throw SEMANTIC_ERROR (_F("invalid bpf embeddedcode syntax (opcode expects imm, found '%s')", args[2].c_str()), stmt.tok);
+        }
+    }
+  else if (cat == BPF_EXIT_ARI1 && args.size() == 1) // op
+    {
+      // nothing
+    }
+  else
+    {
+      const char * expected_args = bpf_expected_args(cat);
+      throw SEMANTIC_ERROR (_F("invalid bpf embeddedcode syntax (opcode expects %s args, found %llu)", expected_args, (long long) args.size()-1), stmt.tok);
+    }
 }
 
 /* Parse an assembly statement starting from position start in code,
@@ -936,6 +1170,9 @@ bpf_unparser::parse_asm_stmt (embeddedcode *s, size_t start,
   size_t pos;
   bool in_comment = false;
   bool in_string = false;
+  bool in_starting_keyword = true;
+  bool trailing_comma = false;
+  bool is_label = false; // XXX "label:" syntax
 
   // ??? As before, parser is extremely non-rigorous and could do
   // with some tightening in terms of the inputs it accepts.
@@ -945,9 +1182,7 @@ bpf_unparser::parse_asm_stmt (embeddedcode *s, size_t start,
   {
     char c = code[pos];
     char c2 = pos + 1 < n ? code [pos + 1] : 0;
-    if (isspace(c) && !in_string)
-      continue; // skip
-    else if (in_comment)
+    if (in_comment)
       {
         if (c == '*' && c2 == '/')
           ++pos, in_comment = false;
@@ -963,8 +1198,35 @@ bpf_unparser::parse_asm_stmt (embeddedcode *s, size_t start,
         else // accept any char, including whitespace
           arg.push_back(c);
       }
+    else if (c == ';' || (c == '\n' && !trailing_comma)) // reached end of statement
+      {
+        // XXX: This strips out empty args. A more rigorous parser would error.
+        if (arg != "")
+          args.push_back(arg);
+        arg = "";
+        pos++, in_starting_keyword = false;
+        break;
+      }
+    else if (c == ':') // reached end of label
+      {
+        is_label = true;
+        pos++, in_starting_keyword = false;
+        trailing_comma = false;
+        break;
+      }
+    else if (c == ',' || (isspace(c) && in_starting_keyword)) // reached end of argument
+      {
+        // XXX: This strips out empty args. A more rigorous parser would error.
+        if (arg != "")
+          args.push_back(arg);
+        arg = "";
+        in_starting_keyword = false;
+        trailing_comma = true;
+      }
+    else if (isspace(c) && !in_string)
+      continue; // skip
     else if (c == '/' && c2 == '*')
-      ++pos, in_comment = true;
+      ++pos, in_comment = true, in_starting_keyword = false;
     else if (c == '"') // found a literal string
       {
         if (arg.empty() && args.empty())
@@ -975,22 +1237,8 @@ bpf_unparser::parse_asm_stmt (embeddedcode *s, size_t start,
         // more rigorous parser would error on mixing strings and
         // regular chars.
         arg.push_back(c); // include quote
-        in_string = true;
-      }
-    else if (c == ',') // reached end of argument
-      {
-        // XXX: This strips out empty args. A more rigorous parser would error.
-        if (arg != "")
-          args.push_back(arg);
-        arg = "";
-      }
-    else if (c == ';') // reached end of statement
-      {
-        // XXX: This strips out empty args. A more rigorous parser would error.
-        if (arg != "")
-          args.push_back(arg);
-        arg = "";
-        pos++; break;
+        in_string = true, in_starting_keyword = false;
+        trailing_comma = false;
       }
     else // found (we assume) a regular char
       {
@@ -1003,10 +1251,19 @@ bpf_unparser::parse_asm_stmt (embeddedcode *s, size_t start,
         // A more rigorous parser would track in_arg
         // and after_arg states and error on whitespace within args.
         arg.push_back(c);
+        trailing_comma = false;
       }
   }
   // final ';' is optional, so we watch for a trailing arg:
   if (arg != "") args.push_back(arg);
+
+  // handle 'label:' syntax
+  if (is_label)
+    {
+      std::string lb = args[0];
+      args[0] = "label";
+      args.push_back(lb);
+    }
 
   // handle the case with no args
   if (args.empty() && pos >= n)
@@ -1103,43 +1360,15 @@ bpf_unparser::parse_asm_stmt (embeddedcode *s, size_t start,
       if (args.size() < 3)
         throw SEMANTIC_ERROR (_F("invalid bpf embeddedcode syntax (call expects at least 2 args, found %llu)", (long long) args.size()-1), stmt.tok);
       stmt.kind = args[0];
+      // TODO: handle optional dest
       stmt.dest = args[1];
       assert(stmt.params.empty());
       for (unsigned k = 2; k < args.size(); k++)
         stmt.params.push_back(args[k]);
     }
-  else if (is_numeric(args[0]))
+  else if (is_numeric(args[0]) || bpf_opcode_id(args[0]) != 0x0)
     {
-      if (args.size() != 5)
-        throw SEMANTIC_ERROR (_F("invalid bpf embeddedcode syntax (opcode expects 4 args, found %llu)", (long long) args.size()-1), stmt.tok);
-      stmt.kind = "opcode";
-      try {
-        stmt.code = stoul(args[0], 0, 0);
-      } catch (std::exception &e) { // XXX: invalid_argument, out_of_range
-        throw SEMANTIC_ERROR (_F("invalid bpf embeddedcode opcode '%s'",
-                                 args[0].c_str()), stmt.tok);
-      }
-      stmt.dest = args[1];
-      stmt.src1 = args[2];
-
-      stmt.has_jmp_target =
-        BPF_CLASS(stmt.code) == BPF_JMP
-        && BPF_OP(stmt.code) != BPF_EXIT
-        && BPF_OP(stmt.code) != BPF_CALL;
-      stmt.has_fallthrough = // only for jcond
-        stmt.has_jmp_target
-        && BPF_OP(stmt.code) != BPF_JA;
-      // XXX: stmt.fallthrough is computed by visit_embeddedcode
-
-      if (stmt.has_jmp_target)
-        {
-          stmt.off = 0;
-          stmt.jmp_target = args[3];
-        }
-      else
-        stmt.off = parse_imm(stmt, args[3]);
-
-      stmt.imm = parse_imm(stmt, args[4]);
+      parse_asm_opcode(args, stmt);
     }
   else
     throw SEMANTIC_ERROR (_F("unknown bpf embeddedcode operator '%s'",
@@ -4927,6 +5156,7 @@ translate_bpf_pass (systemtap_session& s)
 {
   using namespace bpf;
 
+  init_bpf_opcode_tables();
   init_bpf_helper_tables();
 
   if (elf_version(EV_CURRENT) == EV_NONE)
