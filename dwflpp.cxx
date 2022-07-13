@@ -3512,8 +3512,8 @@ success:
       }
 
       Dwarf_Attribute data_member_location = {
-	      .code = DW_AT_data_member_location, .form = DW_FORM_udata,
-	      .valp = loc, .cu = attr.cu
+	      DW_AT_data_member_location, DW_FORM_udata,
+	      loc, attr.cu
       };
 
       dies.insert(dies.begin(), die);
