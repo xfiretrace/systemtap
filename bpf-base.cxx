@@ -157,10 +157,38 @@ std::map<opcode, unsigned> bpf_opcode_category_map;
 // Will gradually add opcodes over the following patches.
 #ifndef __BPF_OPCODE_MAPPER
 #define __BPF_OPCODE_MAPPER(FN_SRC,FN_IMM) \
-    ;
+  FN_SRC(add, 0x0f, BPF_ALU64 | BPF_OP(BPF_ADD) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(add, 0x07, BPF_ALU64 | BPF_OP(BPF_ADD) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(sub, 0x1f, BPF_ALU64 | BPF_OP(BPF_SUB) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(sub, 0x17, BPF_ALU64 | BPF_OP(BPF_SUB) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(mul, 0x2f, BPF_ALU64 | BPF_OP(BPF_MUL) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(mul, 0x27, BPF_ALU64 | BPF_OP(BPF_MUL) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(div, 0x3f, BPF_ALU64 | BPF_OP(BPF_DIV) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(div, 0x37, BPF_ALU64 | BPF_OP(BPF_DIV) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(or, 0x4f, BPF_ALU64 | BPF_OP(BPF_OR) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(or, 0x47, BPF_ALU64 | BPF_OP(BPF_OR) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(and, 0x5f, BPF_ALU64 | BPF_OP(BPF_AND) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(and, 0x57, BPF_ALU64 | BPF_OP(BPF_AND) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(lsh, 0x6f, BPF_ALU64 | BPF_OP(BPF_LSH) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(lsh, 0x67, BPF_ALU64 | BPF_OP(BPF_LSH) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(rsh, 0x7f, BPF_ALU64 | BPF_OP(BPF_RSH) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(rsh, 0x77, BPF_ALU64 | BPF_OP(BPF_RSH) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(neg, 0x87, BPF_ALU64 | BPF_OP(BPF_NEG) | BPF_K, BPF_ALU_ARI2), \
+  FN_SRC(mod, 0x9f, BPF_ALU64 | BPF_OP(BPF_MOD) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(mod, 0x97, BPF_ALU64 | BPF_OP(BPF_MOD) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(xor, 0xaf, BPF_ALU64 | BPF_OP(BPF_XOR) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(xor, 0xa7, BPF_ALU64 | BPF_OP(BPF_XOR) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(mov, 0xbf, BPF_ALU64 | BPF_MOV | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(mov, 0xb7, BPF_ALU64 | BPF_MOV | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(arsh, 0xcf, BPF_ALU64 | BPF_OP(BPF_ARSH) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(arsh, 0xc7, BPF_ALU64 | BPF_OP(BPF_ARSH) | BPF_K, BPF_ALU_ARI3), \
+
 #endif
-//    TODO FN_SRC(op_name, raw_opcode, opcode, category),
-//    TODO FN_IMM(op_name, raw_opcode, opcode, category),
+// TODO 32-bit insns - 25 entries
+// TODO byteswap insns - 2x3 entries, name determines imm (needs special handling)
+// TODO memory insns - 13 entries
+// TODO memory / ldabsw insns - 8 entries
+// TODO branch insns - 25 entries
 
 void
 init_bpf_opcode_tables()
@@ -202,12 +230,13 @@ bpf_opcode_id(const std::string &name)
 /* If op is an ALU/branch opcode taking src,
    return the equivalent opcode taking imm. */
 opcode
-bpf_opcode_variant_imm(opcode op)
+bpf_opcode_variant_imm(opcode code)
 {
-    // TODO add,sub,mul,div,or,and,lsh,rsh,mod,xor,mov,arsh
-    // TODO add32,sub32,mul32,div32,or32,and32,lsh32,rsh32,mod32,xor32,mov32,arsh32
-    // TODO jeq,jgt,jge,jlt,jle,jset,jne,jsgt,jsge,jslt,jsle
-    return op;
+  if (BPF_CLASS(code) == BPF_ALU64
+      || BPF_CLASS(code) == BPF_ALU
+      || BPF_CLASS(code) == BPF_JMP)
+      return (code & ~BPF_X);
+  return code;
 }
 
 unsigned
