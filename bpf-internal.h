@@ -195,7 +195,7 @@ bool is_commutative(opcode c);
 void init_bpf_opcode_tables();
 const char *bpf_opcode_name (opcode code);
 opcode bpf_opcode_id (const std::string &name);
-opcode bpf_opcode_variant_imm(opcode op);
+opcode bpf_opcode_variant_imm(opcode code);
 unsigned bpf_opcode_category (opcode code);
 const char *bpf_expected_args (unsigned cat);
 

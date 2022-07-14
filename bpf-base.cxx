@@ -146,6 +146,13 @@ std::map<opcode, unsigned> bpf_opcode_category_map;
 // kernel linux/bpf_exp.y to avoid getting into weird addressing-mode syntax.
 // Perhaps later, expanding the above bpf_{src,imm}_opcode_map scheme.
 //
+// Define as FN_{SRC,IMM}(op_name, raw_opcode, opcode, category)
+// (raw_opcode is the hex opcode taken from the iovisor cheatsheet,
+//  opcode is the opcode as constructed from linux bpf.h/bpf_common.h macros
+//  following the scheme in linux/filter.h (yet another assembler format!)
+//  These codes should be equal, both are included to sanity-check the table.)
+// with FN_IMM used only for variants of SRC opcodes that take an IMM value.
+//
 // XXX: Does not have to be complete, just complete enough for the needs of the tapsets.
 // Will gradually add opcodes over the following patches.
 #ifndef __BPF_OPCODE_MAPPER
@@ -163,21 +170,21 @@ init_bpf_opcode_tables()
 #define __BPF_SET_OPCODE_IMM(name, x, _x, _cat) bpf_imm_opcode_map[#name] = (x)
 #define __BPF_SET_OPCODE_CATEGORY(name, x, _x, cat) bpf_opcode_category_map[(x)] = (cat)
 #define __BPF_CHECK_OPCODE(name, x, y, _cat) assert((x)==(y))
-    __BPF_OPCODE_MAPPER(__BPF_SET_OPCODE_NAME,__BPF_SET_OPCODE_NAME)
-    __BPF_OPCODE_MAPPER(__BPF_SET_OPCODE_SRC,__BPF_SET_OPCODE_IMM)
-    __BPF_OPCODE_MAPPER(__BPF_SET_OPCODE_CATEGORY,__BPF_SET_OPCODE_CATEGORY)
-    __BPF_OPCODE_MAPPER(__BPF_CHECK_OPCODE,__BPF_CHECK_OPCODE)
-    (void)0;
+  __BPF_OPCODE_MAPPER(__BPF_SET_OPCODE_NAME,__BPF_SET_OPCODE_NAME)
+  __BPF_OPCODE_MAPPER(__BPF_SET_OPCODE_SRC,__BPF_SET_OPCODE_IMM)
+  __BPF_OPCODE_MAPPER(__BPF_SET_OPCODE_CATEGORY,__BPF_SET_OPCODE_CATEGORY)
+  __BPF_OPCODE_MAPPER(__BPF_CHECK_OPCODE,__BPF_CHECK_OPCODE)
+  (void)0;
 }
 
 /* Convert opcode code to name. */
 const char *
 bpf_opcode_name(opcode code)
 {
-    auto it = bpf_opcode_name_map.find(code);
-    if (it == bpf_opcode_name_map.end())
-        return "unknown";
-    return it->second;
+  auto it = bpf_opcode_name_map.find(code);
+  if (it == bpf_opcode_name_map.end())
+    return "unknown";
+  return it->second;
 }
 
 /* Convert opcode name to code. In ambiguous cases
@@ -186,10 +193,10 @@ bpf_opcode_name(opcode code)
 opcode
 bpf_opcode_id(const std::string &name)
 {
-    auto it = bpf_src_opcode_map.find(name);
-    if (it == bpf_src_opcode_map.end())
-        return 0;
-    return it->second;
+  auto it = bpf_src_opcode_map.find(name);
+  if (it == bpf_src_opcode_map.end())
+    return 0;
+  return it->second;
 }
 
 /* If op is an ALU/branch opcode taking src,
@@ -206,35 +213,35 @@ bpf_opcode_variant_imm(opcode op)
 unsigned
 bpf_opcode_category(opcode code)
 {
-    auto it = bpf_opcode_category_map.find(code);
-    if (it == bpf_opcode_category_map.end())
-        return BPF_UNKNOWN_ARI;
-    return it->second;
+  auto it = bpf_opcode_category_map.find(code);
+  if (it == bpf_opcode_category_map.end())
+    return BPF_UNKNOWN_ARI;
+  return it->second;
 }
 
 const char *
 bpf_expected_args (unsigned cat)
 {
-    switch (cat) {
-    case BPF_MEMORY_ARI4:
-    case BPF_BRANCH_ARI4:
-        return "3-4";
-    case BPF_MEMORY_ARI34_SRCOFF:
-    case BPF_MEMORY_ARI34_DSTOFF:
-        return "2-4";
-    case BPF_ALU_ARI3:
-    case BPF_MEMORY_ARI3:
-        return "2/4";
-    case BPF_ALU_ARI2:
-    case BPF_BRANCH_ARI2:
-    case BPF_CALL_ARI2:
-        return "1/4";
-    case BPF_EXIT_ARI1:
-        return "0/4";
-    case BPF_UNKNOWN_ARI:
-    default:
-        return "4";
-    }
+  switch (cat) {
+  case BPF_MEMORY_ARI4:
+  case BPF_BRANCH_ARI4:
+    return "3-4";
+  case BPF_MEMORY_ARI34_SRCOFF:
+  case BPF_MEMORY_ARI34_DSTOFF:
+    return "2-4";
+  case BPF_ALU_ARI3:
+  case BPF_MEMORY_ARI3:
+    return "2/4";
+  case BPF_ALU_ARI2:
+  case BPF_BRANCH_ARI2:
+  case BPF_CALL_ARI2:
+    return "1/4";
+  case BPF_EXIT_ARI1:
+    return "0/4";
+  case BPF_UNKNOWN_ARI:
+  default:
+    return "4";
+  }
 }
 
 /* BPF helper lookup for the translator: */
