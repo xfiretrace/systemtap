@@ -182,13 +182,37 @@ std::map<opcode, unsigned> bpf_opcode_category_map;
   FN_IMM(mov, 0xb7, BPF_ALU64 | BPF_MOV | BPF_K, BPF_ALU_ARI3), \
   FN_SRC(arsh, 0xcf, BPF_ALU64 | BPF_OP(BPF_ARSH) | BPF_X, BPF_ALU_ARI3), \
   FN_IMM(arsh, 0xc7, BPF_ALU64 | BPF_OP(BPF_ARSH) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(ja, 0x05, BPF_JMP | BPF_JA, BPF_BRANCH_ARI2), \
+  FN_SRC(jeq, 0x1d, BPF_JMP | BPF_OP(BPF_JEQ) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jeq, 0x15, BPF_JMP | BPF_OP(BPF_JEQ) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jgt, 0x2d, BPF_JMP | BPF_OP(BPF_JGT) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jgt, 0x25, BPF_JMP | BPF_OP(BPF_JGT) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jge, 0x3d, BPF_JMP | BPF_OP(BPF_JGE) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jge, 0x35, BPF_JMP | BPF_OP(BPF_JGE) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jlt, 0xad, BPF_JMP | BPF_OP(BPF_JLT) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jlt, 0xa5, BPF_JMP | BPF_OP(BPF_JLT) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jle, 0xbd, BPF_JMP | BPF_OP(BPF_JLE) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jle, 0xb5, BPF_JMP | BPF_OP(BPF_JLE) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jset, 0x4d, BPF_JMP | BPF_OP(BPF_JSET) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jset, 0x45, BPF_JMP | BPF_OP(BPF_JSET) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jne, 0x5d, BPF_JMP | BPF_OP(BPF_JNE) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jne, 0x55, BPF_JMP | BPF_OP(BPF_JNE) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jsgt, 0x6d, BPF_JMP | BPF_OP(BPF_JSGT) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jsgt, 0x65, BPF_JMP | BPF_OP(BPF_JSGT) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jsge, 0x7d, BPF_JMP | BPF_OP(BPF_JSGE) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jsge, 0x75, BPF_JMP | BPF_OP(BPF_JSGE) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jslt, 0xcd, BPF_JMP | BPF_OP(BPF_JSLT) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jslt, 0xc5, BPF_JMP | BPF_OP(BPF_JSLT) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(jsle, 0xdd, BPF_JMP | BPF_OP(BPF_JSLE) | BPF_X, BPF_BRANCH_ARI4), \
+  FN_IMM(jsle, 0xd5, BPF_JMP | BPF_OP(BPF_JSLE) | BPF_K, BPF_BRANCH_ARI4), \
+  FN_SRC(call, 0x85, BPF_JMP | BPF_CALL, BPF_CALL_ARI2), \
+  FN_SRC(exit, 0x95, BPF_JMP | BPF_EXIT, BPF_EXIT_ARI1), \
 
 #endif
 // TODO 32-bit insns - 25 entries
 // TODO byteswap insns - 2x3 entries, name determines imm (needs special handling)
 // TODO memory insns - 13 entries
 // TODO memory / ldabsw insns - 8 entries
-// TODO branch insns - 25 entries
 
 void
 init_bpf_opcode_tables()
