@@ -182,6 +182,31 @@ std::map<opcode, unsigned> bpf_opcode_category_map;
   FN_IMM(mov, 0xb7, BPF_ALU64 | BPF_MOV | BPF_K, BPF_ALU_ARI3), \
   FN_SRC(arsh, 0xcf, BPF_ALU64 | BPF_OP(BPF_ARSH) | BPF_X, BPF_ALU_ARI3), \
   FN_IMM(arsh, 0xc7, BPF_ALU64 | BPF_OP(BPF_ARSH) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(add32, 0x0c, BPF_ALU | BPF_OP(BPF_ADD) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(add32, 0x04, BPF_ALU | BPF_OP(BPF_ADD) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(sub32, 0x1c, BPF_ALU | BPF_OP(BPF_SUB) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(sub32, 0x14, BPF_ALU | BPF_OP(BPF_SUB) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(mul32, 0x2c, BPF_ALU | BPF_OP(BPF_MUL) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(mul32, 0x24, BPF_ALU | BPF_OP(BPF_MUL) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(div32, 0x3c, BPF_ALU | BPF_OP(BPF_DIV) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(div32, 0x34, BPF_ALU | BPF_OP(BPF_DIV) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(or32, 0x4c, BPF_ALU | BPF_OP(BPF_OR) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(or32, 0x44, BPF_ALU | BPF_OP(BPF_OR) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(and32, 0x5c, BPF_ALU | BPF_OP(BPF_AND) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(and32, 0x54, BPF_ALU | BPF_OP(BPF_AND) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(lsh32, 0x6c, BPF_ALU | BPF_OP(BPF_LSH) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(lsh32, 0x64, BPF_ALU | BPF_OP(BPF_LSH) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(rsh32, 0x7c, BPF_ALU | BPF_OP(BPF_RSH) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(rsh32, 0x74, BPF_ALU | BPF_OP(BPF_RSH) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(neg32, 0x84, BPF_ALU | BPF_OP(BPF_NEG) | BPF_K, BPF_ALU_ARI2), \
+  FN_SRC(mod32, 0x9c, BPF_ALU | BPF_OP(BPF_MOD) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(mod32, 0x94, BPF_ALU | BPF_OP(BPF_MOD) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(xor32, 0xac, BPF_ALU | BPF_OP(BPF_XOR) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(xor32, 0xa4, BPF_ALU | BPF_OP(BPF_XOR) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(mov32, 0xbc, BPF_ALU | BPF_MOV | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(mov32, 0xb4, BPF_ALU | BPF_MOV | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(arsh32, 0xcc, BPF_ALU | BPF_OP(BPF_ARSH) | BPF_X, BPF_ALU_ARI3), \
+  FN_IMM(arsh32, 0xc4, BPF_ALU | BPF_OP(BPF_ARSH) | BPF_K, BPF_ALU_ARI3), \
   FN_SRC(lddw, 0x18, BPF_LD | BPF_DW | BPF_IMM, BPF_MEMORY_ARI3), \
   FN_SRC(ldxw, 0x61, BPF_LDX | BPF_SIZE(BPF_W) | BPF_MEM, BPF_MEMORY_ARI34_SRCOFF), \
   FN_SRC(ldxh, 0x69, BPF_LDX | BPF_SIZE(BPF_H) | BPF_MEM, BPF_MEMORY_ARI34_SRCOFF), \
@@ -222,7 +247,6 @@ std::map<opcode, unsigned> bpf_opcode_category_map;
   FN_SRC(exit, 0x95, BPF_JMP | BPF_EXIT, BPF_EXIT_ARI1), \
 
 #endif
-// TODO 32-bit insns - 25 entries
 // XXX The 2x3 byteswap insns are not too useful.
 //     They need special handling since the opcode name determines imm value.
 // XXX The 8 ldabs* / ldind* opcodes are specific to network processing.
