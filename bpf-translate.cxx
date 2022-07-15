@@ -1084,6 +1084,26 @@ bpf_unparser::parse_asm_opcode (const std::vector<std::string> &args, /*OUT*/asm
       stmt.dest = args[1];
       parse_reg_offset(stmt, args[2], stmt.dest, stmt.off);
     }
+  else if (cat == BPF_MEMORY_ARI34_DSTOFF_IMM && args.size() == 4) // op dest off imm, op dest src imm
+    {
+      stmt.dest = args[1];
+
+      // allow off/src to be ordered according to either convention
+      if (parse_imm_optional(stmt, args[2], stmt.off))
+        {
+          stmt.imm = parse_imm(stmt, args[2]);
+        }
+      else
+        {
+          stmt.imm = parse_imm(stmt, args[2]);
+          stmt.off = parse_imm(stmt, args[3]);
+        }
+    }
+  else if (cat == BPF_MEMORY_ARI34_DSTOFF_IMM && args.size() == 3) // op [dest+off] imm
+    {
+      parse_reg_offset(stmt, args[1], stmt.dest, stmt.off);
+      stmt.imm = parse_imm(stmt, args[2]);
+    }
   else if (cat == BPF_MEMORY_ARI34_DSTOFF && args.size() == 4) // op dest off src, op dest src off
     {
       stmt.dest = args[1];

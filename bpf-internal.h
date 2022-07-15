@@ -177,19 +177,21 @@ bool is_commutative(opcode c);
 #define BPF_BRANCH_ARI4 2
 #define BPF_MEMORY_ARI34_SRCOFF 3
 // -> can take [src+off]
-#define BPF_MEMORY_ARI34_DSTOFF 4
-// -> can take [dst+off]
-#define BPF_ALU_ARI3 5
+#define BPF_MEMORY_ARI34_DSTOFF_IMM 4
+// -> can take [dst+off]+imm
+#define BPF_MEMORY_ARI34_DSTOFF 5
+// -> can take [dst+off]+src
+#define BPF_ALU_ARI3 6
 // -> takes dst+src/imm
-#define BPF_MEMORY_ARI3 6
+#define BPF_MEMORY_ARI3 7
 // -> takes dst+imm
-#define BPF_ALU_ARI2 7
+#define BPF_ALU_ARI2 8
 // -> takes dst
-#define BPF_BRANCH_ARI2 8
+#define BPF_BRANCH_ARI2 9
 // -> takes jmp_target
-#define BPF_CALL_ARI2 9
+#define BPF_CALL_ARI2 10
 // -> takes imm
-#define BPF_EXIT_ARI1 10
+#define BPF_EXIT_ARI1 11
 
 /* PR29307: BPF opcode lookup for the embedded-code assembler: */
 void init_bpf_opcode_tables();

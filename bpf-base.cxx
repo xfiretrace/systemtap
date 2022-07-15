@@ -182,6 +182,19 @@ std::map<opcode, unsigned> bpf_opcode_category_map;
   FN_IMM(mov, 0xb7, BPF_ALU64 | BPF_MOV | BPF_K, BPF_ALU_ARI3), \
   FN_SRC(arsh, 0xcf, BPF_ALU64 | BPF_OP(BPF_ARSH) | BPF_X, BPF_ALU_ARI3), \
   FN_IMM(arsh, 0xc7, BPF_ALU64 | BPF_OP(BPF_ARSH) | BPF_K, BPF_ALU_ARI3), \
+  FN_SRC(lddw, 0x18, BPF_LD | BPF_DW | BPF_IMM, BPF_MEMORY_ARI3), \
+  FN_SRC(ldxw, 0x61, BPF_LDX | BPF_SIZE(BPF_W) | BPF_MEM, BPF_MEMORY_ARI34_SRCOFF), \
+  FN_SRC(ldxh, 0x69, BPF_LDX | BPF_SIZE(BPF_H) | BPF_MEM, BPF_MEMORY_ARI34_SRCOFF), \
+  FN_SRC(ldxb, 0x71, BPF_LDX | BPF_SIZE(BPF_B) | BPF_MEM, BPF_MEMORY_ARI34_SRCOFF), \
+  FN_SRC(ldxdw, 0x79, BPF_LDX | BPF_SIZE(BPF_DW) | BPF_MEM, BPF_MEMORY_ARI34_SRCOFF), \
+  FN_SRC(stw, 0x62, BPF_ST | BPF_SIZE(BPF_W) | BPF_MEM, BPF_MEMORY_ARI34_DSTOFF_IMM), \
+  FN_SRC(sth, 0x6a, BPF_ST | BPF_SIZE(BPF_H) | BPF_MEM, BPF_MEMORY_ARI34_DSTOFF_IMM), \
+  FN_SRC(stb, 0x72, BPF_ST | BPF_SIZE(BPF_B) | BPF_MEM, BPF_MEMORY_ARI34_DSTOFF_IMM), \
+  FN_SRC(stdw, 0x7a, BPF_ST | BPF_SIZE(BPF_DW) | BPF_MEM, BPF_MEMORY_ARI34_DSTOFF_IMM), \
+  FN_SRC(stxw, 0x63, BPF_STX | BPF_SIZE(BPF_W) | BPF_MEM, BPF_MEMORY_ARI34_DSTOFF), \
+  FN_SRC(stxh, 0x6b, BPF_STX | BPF_SIZE(BPF_H) | BPF_MEM, BPF_MEMORY_ARI34_DSTOFF), \
+  FN_SRC(stxb, 0x73, BPF_STX | BPF_SIZE(BPF_B) | BPF_MEM, BPF_MEMORY_ARI34_DSTOFF), \
+  FN_SRC(stxdw, 0x7b, BPF_STX | BPF_SIZE(BPF_DW) | BPF_MEM, BPF_MEMORY_ARI34_DSTOFF), \
   FN_SRC(ja, 0x05, BPF_JMP | BPF_JA, BPF_BRANCH_ARI2), \
   FN_SRC(jeq, 0x1d, BPF_JMP | BPF_OP(BPF_JEQ) | BPF_X, BPF_BRANCH_ARI4), \
   FN_IMM(jeq, 0x15, BPF_JMP | BPF_OP(BPF_JEQ) | BPF_K, BPF_BRANCH_ARI4), \
@@ -210,9 +223,9 @@ std::map<opcode, unsigned> bpf_opcode_category_map;
 
 #endif
 // TODO 32-bit insns - 25 entries
-// TODO byteswap insns - 2x3 entries, name determines imm (needs special handling)
-// TODO memory insns - 13 entries
-// TODO memory / ldabsw insns - 8 entries
+// XXX The 2x3 byteswap insns are not too useful.
+//     They need special handling since the opcode name determines imm value.
+// XXX The 8 ldabs* / ldind* opcodes are specific to network processing.
 
 void
 init_bpf_opcode_tables()
