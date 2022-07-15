@@ -1027,6 +1027,13 @@ bpf_unparser::parse_asm_opcode (const std::vector<std::string> &args, /*OUT*/asm
     && BPF_OP(stmt.code) != BPF_JA;
   // XXX: stmt.fallthrough is computed by visit_embeddedcode
 
+  // XXX default values required for emit_asm_opcode
+  stmt.dest = "-";
+  stmt.src1 = "-";
+  stmt.off = 0;
+  stmt.jmp_target = "-";
+  stmt.imm = 0;
+
   unsigned cat = bpf_opcode_category(stmt.code);
   if (args.size() == 5) // op dest src jmp_target/off imm
     {
@@ -1190,8 +1197,8 @@ bpf_unparser::parse_asm_stmt (embeddedcode *s, size_t start,
   size_t pos;
   bool in_comment = false;
   bool in_string = false;
-  bool in_starting_keyword = true;
-  bool trailing_comma = false;
+  bool in_starting_keyword = true; // first keyword terminated by space
+  bool trailing_comma = false; // newline not after comma separates statements
   bool is_label = false; // XXX "label:" syntax
 
   // ??? As before, parser is extremely non-rigorous and could do
@@ -1224,7 +1231,7 @@ bpf_unparser::parse_asm_stmt (embeddedcode *s, size_t start,
         if (arg != "")
           args.push_back(arg);
         arg = "";
-        pos++, in_starting_keyword = false;
+        pos++, in_starting_keyword = true;
         break;
       }
     else if (c == ':') // reached end of label
@@ -1234,19 +1241,20 @@ bpf_unparser::parse_asm_stmt (embeddedcode *s, size_t start,
         trailing_comma = false;
         break;
       }
-    else if (c == ',' || (isspace(c) && in_starting_keyword)) // reached end of argument
+    else if (c == ','
+             || (isspace(c) && in_starting_keyword && arg != "")) // reached end of argument
       {
         // XXX: This strips out empty args. A more rigorous parser would error.
         if (arg != "")
           args.push_back(arg);
         arg = "";
         in_starting_keyword = false;
-        trailing_comma = true;
+        trailing_comma = (c == ','); // XXX only after an actual comma
       }
     else if (isspace(c) && !in_string)
       continue; // skip
     else if (c == '/' && c2 == '*')
-      ++pos, in_comment = true, in_starting_keyword = false;
+      ++pos, in_comment = true; // XXX in_starting_keyword unchanged
     else if (c == '"') // found a literal string
       {
         if (arg.empty() && args.empty())
