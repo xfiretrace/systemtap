@@ -1,5 +1,5 @@
 // bpf internal classes
-// Copyright (C) 2016-2021 Red Hat Inc.
+// Copyright (C) 2016-2022 Red Hat Inc.
 //
 // This file is part of systemtap, and is free software.  You can
 // redistribute it and/or modify it under the terms of the GNU General
