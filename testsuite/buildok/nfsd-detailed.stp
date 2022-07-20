@@ -327,14 +327,14 @@ probe nfsd.create.return
 # nfsd.createv3 tests
 #
 
-probe nfsd.createv3
+probe nfsd.createv3 ?
 {
 	printf("%s(%s)\n", name, argstr)
 	printf("%s %s\n", client_ip, fh)
 	printf("%d %s %d %d\n", filelen, filename, iap_valid, iap_mode)
 	printf("%d %d %d\n", truncp, verifier, createmode)
 }
-probe nfsd.createv3.return
+probe nfsd.createv3.return ?
 {
 	printf("%s(%s)\n", name, retstr)
 	printf("%s %s\n", client_ip, fh)
