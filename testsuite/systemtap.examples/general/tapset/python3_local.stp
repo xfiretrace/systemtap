@@ -182,7 +182,7 @@ function p3_get_dict_hash (dict, i) {
     n = @cast (dict, "PyDictObject", @PYTHON3_LIBRARY)->ma_used;
     if (i > n || entries == 0)
 	return 0
-    return @cast (entries, "PyDictKeysObject", @PYTHON3_LIBRARY)->dk_entries[i]->me_hash
+    return @cast (@DK_ENTRIES(entries), "PyDictKeyEntry", @PYTHON3_LIBRARY)[i]->me_hash
 }
 
 # FUNCTION P3_GET_DICT_KEY
@@ -195,7 +195,7 @@ function p3_get_dict_key (dict, i) {
     n = @cast (dict, "PyDictObject", @PYTHON3_LIBRARY)->ma_used;
     if (i > n || entries == 0)
 	return 0
-    return @cast (entries, "PyDictKeysObject", @PYTHON3_LIBRARY)->dk_entries[i]->me_key
+    return @cast (@DK_ENTRIES(entries), "PyDictKeyEntry", @PYTHON3_LIBRARY)[i]->me_key
 }
 
 # FUNCTION P3_GET_DICT_VALUE
@@ -214,7 +214,7 @@ function p3_get_dict_value (dict, i) {
     n = @cast (dict, "PyDictObject", @PYTHON3_LIBRARY)->ma_used;
     if (i > n || entries == 0)
 	return 0
-    return @cast (entries, "PyDictKeysObject", @PYTHON3_LIBRARY)->dk_entries[i]->me_value
+    return @cast (@DK_ENTRIES(entries), "PyDictKeyEntry", @PYTHON3_LIBRARY)[i]->me_value
   }
 }
 
