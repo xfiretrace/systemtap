@@ -7,5 +7,40 @@
 # Set this to the location of the python 3 .so
 @define PYTHON3_LIBRARY
 %(
-  "/usr/lib64/libpython3.4m.so.1.0"
+  "/usr/lib64/libpython3.7m.so.1.0"
+%)
+
+@define Py3DictKeysObject(object) %(
+                    @cast(@object, "PyDictKeysObject", @PYTHON3_LIBRARY)
+                    %)
+@define Py3DictKeyEntry(object) %(
+                    @cast(@object, "PyDictKeyEntry", @PYTHON3_LIBRARY)
+                    %)
+
+@define DK_SIZE(dk) %(
+    @Py3DictKeysObject(@dk)->dk_size
+%)
+@define DK_IXSIZE(dk) %(
+    %( CONFIG_64BIT == "y" %?
+        %( CONFIG_COMPAT == "y" %?
+            (@__compat_task
+             ? (@DK_SIZE(@dk) <= 0xff ? 1 : (@DK_SIZE(@dk) <= 0xffff ? 2
+: 4))
+             : (@DK_SIZE(@dk) <= 0xff ?
+                1 : (@DK_SIZE(@dk) <= 0xffff ?
+                2 : (@DK_SIZE(@dk) <= 0xffffffff ? 4 : 8))))
+        %:
+            (@DK_SIZE(@dk) <= 0xff ?
+             1 : (@DK_SIZE(@dk) <= 0xffff ?
+             2 : (@DK_SIZE(@dk) <= 0xffffffff ? 4 : 8)))
+        %)
+    %:
+        (@DK_SIZE(@dk) <= 0xff ? 1 : (@DK_SIZE(@dk) <= 0xffff ? 2 : 4))
+    %)
+%)
+
+@define DK_ENTRIES(dk) %(
+     (@choose_defined(@Py3DictKeysObject(@dk)->dk_entries,
+(&@Py3DictKeyEntry(&@Py3DictKeysObject(@dk)->dk_indices[@DK_SIZE(@dk) *
+@DK_IXSIZE(@dk)]))))
 %)
