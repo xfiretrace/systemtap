@@ -20,7 +20,11 @@
 %{!?with_bpf: %global with_bpf 0%{?fedora} >= 22 || 0%{?rhel} >= 8}
 %{!?with_systemd: %global with_systemd 0%{?fedora} >= 19 || 0%{?rhel} >= 7}
 %{!?with_emacsvim: %global with_emacsvim 0%{?fedora} >= 19 || 0%{?rhel} >= 7}
+%ifarch %{ix86}
+%{!?with_java: %global with_java 0}
+%else
 %{!?with_java: %global with_java 0%{?fedora} >= 19 || 0%{?rhel} >= 7}
+%endif
 %{!?with_debuginfod: %global with_debuginfod 0%{?fedora} >= 25 || 0%{?rhel} >= 7}
 %{!?with_virthost: %global with_virthost 0%{?fedora} >= 19 || 0%{?rhel} >= 7}
 %{!?with_virtguest: %global with_virtguest 1}
@@ -206,11 +210,7 @@ BuildRequires: xmlto /usr/share/xmlto/format/fo/pdf
 BuildRequires: emacs
 %endif
 %if %{with_java}
-%if 0%{?fedora} >= 36
-BuildRequires: java-latest-openjdk-devel
-%else
 BuildRequires: java-devel
-%endif
 %endif
 %if %{with_virthost}
 # BuildRequires: libvirt-devel >= 1.0.2
@@ -488,11 +488,7 @@ Conflicts: systemtap-runtime = %{version}-%{release}.x86_64
 %endif
 Requires: byteman > 2.0
 Requires: iproute
-%if 0%{?fedora} >= 36
-BuildRequires: java-latest-openjdk-devel
-%else
 Requires: java-devel
-%endif
 
 %description runtime-java
 This package includes support files needed to run systemtap scripts
