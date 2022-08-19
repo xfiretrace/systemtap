@@ -4785,8 +4785,16 @@ dwarf_var_expanding_visitor::visit_cast_op (cast_op *e)
 {
   // Fill in our current module context if needed
   if (e->module.empty())
-    e->module = q.dw.module_name;
-
+    {
+      // Backward compatibility for @cast() ops, sans module string,
+      // which expanded to "kernel" rather than to the current
+      // function/probe context.
+      if (strverscmp(sess.compatible.c_str(), "4.3") < 0)
+        e->module = "kernel";
+      else
+        e->module = q.dw.module_name;
+    }
+  
   var_expanding_visitor::visit_cast_op(e);
 }
 
