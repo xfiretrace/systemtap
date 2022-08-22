@@ -971,7 +971,7 @@ probe vfs.remove_from_page_cache =
 }
 probe vfs.remove_from_page_cache.return =
 	kernel.function("__delete_from_page_cache").return !,
-	kernel.function("__remove_from_page_cache").return
+	kernel.function("__remove_from_page_cache").return ?
 {
 	name = "vfs.remove_from_page_cache"
 	retstr = sprintf("N/A")
