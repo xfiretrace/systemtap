@@ -42,10 +42,4 @@ probe process.function("sub").return
 	 &@cast($foo->bar, "struct foo")->bar);
   printf("$foo->bar == @entry($foo->bar): %s\n",
 	 $foo->bar == @entry($foo->bar) ? "true" : "false");
-%( systemtap_v <= "4.0" %?
-  printf("&@cast(@var(\"foo\")->bar, \"struct foo\")->bar: %d\n",
-	 &@cast(@var("foo")->bar, "struct foo")->bar);
-  printf("@var(\"foo\")->bar == @entry(@var(\"foo\")->bar): %s\n",
-	 @var("foo")->bar == @entry(@var("foo")->bar) ? "true" : "false");
-%)
 }
