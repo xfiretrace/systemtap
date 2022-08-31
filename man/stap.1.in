@@ -1879,6 +1879,9 @@ separators.  If the module is not specified, it will default either to
 the probe module for dwarf probes, or to "kernel" for functions and all
 other probes types.
 .PP
+Previously up to systemtap version 4.2, "kernel" was inferred if unspecified.
+Use --compatible=4.2 to activate this default.
+.PP
 The translator can create its own module with type information from a header
 surrounded by angle brackets, in case normal debuginfo is not available.  For
 kernel headers, prefix it with "kernel" to use the appropriate build system.
