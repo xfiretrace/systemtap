@@ -459,7 +459,7 @@ static void *_stp_alloc_percpu(size_t size)
 
 #ifdef STP_MAXMEMORY
 	if ((_STP_MODULE_CORE_SIZE + _stp_allocated_memory
-	     + (size * num_online_cpus()))
+	     + (size * num_possible_cpus()))
 	    > (STP_MAXMEMORY * 1024)) {
 		return NULL;
 	}
@@ -477,12 +477,12 @@ static void *_stp_alloc_percpu(size_t size)
 			free_percpu(ret);
 			return NULL;
 		}
-	        _stp_allocated_memory += size * num_online_cpus();
+	        _stp_allocated_memory += size * num_possible_cpus();
 		_stp_mem_debug_percpu(m, ret, size);
 	}
 #else
 	if (likely(ret)) {
-	        _stp_allocated_memory += size * num_online_cpus();
+	        _stp_allocated_memory += size * num_possible_cpus();
 	}
 #endif
 	return ret;
