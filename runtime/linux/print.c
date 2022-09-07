@@ -295,7 +295,7 @@ static void _stp_print_kernel_info(char *sname, char *vstr, int ctx, int num_pro
 {
 	printk(KERN_DEBUG
                "%s (%s): systemtap: %s, base: %lx"
-               ", memory: %ludata/%lutext/%uctx/%unet/%ualloc kb"
+               ", memory: %ludata/%lutext/%uctx/%lunet/%lualloc kb"
                ", probes: %d"
 #if ! STP_PRIVILEGE_CONTAINS (STP_PRIVILEGE, STP_PR_STAPDEV)
                ", unpriv-uid: %d"
