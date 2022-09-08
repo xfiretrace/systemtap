@@ -37,7 +37,8 @@
 
 struct _stp_log {
 	unsigned int len; /* Bytes used in the buffer */
-	char buf[STP_BUFFER_SIZE];
+	char *buf; /* NB we don't use arrays here to avoid allocating memory
+		      on offline CPUs (but still possible ones) */
 	atomic_t reentrancy_lock;
 };
 #include "print_flush.c"
@@ -67,6 +68,17 @@ static bool _stp_print_trylock_irqsave(unsigned long *flags)
 	bool context_held = false;
 	struct _stp_log *log;
 
+	log = per_cpu_ptr(_stp_log_pcpu, raw_smp_processor_id());
+
+	/* We have to check log->buf == NULL here since the online
+	 * CPUs may change at any time through the CPU hotplug
+	 * feature of the kernel. So the current CPU's log->buf could be NULL
+	 * if it is a new online CPU. And we cannot allocate new memory from within
+	 * this context.
+	 */
+	if (unlikely(log->buf == NULL))
+		return false;
+
 	local_irq_save(*flags);
 	if (!atomic_add_unless(&_stp_print_ctr, 1, INT_MAX))
 		goto irq_restore;
@@ -89,7 +101,6 @@ static bool _stp_print_trylock_irqsave(unsigned long *flags)
 
 	/* Fall back onto the reentrancy lock if the context isn't held */
 	if (!context_held) {
-		log = per_cpu_ptr(_stp_log_pcpu, raw_smp_processor_id());
 		if (atomic_cmpxchg(&log->reentrancy_lock, 0, 1))
 			goto print_unlock;
 	}
@@ -128,14 +139,32 @@ static int _stp_print_init (void)
 {
 	unsigned int cpu;
 
+	/* _stp_alloc_percpu() always zero-fills the allocated percpu memory
+	 * since the kernel's __alloc_percpu() always does that.
+	 */
 	_stp_log_pcpu = _stp_alloc_percpu(sizeof(*_stp_log_pcpu));
 	if (!_stp_log_pcpu)
 		return -ENOMEM;
 
-	for_each_possible_cpu(cpu) {
+	/* We don't use for_aech_possible_cpu() here since the number of possible
+	 * CPUs may be very large even though there are many fewere online CPUs.
+	 * For example, VMWare guests usually have 128 possible CPUs while only
+	 * have a few online CPUs. Once the bufs were allocated for
+	 * online CPUs at this point, we will discard any printing operations on
+	 * any future online CPUs dynamically added through the kernel's CPU
+	 * hotplug feature. Memory allocations of the bufs can only happen right
+	 * here.
+	 */
+	for_each_online_cpu(cpu) {
 		struct _stp_log *log = per_cpu_ptr(_stp_log_pcpu, cpu);
 
 		log->reentrancy_lock = (atomic_t)ATOMIC_INIT(0);
+		log->buf = _stp_vzalloc_node(STP_BUFFER_SIZE, cpu_to_node(cpu));
+		if (unlikely(log->buf == NULL)) {
+			_stp_error ("print log buf (size %lu per cpu) allocation failed",
+				    (unsigned long) STP_BUFFER_SIZE);
+			return -ENOMEM;
+		}
 	}
 	return 0;
 }
@@ -148,6 +177,10 @@ static void _stp_print_cleanup (void)
 	while (atomic_cmpxchg(&_stp_print_ctr, 0, INT_MAX))
 		cpu_relax();
 
+	/* NB We cannot use the for_each_online_cpu() here since online
+	 * CPUs may get changed on-the-fly through the CPU hotplug feature
+	 * of the kernel. We only allocated bufs on original online CPUs
+	 * when _stp_print_init() was called. */
 	for_each_possible_cpu(cpu) {
 		struct _stp_log *log = per_cpu_ptr(_stp_log_pcpu, cpu);
 
@@ -156,7 +189,15 @@ static void _stp_print_cleanup (void)
 		 * safe to do this without any kind of synchronization mechanism
 		 * because nothing is using this print buffer anymore.
 		 */
-		__stp_print_flush(log);
+		if (likely(log->buf)) {
+			/* We have to check log->buf != NULL here since the
+			 * online CPUs may change at any time through the CPU
+			 * hotplug feature of the kernel.
+			 */
+			__stp_print_flush(log);
+			_stp_vfree(log->buf);
+			log->buf = NULL;
+		}
 	}
 
 	_stp_free_percpu(_stp_log_pcpu);
@@ -192,6 +233,8 @@ static void * _stp_reserve_bytes (int numbytes)
 		return NULL;
 
 	log = per_cpu_ptr(_stp_log_pcpu, raw_smp_processor_id());
+	/* _stp_print_trylock_irqsave already checks log->buf != NULL */
+
 	if (unlikely(numbytes > (STP_BUFFER_SIZE - log->len)))
 		__stp_print_flush(log);
 
@@ -206,6 +249,15 @@ static void _stp_unreserve_bytes (int numbytes)
 	struct _stp_log *log;
 
 	log = per_cpu_ptr(_stp_log_pcpu, raw_smp_processor_id());
+
+	/* We have to check log->buf == NULL here since the online CPUs may
+	 * change at any time through the CPU hotplug feature of the kernel.
+	 * So the current CPU's log->buf could be NULL if it is a new online
+	 * CPU.
+	 */
+	if (unlikely(log->buf == NULL))
+		return;
+
 	if (numbytes <= log->len)
 		log->len -= numbytes;
 }
