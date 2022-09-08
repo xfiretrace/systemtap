@@ -152,11 +152,21 @@ static void __stp_relay_wakeup_timer(stp_timer_callback_parameter_t unused)
 
 	if (atomic_cmpxchg(&_stp_relay_data.wakeup, 1, 0)) {
 		struct rchan_buf *buf;
-		
-		for_each_possible_cpu(i) {
+
+		/* NB it makes no sense to wake up readers on offline CPUs */
+		for_each_online_cpu(i) {
 			buf = _stp_get_rchan_subbuf(_stp_relay_data.rchan->buf,
 						    i);
-			__stp_relay_wakeup_readers(buf);
+
+			/* relay_open() only initializes bufs on the online CPUs
+			 * at the time of invocation. The online CPUs may
+			 * change at any time, so the current online CPU might
+			 * be offline when relay_open() was called.  so we must
+			 * check if the buf for the current CPU is invalid
+			 * otherwise we may dereference a NULL pointer.
+			 */
+			if (likely(buf))
+				__stp_relay_wakeup_readers(buf);
 		}
 	}
 
@@ -323,8 +333,29 @@ static int _stp_transport_data_fs_init(void)
            allocated by relay_open. */
         {
                 u64 relay_mem;
-                relay_mem = _stp_subbuf_size * _stp_nsubbufs;
-                relay_mem *= num_online_cpus();
+
+		/* relay_open() invokes relay_open_buf() to allocate this part
+		 * of memory for online CPUs only.
+		 */
+		relay_mem = _stp_subbuf_size * _stp_nsubbufs;
+		relay_mem *= num_online_cpus();
+
+		relay_mem += sizeof(struct rchan);
+
+		if (sizeof(_stp_relay_data.rchan->buf) == sizeof(struct rchan_buf *)) {
+			/* newer kernels (newer than 3.10, for example) */
+			/* this part was allocated by alloc_percpu() inside
+			 * relay_open(). */
+			relay_mem += sizeof(struct rchan_buf *) * num_possible_cpus();
+
+		} else {
+			/* for older kernels like 3.10, the buf pointers are
+			 * already part of struct rchan as its array member
+			 * 'struct rchan_buf *buf[NR_CPUS]'. so we do nothing
+			 * here.
+			 */
+		}
+
                 _stp_allocated_net_memory += relay_mem;
                 _stp_allocated_memory += relay_mem;
         }
@@ -362,6 +393,16 @@ _stp_data_write_reserve(size_t size_request, void **entry)
 
 	buf = _stp_get_rchan_subbuf(_stp_relay_data.rchan->buf,
 				    smp_processor_id());
+
+	/* relay_open() only initializes bufs on the online CPUs at the time
+	 * of invocation. The online CPUs may change at any time, so the
+	 * current online CPU might be offline when relay_open() was called.
+	 * So we must check if the buf for the current CPU is invalid otherwise
+	 * we may dereference a NULL pointer.
+	 */
+	if (unlikely(buf == NULL))
+		return -EINVAL;
+
 	if (buf->offset >= buf->chan->subbuf_size) {
 		size_request = __stp_relay_switch_subbuf(buf, size_request);
 		if (!size_request)
