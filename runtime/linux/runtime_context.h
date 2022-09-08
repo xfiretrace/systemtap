@@ -13,18 +13,29 @@
 
 /* Can't use a lock primitive for this because lock_acquire() has tracepoints */
 static atomic_t _stp_contexts_busy_ctr = ATOMIC_INIT(0);
+
+/* Per-cpu data is always initialized with zero filled. */
 static DEFINE_PER_CPU(struct context *, contexts);
 
 static int _stp_runtime_contexts_alloc(void)
 {
 	unsigned int cpu;
 
-	for_each_possible_cpu(cpu) {
+	/* We don't use for_aech_possible_cpu() here since the number of possible
+	 * CPUs may be very large even though there are many fewere online CPUs.
+	 * For example, VMWare guests usually have 128 possible CPUs while only
+	 * have a few online CPUs. Once the context structs were
+	 * allocated for online CPUs at this point, we will discard any context
+	 * fetching operations on any future online CPUs dynamically added
+	 * through the kernel's CPU hotplug feature. Memory allocations of the
+	 * context structs can only happen right here.
+	 */
+	for_each_online_cpu(cpu) {
 		/* Module init, so in user context, safe to use
 		 * "sleeping" allocation. */
 		struct context *c = _stp_vzalloc_node(sizeof (struct context),
 						      cpu_to_node(cpu));
-		if (c == NULL) {
+		if (unlikely(c == NULL)) {
 			_stp_error ("context (size %lu per cpu) allocation failed",
 				    (unsigned long) sizeof (struct context));
 			return -ENOMEM;
@@ -37,6 +48,12 @@ static int _stp_runtime_contexts_alloc(void)
 static bool _stp_runtime_context_trylock(void)
 {
 	bool locked;
+
+	/* fast path to ignore new online CPUs without percpu context memory
+	 * allocations. this also serves as an extra safe guard for NULL context
+	 * pointers. */
+	if (unlikely(_stp_runtime_get_context() == NULL))
+		return false;
 
 	preempt_disable();
 	locked = atomic_add_unless(&_stp_contexts_busy_ctr, 1, INT_MAX);
@@ -64,8 +81,17 @@ static void _stp_runtime_contexts_free(void)
 		cpu_relax();
 
 	/* Now we can actually free the contexts */
-	for_each_possible_cpu(cpu)
-		_stp_vfree(per_cpu(contexts, cpu));
+
+	/* NB We cannot use the for_each_online_cpu() here since online
+	 * CPUs may get changed on-the-fly through the CPU hotplug feature
+	 * of the kernel. We only allocated the context structs on original
+	 * online CPUs when _stp_runtime_contexts_alloc() was called. And we
+	 * cannot allocate new memory from within this context. */
+	for_each_possible_cpu(cpu) {
+		struct context *c = per_cpu(contexts, cpu);
+		if (likely(c))
+			_stp_vfree(c);
+	}
 }
 
 static inline struct context * _stp_runtime_get_context(void)
