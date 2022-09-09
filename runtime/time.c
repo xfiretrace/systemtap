@@ -96,6 +96,11 @@ typedef struct __stp_time_t {
 
     /* Callback used to schedule updates of the base time */
     struct timer_list timer;
+
+    /* Flag to indicate that a timer is indeed added. We only add timers
+     * to online CPUs at startup but online CPUs may change at any time
+     * through the CPU hotplug feature of the kernel. */
+    bool is_valid;
 } stp_time_t;
 
 static void *stp_time = NULL;
@@ -166,6 +171,10 @@ __stp_time_local_update(void)
     // problem, at the cost of holding time->lock a bit longer than we
     // originally did.
     time = per_cpu_ptr(stp_time, smp_processor_id());
+    if (unlikely(!time->is_valid)) {
+	    return time;
+    }
+
     write_seqlock_irqsave(&time->lock, flags);
 
     __stp_ktime_get_real_ts(&ts);
@@ -194,6 +203,9 @@ static void
 __stp_time_timer_callback(stp_timer_callback_parameter_t unused)
 {
     stp_time_t *time =__stp_time_local_update();
+    if (unlikely(!time->is_valid))
+	    return;
+
     (void) unused;
 
     /* PR6481: make sure IRQs are enabled before resetting the timer
@@ -248,6 +260,7 @@ __stp_init_time(void *info)
 
 #ifndef STAPCONF_ADD_TIMER_ON
     add_timer(&time->timer);
+    time->is_valid = true;
 #endif
 }
 
@@ -274,6 +287,9 @@ __stp_time_cpufreq_callback(struct notifier_block *self,
             freqs = (struct cpufreq_freqs *)vfreqs;
             freq_khz = freqs->new;
             time = per_cpu_ptr(stp_time, freqs->cpu);
+	    if (unlikely(!time->is_valid))
+		    break;
+
             write_seqlock_irqsave(&time->lock, flags);
             if (time->freq != freq_khz) {
                     time->freq = freq_khz;
@@ -329,9 +345,17 @@ _stp_kill_time(void)
 {
     if (stp_time) {
         int cpu;
-        for_each_online_cpu(cpu) {
+
+       /* NB We cannot use the for_each_online_cpu() here since online
+        * CPUs may get changed on-the-fly through the CPU hotplug feature
+        * of the kernel. We only allocated the context structs on original
+        * online CPUs when _stp_runtime_contexts_alloc() was called.
+        */
+        for_each_possible_cpu(cpu) {
             stp_time_t *time = per_cpu_ptr(stp_time, cpu);
-            del_timer_sync(&time->timer);
+            if (likely(time->is_valid)) {
+		    del_timer_sync(&time->timer);
+	    }
         }
 #ifdef CONFIG_CPU_FREQ
         if (!__stp_constant_freq() && __stp_cpufreq_notifier_registered) {
@@ -355,8 +379,8 @@ _stp_init_time(void)
     _stp_kill_time();
 
     stp_time = _stp_alloc_percpu(sizeof(stp_time_t));
-    if (unlikely(stp_time == 0))
-	    return -1;
+    if (unlikely(stp_time == NULL))
+	    return -ENOMEM;
 
 #ifdef STAPCONF_ONEACHCPU_RETRY
     ret = on_each_cpu(__stp_init_time, NULL, 0, 1);
@@ -368,6 +392,7 @@ _stp_init_time(void)
     for_each_online_cpu(cpu) {
         stp_time_t *time = per_cpu_ptr(stp_time, cpu);
         add_timer_on(&time->timer, cpu);
+        time->is_valid = true;
     }
 #endif
 
@@ -381,9 +406,11 @@ _stp_init_time(void)
                 int freq_khz = cpufreq_get(cpu); // may block
                 if (freq_khz > 0) {
                     stp_time_t *time = per_cpu_ptr(stp_time, cpu);
-                    write_seqlock_irqsave(&time->lock, flags);
-                    time->freq = freq_khz;
-                    write_sequnlock_irqrestore(&time->lock, flags);
+		    if (likely(time->is_valid)) {
+			    write_seqlock_irqsave(&time->lock, flags);
+			    time->freq = freq_khz;
+			    write_sequnlock_irqrestore(&time->lock, flags);
+		    }
                 }
             }
         }
@@ -416,8 +443,13 @@ _stp_gettimeofday_ns(void)
     if (!stp_time)
         return -1;
 
-    preempt_disable(); /* XXX: why?  Isn't this is only run from probe handlers? */
     time = per_cpu_ptr(stp_time, smp_processor_id());
+
+    if (unlikely(!time->is_valid)) {
+	    return -1;
+    }
+
+    preempt_disable(); /* XXX: why?  Isn't this is only run from probe handlers? */
 
     seq = read_seqbegin(&time->lock);
     base = time->base_ns;
