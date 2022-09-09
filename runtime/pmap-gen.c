@@ -236,6 +236,8 @@ static int KEYSYM(_stp_pmap_set) (PMAP pmap, ALLKEYSD(key), VSTYPE val)
 {
 	int res;
 	MAP m = _stp_pmap_get_map (pmap, MAP_GET_CPU());
+	if (unlikely(m == NULL))
+	       return -2;
 	res = KEYSYM(__stp_map_set) (m, ALLKEYS(key), val, 0, 1, 1, 1, 1, 1);
         MAP_PUT_CPU();
 	return res;
@@ -245,6 +247,8 @@ static inline int KEYSYM(_stp_pmap_add) (PMAP pmap, ALLKEYSD(key), VSTYPE val, i
 {
 	int res;
 	MAP m = _stp_pmap_get_map (pmap, MAP_GET_CPU());
+	if (unlikely(m == NULL))
+	       return -2;
 	m->bit_shift = pmap->bit_shift;
 	m->stat_ops = pmap->stat_ops;
 	res = KEYSYM(__stp_map_set) (m, ALLKEYS(key), val, 1, s1, s2, s3, s4, s5);
@@ -263,6 +267,8 @@ static VALTYPE KEYSYM(_stp_pmap_get_cpu) (PMAP pmap, ALLKEYSD(key))
 	MAP map;
 
 	map = _stp_pmap_get_map (pmap, MAP_GET_CPU());
+	if (unlikely(map == NULL))
+	       return NULLRET;
 	hv = KEYSYM(hash) (ALLKEYS(key)) & map->hash_table_mask;
 	head = &map->hashes[hv];
 	mhlist_for_each_entry(n, e, head, node.hnode) {
@@ -303,6 +309,10 @@ static VALTYPE KEYSYM(_stp_pmap_get) (PMAP pmap, ALLKEYSD(key))
 	/* now total each cpu */
 	for_each_possible_cpu(cpu) {
 		map = _stp_pmap_get_map (pmap, cpu);
+		if (unlikely(map == NULL)) {
+                       /* offline CPU or a newly-added online CPU */
+                       continue;
+		}
 		head = &map->hashes[hv & map->hash_table_mask];
 		mhlist_for_each_entry(n, e, head, node.hnode) {
 			if (KEY_EQ_P(n)) {
@@ -346,6 +356,8 @@ static int KEYSYM(_stp_pmap_del) (PMAP pmap, ALLKEYSD(key))
 	/* Delete in each cpu's map */
 	for_each_possible_cpu(cpu) {
 		m = _stp_pmap_get_map (pmap, cpu);
+		if (unlikely(m == NULL))
+                       continue;
 		(void)KEYSYM(_stp_map_del_hash) (m, hv & m->hash_table_mask,
                                                  ALLKEYS(key));
 	}

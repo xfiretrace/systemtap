@@ -85,6 +85,8 @@ _stp_pmap_new_hstat_linear (unsigned max_entries, int wrap, int node_size,
 
 		for_each_possible_cpu(i) {
 			m = _stp_pmap_get_map (pmap, i);
+			if (unlikely(m == NULL))
+				continue;
 			m->hist.type = HIST_LINEAR;
 			m->hist.start = start;
 			m->hist.stop = stop;
@@ -115,6 +117,8 @@ _stp_pmap_new_hstat_log (unsigned max_entries, int wrap, int node_size)
 		MAP m;
 		for_each_possible_cpu(i) {
 			m = _stp_pmap_get_map (pmap, i);
+			if (unlikely(m == NULL))
+				continue;
 			m->hist.type = HIST_LOG;
 			m->hist.buckets = HIST_LOG_BUCKETS;
 		}
@@ -135,6 +139,8 @@ _stp_pmap_new_hstat (unsigned max_entries, int wrap, int node_size)
 		MAP m;
 		for_each_possible_cpu(i) {
 			m = _stp_pmap_get_map (pmap, i);
+			if (unlikely(m == NULL))
+				continue;
 			m->hist.type = HIST_NONE;
 		}
 		/* now set agg map params */

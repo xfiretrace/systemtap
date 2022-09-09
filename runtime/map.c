@@ -125,7 +125,8 @@ static void _stp_pmap_clear(PMAP pmap)
 
 	for_each_possible_cpu(i) {
 		MAP m = _stp_pmap_get_map (pmap, i);
-		_stp_map_clear(m);
+		if (likely(m != NULL))
+			_stp_map_clear(m);
 	}
 	_stp_map_clear(_stp_pmap_get_agg(pmap));
 }
@@ -351,6 +352,11 @@ static MAP _stp_pmap_agg (PMAP pmap, map_update_fn update, map_cmp_fn cmp)
 
 	for_each_possible_cpu(i) {
 		m = _stp_pmap_get_map (pmap, i);
+		if (unlikely(m == NULL)) {
+			/* offline CPU or a newly-added online CPU */
+			continue;
+		}
+
 		/* walk the hash chains. */
 		for (hash = 0; hash <= m->hash_table_mask; hash++) {
 			head = &m->hashes[hash];
@@ -545,6 +551,10 @@ static int _stp_pmap_size (PMAP pmap)
 
 	for_each_possible_cpu(i) {
 		MAP m = _stp_pmap_get_map (pmap, i);
+		if (unlikely(m == NULL)) {
+			/* offline CPU or a newly-added online CPU */
+			continue;
+		}
 		num += m->num;
 	}
 	return num;
