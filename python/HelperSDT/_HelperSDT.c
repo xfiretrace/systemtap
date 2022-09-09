@@ -19,7 +19,7 @@
 #if PY_MAJOR_VERSION <= 3 && PY_MINOR_VERSION < 11
 PyFrameObject _dummy_frame;
 #else
-//PyFrameObject *_dummy_frame;
+PyFrameObject *_dummy_frame;
 #endif
 #include <object.h>
 PyVarObject _dummy_var;
@@ -88,6 +88,92 @@ struct _dictkeysobject {
   Py_ssize_t dk_nentries;
   char dk_indices[];
 };
+
+#elif PY_MINOR_VERSION == 11  /* python 3.11 */
+/*
+ * PyDictObject [...,PyDictKeysObject ma_keys,...]
+ * PyDictKeysObject [..,dk_log2_size,dk_kind,...]
+ * PyDictKeyEntry [me_hash,me_key,me_value]
+ */
+
+typedef struct {
+  Py_hash_t me_hash;
+  PyObject *me_key;
+  PyObject *me_value;
+} PyDictKeyEntry;
+PyDictKeyEntry _dummy_dictkeyentry;
+typedef struct {
+    PyObject *me_key;
+    PyObject *me_value;
+} PyDictUnicodeEntry;
+PyDictUnicodeEntry _dummy_dictunicodeentry;
+struct _dictkeysobject {
+  Py_ssize_t dk_refcnt;
+  uint8_t dk_log2_size;
+  uint8_t dk_log2_index_bytes;
+  uint8_t dk_kind;
+  uint32_t dk_version;
+  Py_ssize_t dk_usable;
+  Py_ssize_t dk_nentries;
+  char dk_indices[];  /* char is required to avoid strict aliasing. */
+};
+
+struct Py3_object {
+    long ob_refcnt;
+    void *ob_type;
+};
+typedef struct Py3_object Py3Object;
+
+struct _dictvalues {
+    Py3Object *values[1];
+};
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <python3.11/Python.h>
+
+// Redacted Python-3.11.0b3/Include/internal/pycore_frame.h
+
+struct _stp_frame {
+    PyObject_HEAD
+    struct _frame *f_back;      /* previous frame, or NULL */
+    struct _stp_Py3InterpreterFrame *f_frame; /* points to the frame data */
+    PyObject *f_trace;          /* Trace function */
+    int f_lineno;               /* Current line number. Only valid if non-zero */
+    char f_trace_lines;         /* Emit per-line trace events? */
+    char f_trace_opcodes;       /* Emit per-opcode trace events? */
+    char f_fast_as_locals;      /* Have the fast locals of this frame been converted to a dict? */
+    /* The frame data, if this frame object owns the frame */
+    PyObject *_f_frame_data[1];
+};
+
+typedef struct _stp_frame _stp_Py3FrameObject;
+_stp_Py3FrameObject _dummy_stp_Py3FrameObject;
+
+struct _stp_Py3InterpreterFrame {
+    /* "Specials" section */
+    void /*PyFunctionObject*/ *f_func; /* Strong reference */
+    PyObject *f_globals; /* Borrowed reference */
+    PyObject *f_builtins; /* Borrowed reference */
+    PyObject *f_locals; /* Strong reference, may be NULL */
+    PyCodeObject *f_code; /* Strong reference */
+    void /*PyFrameObject*/ *frame_obj; /* Strong reference, may be NULL */
+    /* Linkage section */
+    struct _stp_Py3InterpreterFrame *previous;
+    // NOTE: This is not necessarily the last instruction started in the given
+    // frame. Rather, it is the code unit *prior to* the *next* instruction. For
+    // example, it may be an inline CACHE entry, an instruction we just jumped
+    // over, or (in the case of a newly-created frame) a totally invalid value:
+    void /*_Py_CODEUNIT*/ *prev_instr;
+    int stacktop;     /* Offset of TOS from localsplus  */
+    bool is_entry;  // Whether this is the "root" frame for the current _PyCFrame.
+    char owner;
+    /* Locals and stack */
+    PyObject *localsplus[1];
+} _stp_InterpreterFrame;
+
+typedef struct _stp_InterpreterFrame _stp_Py3InterpreterFrame;
+
 #endif
 
 #endif
