@@ -20,7 +20,7 @@ struct pmap {
 	int bit_shift;	/* scale factor for integer arithmetic */
 	int stat_ops;	/* related statistical operators */
 	MAP agg;	/* aggregation map */
-	MAP map[];	/* per-cpu maps */
+	MAP *map;	/* per-cpu maps */
 };
 
 static inline MAP _stp_pmap_get_agg(PMAP p)
@@ -37,14 +37,14 @@ static inline MAP _stp_pmap_get_map(PMAP p, unsigned cpu)
 {
 	if (cpu >= NR_CPUS)
 		cpu = 0;
-	return p->map[cpu];
+	return *per_cpu_ptr(p->map, cpu);
 }
 
 static inline void _stp_pmap_set_map(PMAP p, MAP m, unsigned cpu)
 {
 	if (cpu >= NR_CPUS)
 		cpu = 0;
-	p->map[cpu] = m;
+	*per_cpu_ptr(p->map, cpu) = m;
 }
 
 
@@ -76,6 +76,8 @@ static void _stp_pmap_del(PMAP pmap)
 		MAP m = _stp_pmap_get_map (pmap, i);
 		_stp_map_del(m);
 	}
+
+	_stp_free_percpu (pmap->map);
 
 	/* free agg map elements */
 	_stp_map_del(_stp_pmap_get_agg(pmap));
@@ -158,10 +160,15 @@ _stp_pmap_new(unsigned max_entries, int wrap, int node_size)
 	int i;
 	MAP m;
 
-	PMAP pmap = _stp_map_vzalloc(sizeof(struct pmap)
-				     + NR_CPUS * sizeof(MAP), -1);
+	PMAP pmap = _stp_map_vzalloc(sizeof(struct pmap), -1);
 	if (pmap == NULL)
 		return NULL;
+
+	pmap->map = _stp_alloc_percpu (sizeof(MAP));
+	if (unlikely(pmap->map == NULL)) {
+		_stp_vfree(pmap);
+		return NULL;
+	}
 
 	/* Allocate the per-cpu maps.  */
 	for_each_possible_cpu(i) {
@@ -184,6 +191,7 @@ err1:
 		m = _stp_pmap_get_map (pmap, i);
 		_stp_map_del(m);
 	}
+	_stp_free_percpu (pmap->map);
 	_stp_vfree(pmap);
 	return NULL;
 }
