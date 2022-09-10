@@ -436,7 +436,7 @@ int init_relayfs(void)
 		dbug(2, "cpui=%d, relayfd=%d\n", i, avail_cpus[i]);
 
 	if (ncpus == 0) {
-		_err("couldn't open %s.\n", buf);
+		_err("couldn't open %s: %s\n", buf, strerror(errno));
 		return -1;
 	}
 

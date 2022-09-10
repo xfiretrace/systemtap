@@ -274,7 +274,7 @@ struct file_operations relay_procfs_operations;
 static int _stp_procfs_transport_fs_init(const char *module_name)
 {
 #ifdef STAPCONF_PROC_OPS
-  relay_procfs_operations.proc_open = relay_file_operations.open;
+  relay_procfs_operations.proc_open = __stp_relay_file_open;
   relay_procfs_operations.proc_poll = __stp_relay_file_poll;
   relay_procfs_operations.proc_mmap = relay_file_operations.mmap;
   relay_procfs_operations.proc_read = __stp_relay_file_read;
@@ -282,6 +282,7 @@ static int _stp_procfs_transport_fs_init(const char *module_name)
   relay_procfs_operations.proc_release = relay_file_operations.release;
 #else
   relay_procfs_operations = relay_file_operations;
+  relay_procfs_operations.open = __stp_relay_file_open;
   relay_procfs_operations.owner = THIS_MODULE;
   relay_procfs_operations.poll = __stp_relay_file_poll;
   relay_procfs_operations.read = __stp_relay_file_read;

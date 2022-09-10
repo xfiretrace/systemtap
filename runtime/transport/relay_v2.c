@@ -98,6 +98,25 @@ static bool __stp_relay_buf_empty(struct rchan_buf *buf)
 	return !buf->offset && buf->subbufs_produced == buf->subbufs_consumed;
 }
 
+static int __stp_relay_file_open(struct inode *inode, struct file *filp)
+{
+	struct rchan_buf *buf = inode->i_private;
+
+	/* kernel's relay_file_open() does not check NULL buf (at least as of
+	 * Sep 9, 2022) and there is a race window in our
+	 * __stp_procfs_relay_create_buf_file_callback() function,
+	 * between proc_create() and the `in->i_private = buf` assignment.
+	 * without this check, we can reproduce a NULL ptr deref kernel panic
+	 * while loading a system with a lot of short-lived stap sessions.
+	 */
+	if (unlikely(buf == NULL)) {
+		dbug_trans(0, "relay_file_open: found NULL rchan buf\n");
+		return -ENOENT;
+	}
+
+	return relay_file_operations.open(inode, filp);
+}
+
 static unsigned int __stp_relay_file_poll(struct file *filp, poll_table *wait)
 {
 	struct rchan_buf *buf = filp->private_data;
