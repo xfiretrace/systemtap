@@ -271,8 +271,22 @@ struct file_operations relay_procfs_operations;
 #endif
 
 
+// We need to map procfs concepts of proc_dir_entry* and relayfs/vfs of path/dentry*.
+struct procfs_relay_file
+{
+        struct path p;               // contains the dentry*
+        struct proc_dir_entry *pde;  // entry valid if this pointer non-NULL
+};
+struct procfs_relay_file *p_r_files;
+
+
 static int _stp_procfs_transport_fs_init(const char *module_name)
 {
+  p_r_files = _stp_vzalloc(num_possible_cpus()
+                           * sizeof(struct procfs_relay_file));
+  if (unlikely(p_r_files == NULL))
+    return -ENOMEM;
+
 #ifdef STAPCONF_PROC_OPS
   relay_procfs_operations.proc_open = __stp_relay_file_open;
   relay_procfs_operations.proc_poll = __stp_relay_file_poll;
@@ -288,8 +302,11 @@ static int _stp_procfs_transport_fs_init(const char *module_name)
   relay_procfs_operations.read = __stp_relay_file_read;
 #endif
   
-  if (_stp_mkdir_proc_module()) // get the _stp_procfs_module_dir* created
+  if (_stp_mkdir_proc_module()) { // get the _stp_procfs_module_dir* created
+          _stp_vfree (p_r_files);
+          p_r_files = NULL;
           return -1;
+  }
 
   dbug_trans(1, "transport_fs_init dentry=%08lx pde=%08lx ",
              (unsigned long) _stp_procfs_module_dir_path.dentry,
@@ -297,6 +314,8 @@ static int _stp_procfs_transport_fs_init(const char *module_name)
   
   if (_stp_transport_data_fs_init() != 0) {
           _stp_rmdir_proc_module();
+          _stp_vfree (p_r_files);
+          p_r_files = NULL;
           return -1;
   }
   
@@ -307,19 +326,12 @@ static int _stp_procfs_transport_fs_init(const char *module_name)
 static void _stp_procfs_transport_fs_close(void)
 {
 	_stp_transport_data_fs_close();
+
+	if (likely(p_r_files)) {
+        	_stp_vfree (p_r_files);
+        	p_r_files = NULL;
+        }
 }
-
-
-
-// We need to map procfs concepts of proc_dir_entry* and relayfs/vfs of path/dentry*.
-#define MAX_RELAYFS_FILES NR_CPUS
-struct procfs_relay_file
-{
-        struct path p;               // contains the dentry*
-        struct proc_dir_entry *pde;  // entry valid if this pointer non-NULL
-};
-struct procfs_relay_file p_r_files[MAX_RELAYFS_FILES];
-
 
 
 static struct dentry *_stp_procfs_get_module_dir(void)
@@ -334,14 +346,19 @@ static int __stp_procfs_relay_remove_buf_file_callback(struct dentry *dentry)
   struct proc_dir_entry *pde = NULL;
   
   // find the corresponding pde*
-  for (i=0; i<MAX_RELAYFS_FILES; i++)
+
+  /* NB We cannot use the for_each_online_cpu() here since online
+   * CPUs may get changed on-the-fly through the CPU hotplug feature
+   * of the kernel.
+   */
+  for_each_possible_cpu(i)
     {
       if (p_r_files[i].pde != NULL &&
           p_r_files[i].p.dentry == dentry)
         break;
     }
 
-  if (i != MAX_RELAYFS_FILES)
+  if (i != num_possible_cpus())
     {
       pde = p_r_files[i].pde;
       proc_remove (pde);
@@ -391,12 +408,17 @@ __stp_procfs_relay_create_buf_file_callback(const char *filename,
                 THIS_MODULE->name, filename);
   
   // find spot to plop this
-  for (i=0; i<MAX_RELAYFS_FILES; i++)
+
+  /* NB We cannot use the for_each_online_cpu() here since online
+   * CPUs may get changed on-the-fly through the CPU hotplug feature
+   * of the kernel.
+   */
+  for_each_possible_cpu(i)
     {
       if (p_r_files[i].pde == NULL)
         break;
     }
-  if (i == MAX_RELAYFS_FILES)
+  if (i == num_possible_cpus())
     goto out1;
   
   rc = kern_path (fullpath, 0, &p_r_files[i].p);
