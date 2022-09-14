@@ -126,7 +126,6 @@ private global Py3Object_GenericGetAttr_addr = 0
 
 private function Py3Frame_GetCode (object) 
 {
-#  printf("Py3Frame_GetCode %#lx\n",@cast(object, "_stp_Py3FrameObject")->f_frame->f_code)
   return @choose_defined(@Py3FrameObject(object)->f_code,
 			 @cast(object, "_stp_Py3FrameObject")->f_frame->f_code)
 }
@@ -166,6 +165,9 @@ private function Py3Frame_GetLocalsplus (object)
 			 @cast(object, "_stp_Py3FrameObject")->f_frame->localsplus)
 }
 
+#
+# TODO python 3.11 sometimes returns <NULL> for global values (timing issue?)
+#
 private function Py3Frame_GetGlobals (object) 
 {
   return @choose_defined(
@@ -496,8 +498,9 @@ private function Py3Unicode_AsASCIIString:string(object:long)
 
 private function Py3Code_lnotab (object)
 {
-  return @choose_defined(@Py3CodeObject(object)->co_lnotab,
-			 @cast(object, "_stp_Py3FrameObject")->f_frame->f_code->co_linetable)
+   return @choose_defined(@Py3CodeObject(object)->co_lnotab,
+   			 @choose_defined(@Py3CodeObject(object)->co_linetable,
+   					 @cast(object, "_stp_Py3FrameObject")->f_frame->f_code->co_linetable))
 }
 
 private function Py3Code_firstlineno (object)
@@ -587,21 +590,17 @@ private function Py310Code_Addr2Line:long(code:long, addrq:long)
 
 private function Py3Frame_GetLineNumber (frame)
 {
-#  printf("Py3Frame_GetLineNumber %#lx\n",Py3Frame_GetTrace (frame))
   if (! Py3Frame_GetTrace (frame)) {
     lineno = @choose_defined(@Py3FrameObject(frame)->f_lineno,
 			     @cast(frame, "_stp_Py3FrameObject")->f_lineno)
-#    printf("Py3Frame_GetLineNumber %d\n", lineno)
   } else {
     lasti = @choose_defined(@Py3FrameObject(frame)->f_lasti,
 			    @cast(frame, "_stp_Py3FrameObject")->f_frame->prev_instr - @cast(frame, "_stp_Py3FrameObject")->f_frame->f_code)
-#    printf("Py3Frame_GetLineNumber %d\n", lasti)
     if (@defined(@Py3FrameObject(frame)->f_lasti))
       lineno = Py3Code_Addr2Line(Py3Frame_GetCode(frame), lasti)
     else
       lineno = Py310Code_Addr2Line(Py3Frame_GetCode(frame), lasti)
   }
-#  printf("Py3Frame_GetLineNumber 2 %d\n",lineno)
   return lineno
 }
 
@@ -1063,9 +1062,7 @@ function python_print_backtrace:long()
     printf("Traceback (most recent call first):\n")
     while (frame != 0) {
 	lineno = Py3Frame_GetLineNumber(frame)
-	printf("Traceback frame %#lx:\n", frame)
 	code = Py3Frame_GetCode(frame)
-	printf("Traceback frame %#lx:\n", frame)
         try {
            filename = Py3Unicode_AsASCIIString(Py3Frame_GetFilename(frame))
 	} catch {

@@ -89,6 +89,25 @@ struct _dictkeysobject {
   char dk_indices[];
 };
 
+/* This is internal to libpython. */
+#elif PY_MINOR_VERSION == 10  /* python 3.10 */
+typedef Py_ssize_t (*dict_lookup_func)(PyDictObject *mp, PyObject *key, Py_hash_t hash, PyObject ***value_addr,
+					 Py_ssize_t *hashpos);
+typedef struct {
+  Py_hash_t me_hash;
+  PyObject *me_key;
+  PyObject *me_value;
+} PyDictKeyEntry;
+PyDictKeyEntry _dummy_dictkeyentry;
+struct _dictkeysobject {
+  Py_ssize_t dk_refcnt;
+  Py_ssize_t dk_size;
+  dict_lookup_func dk_lookup;
+  Py_ssize_t dk_usable;
+  Py_ssize_t dk_nentries;
+  char dk_indices[];  /* char is required to avoid strict aliasing. */
+};
+
 #elif PY_MINOR_VERSION == 11  /* python 3.11 */
 /*
  * PyDictObject [...,PyDictKeysObject ma_keys,...]
