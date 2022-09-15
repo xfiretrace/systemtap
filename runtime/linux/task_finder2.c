@@ -1064,6 +1064,7 @@ __stp_utrace_task_finder_report_clone(u32 action,
 	work = __stp_tf_alloc_task_work((void *)(engine->ops));
 	if (work == NULL) {
 		_stp_error("Unable to allocate space for task_work");
+		__stp_tf_handler_end();
 		return UTRACE_RESUME;
 	}
 	__stp_tf_init_task_work(work, &__stp_tf_clone_worker);
@@ -1447,6 +1448,7 @@ __stp_utrace_task_finder_target_quiesce(u32 action,
 	 */
 	work = __stp_tf_alloc_task_work(tgt);
 	if (work == NULL) {
+		__stp_tf_handler_end();
 		_stp_error("Unable to allocate space for task_work");
 		return UTRACE_RESUME;
 	}
