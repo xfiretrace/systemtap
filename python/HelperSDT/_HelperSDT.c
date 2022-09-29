@@ -90,7 +90,7 @@ struct _dictkeysobject {
 };
 
 /* This is internal to libpython. */
-#elif PY_MINOR_VERSION == 10  /* python 3.10 */
+#elif PY_MINOR_VERSION == 9 || PY_MINOR_VERSION == 10  /* python 3.9 / 3.10 */
 typedef Py_ssize_t (*dict_lookup_func)(PyDictObject *mp, PyObject *key, Py_hash_t hash, PyObject ***value_addr,
 					 Py_ssize_t *hashpos);
 typedef struct {

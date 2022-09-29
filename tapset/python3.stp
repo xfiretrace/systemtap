@@ -515,12 +515,6 @@ private function Py3Code_nlocals (object)
 			 @cast(object, "_stp_Py3FrameObject")->f_frame->f_code->co_nlocals)
 }
 
-private function Py3Code_varnames (object)
-{
-  return @choose_defined(@Py3CodeObject(object)->co_varnames,
-			 @cast(object, "_stp_Py3FrameObject")->f_frame->f_code->co_localsplusnames)
-}
-
 private function Py3Code_Addr2Line:long(code:long, addrq:long)
 {
     /*
@@ -559,18 +553,15 @@ private function Py310Code_Addr2Line:long(code:long, addrq:long)
      * since co_lnotab can have embedded null characters. So, we'll
      * grab it character by character.
      *
-     * TODO Fix for python 3.10 and python 3.11
      */
     size = Py3Bytes_Size(Py3Code_lnotab (code)) / 2
     co_lnotab_sval = @Py3BytesObject(Py3Code_lnotab (code))->ob_sval
     line = Py3Code_firstlineno(code)
-    addr = 0
     idx = 0
     while (idx < 52) {
       addr = user_long(co_lnotab_sval+idx)
       idx = idx + 8
     }
-	
     while (--size >= 0) {
     	addr += user_char(co_lnotab_sval)
 	co_lnotab_sval = co_lnotab_sval + 1
@@ -582,7 +573,6 @@ private function Py310Code_Addr2Line:long(code:long, addrq:long)
     }
     return line
 }
-
 
 #
 # Systemtap functions based on C functions in frameobject.c.
