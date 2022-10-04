@@ -1,0 +1,79 @@
+// livepatch tapset macros
+// Copyright (C) 2022 Red Hat Inc.
+//
+// This file is part of systemtap, and is free software.  You can
+// redistribute it and/or modify it under the terms of the GNU General
+// Public License (GPL); either version 2, or (at your option) any
+// later version.
+private cve_id
+private cve_load_time
+private cve_s_on_timer = -1
+
+global cve_notify_p  = 1
+global cve_fix_p     = 0
+global cve_trace_p   = 1
+global cve_enabled_p = 1
+
+probe begin {
+  cve_id = module_name()
+  cve_load_time = gettimeofday_s()
+
+  if (cve_notify_p)
+    printf("%s mitigation loaded\n", cve_id)
+}
+
+probe end {
+  if (cve_notify_p)
+    printf("%s mitigation unloaded\n", cve_id)
+}
+
+# Parameter reading and updating
+@define cve_probe_procfs_parameter (glbl, f_name) %(
+  probe procfs(@f_name).read
+    { $value = sprintf("%d\n", @glbl) }
+
+  probe procfs(@f_name).write
+    { @glbl = strtol($value, 10) }
+%)
+
+@cve_probe_procfs_parameter(cve_notify_p  , "cve_notify_p")
+@cve_probe_procfs_parameter(cve_trace_p   , "cve_trace_p")
+@cve_probe_procfs_parameter(cve_fix_p     , "cve_fix_p")
+@cve_probe_procfs_parameter(cve_enabled_p , "cve_enabled_p")
+
+# The metric accumulation and prometheus
+global cve_metrics
+
+function cve_count_metric (key:string) {
+  cve_metrics[key] ++
+}
+
+function cve_record_metric (key:string, value:long) {
+  cve_metrics[key] = value
+}
+
+probe prometheus {
+  cve_record_metric("runtime", gettimeofday_s() - cve_load_time)
+  @prometheus_dump_array1(cve_metrics, cve_id, "metric")
+}
+
+# Disabling the patch
+probe timer.s(1) {
+  if(!cve_enabled_p && cve_s_on_timer >= 0){
+    if(cve_s_on_timer > 0){
+      cve_s_on_timer--
+    }else{
+      if (cve_notify_p)
+        printf("%s reenabling\n", cve_id)
+      cve_enabled_p = 1
+      cve_s_on_timer = -1
+    }
+  }
+}
+
+function cve_disable_livepatch(duration:long){
+  if (cve_notify_p)
+    printf("%s disabling\n", cve_id)
+  cve_enabled_p = 0
+  cve_s_on_timer = duration
+}
