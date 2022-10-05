@@ -1,5 +1,9 @@
 * What's new in version 4.8
 
+- A template cve band-aid script is now included, which demonstrates
+  how to use a new 'livepatch.stp' tapset to standardize activation,
+  interactive control, and monitoring of systemtap cve band-aids.
+
 - The kernel runtime now uses much less memory when the number of
   "possible CPUs" are way more than the online ones. For example,
   VMWare guests usually have 128 "possible CPUs" while way less
