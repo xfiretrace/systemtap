@@ -1,5 +1,8 @@
 * What's new in version 4.8
 
+- The python3 tapset was extended to support python3 3.9, 3.10, and 3.11.
+  See stapprobes(3stap) for further details on probing python functions.
+
 - A template cve band-aid script is now included, which demonstrates
   how to use a new 'livepatch.stp' tapset to standardize activation,
   interactive control, and monitoring of systemtap cve band-aids.
