@@ -179,9 +179,11 @@ git_repo=no
 # "git-rev-parse --git-dir" since git-0.99.7
 git_repo_dir="$($GIT rev-parse --git-dir 2> /dev/null || true)"
 abs_repo_dir="$(cd "$git_repo_dir" && pwd)"
-# Only accept the found git repo iff it is in our top srcdir, as determined
-# by comparing absolute pathnames created by running pwd in the respective dir.
-if [ "x$git_repo_dir" != "x" ] && [ "x${abs_repo_dir}" = "x${abs_srcdir}/.git" ]; then
+# Don't be so picky as to only accept the found git repo iff it is in
+# our top srcdir, as determined by comparing absolute pathnames
+# created by running pwd in the respective dir.  That is incompatible
+# with "git worktree" instances.
+if [ "x$git_repo_dir" != "x" ]; then #
     git_repo=yes
     if [ "x$git_found" = "xyes" ]; then
         # git-1.4 and probably earlier understand "git-rev-parse HEAD"
@@ -221,7 +223,7 @@ if [ "x$git_repo_dir" != "x" ] && [ "x${abs_repo_dir}" = "x${abs_srcdir}/.git" ]
             git_errors="${git_errors+${git_errors}; }error running '$GIT describe'"
         fi
         # Grab the commit timestamp
-        git_timestamp=`$GIT show -s --format=%ct`
+        git_timestamp=`$GIT show --no-show-signature -s --format=%ct`
         if [ "x$git_timestamp" = "x" ]; then
             git_errors="${git_errors+${git_errors}; }error running '$GIT show -s --format=%ct'"
         fi
