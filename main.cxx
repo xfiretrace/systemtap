@@ -1602,6 +1602,11 @@ main (int argc, char * const argv [])
       // Exiting for any quiet reason.
       return e.rc;
   }
+  catch (const bad_alloc &e) {
+      cerr << "Out of memory.   Please check --rlimit-as and memory availability." << endl;
+      cerr << e.what() << endl;
+      return EXIT_FAILURE;
+  }
   catch (const exception &e) {
       // Some other uncaught exception.
       cerr << e.what() << endl;
