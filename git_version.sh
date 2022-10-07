@@ -3,7 +3,8 @@
 # Generate some basic versioning information which can be piped to a header.
 #
 # Copyright (c) 2006-2007 Luc Verhaegen <libv@skynet.be>
-# Copyright (C) 2007 Hans Ulrich Niedermann <hun@n-dimensional.de>
+# Copyright (C) 2007-2008 Hans Ulrich Niedermann <hun@n-dimensional.de>
+# Copyright (C) 2021 Lawrence Sebald
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -26,7 +27,8 @@
 # This script is based on the one written for xf86-video-unichrome by
 # Luc Verhaegen, but was rewritten almost completely by Hans Ulrich
 # Niedermann. The script contains a few bug fixes from Egbert Eich,
-# Matthias Hopf, Joerg Sonnenberger, and possibly others.
+# Matthias Hopf, Joerg Sonnenberger, and possibly others. Later modified
+# for Sylverant by Lawrence Sebald.
 #
 # The author thanks the nice people on #git for the assistance.
 #
@@ -41,10 +43,8 @@
 # work in the xf86-video-radeonhd build system. For non-recursive make,
 # you can probably make things a little bit simpler.
 #
-# KNOWN BUGS:
-#  * Uses hyphenated ("git-foo-bar") program names, which git upstream
-#    have declared deprecated.
-#
+# Requires git >= 1.3.0 for the 'git foo' (with space) syntax,
+#      and git >= 1.4   for some specific commands.
 
 # Help messages
 USAGE="[<option>...]"
@@ -60,12 +60,13 @@ Options:
 
 # The caller may have set these for us
 SED="${SED-sed}"
+GIT="${GIT-git}"
 
 # Initialize
-working_dir="$(pwd)"
+working_dir=`pwd`
 
 # Who am I?
-self="$(basename "$0")"
+self=`basename "$0"`
 
 # Defaults
 ifndef_symbol="GIT_VERSION_H"
@@ -73,7 +74,7 @@ outfile="-"
 print_example=false
 keep_if_no_repo=no
 quiet=false
-srcdir="$(pwd)"
+srcdir=`pwd`
 
 # Parse command line parameter, affecting defaults
 while [ "x$1" != "x" ]
@@ -88,8 +89,6 @@ do
                 if [ "x$outfile" = "x-" ]; then
                     : # keep default ifndef_symbol
                 else
-                    newdir=$(mktemp -t -d git_version_XXXXXX)
-                    outfilenew="$newdir/$1.new"
                     ifndef_symbol=`basename "$outfile" | $SED 's|\.|_|g; s|[^A-Za-z0-9_]||g' | tr a-z A-Z`
                 fi
             else
@@ -129,17 +128,17 @@ do
     shift
 done
 
-# If not printing to stdout, redirect stdout to output file
+# If not printing to stdout, redirect stdout to output file?
 rename_new_output=false
 if [ "x$outfile" = "x-" ]
 then
     : # keep using stdout
 else
-    exec 1> "${outfilenew}"
+    exec 1> "${outfile}.new"
 fi
 
 # Done with creating output files, so we can change to source dir
-abs_srcdir="$(cd "$srcdir" && pwd)"
+abs_srcdir=`cd "$srcdir" && pwd`
 cd "$srcdir"
 
 # Write program header
@@ -152,71 +151,50 @@ cat<<EOF
 #ifndef ${ifndef_symbol}
 #define ${ifndef_symbol} 1
 
+#include <stdint.h>
+
 /* whether this is a dist tarball or not */
 #undef GIT_IS_DIST
 
 EOF
 
-# Backwards compatibility hack for git 1.6.0 (and people running the
-# latest pre-release version of git.) 
-#
-# For now, we'll do this to support git 1.6, with minimal changes to
-# the rest of this script, but no guarantees how long this will work.
-# The hyphenated git-foo-bar names really are deprecated, and may
-# disappear in the future as more of git gets rewritten as built-in C
-# programs.  Google summer of code students and other git developers
-# are hard at work doing this, in order to make git more
-# portable/usable for Windows users.  As a result, some of the
-# git-foo-bar programs, which will be moved to the exec-dir directory
-# in git 1.6, may disappear altogether in the future.  Hence the only
-# truly safe and future-compatible way of running commands such as
-# git-diff-files, git-rev-parse, etc., are "git diff-files" and 
-# "git rev-parse".  Here endeth the git portability sermon, which
-# I suspect will have as much effect as abstinence-only sex ed 
-# classes.  :-)   TYT, 2008-07-08
-
-execdir=$(git --exec-path 2> /dev/null)
-if test -n "$execdir"; then
-    PATH=$PATH:$execdir
-fi
-
-# Detect git tools (should work with old and new git versions)
+# Detect git tool (should work with old and new git versions)
 git_found=yes
-for git_tool in git-symbolic-ref git-rev-parse git-diff-files git-diff-index git git-describe
-do
-    if [ x`which $git_tool 2>/dev/null` = "x" ]; then
-        git_found="'$git_tool' not found"
-        break
-    fi
-done
+if [ "x$GIT" = "xgit" ] && [ x`which $GIT 2>/dev/null` = "x" ]; then
+    git_found="'$GIT' not found"
+    break
+fi
+# If git_found=yes, we can now use $() substitutions (as git does). Hooray!
 
 # Determine git specific defines
 unset git_errors ||:
 if [ "x$git_found" = "xyes" ]; then
-    git_version=`git --version`
+    git_version=`$GIT --version`
     if [ "x$git_version" = "x" ]; then
-        git_errors="${git_errors+${git_errors}; }error running 'git --version'"
+        git_errors="${git_errors+${git_errors}; }error running '$GIT --version'"
     fi
 fi
 
 git_repo=no
 # "git-rev-parse --git-dir" since git-0.99.7
-git_repo_dir="$(git-rev-parse --git-dir 2> /dev/null || true)"
+git_repo_dir="$($GIT rev-parse --git-dir 2> /dev/null || true)"
 abs_repo_dir="$(cd "$git_repo_dir" && pwd)"
 # Only accept the found git repo iff it is in our top srcdir, as determined
-# by comparing absolute pathnames creaged by running pwd in the respective dir.
+# by comparing absolute pathnames created by running pwd in the respective dir.
 if [ "x$git_repo_dir" != "x" ] && [ "x${abs_repo_dir}" = "x${abs_srcdir}/.git" ]; then
     git_repo=yes
     if [ "x$git_found" = "xyes" ]; then
         # git-1.4 and probably earlier understand "git-rev-parse HEAD"
-        git_shaid=`git-describe --abbrev=12 --long 2>/dev/null ||
-                   git-describe --abbrev=12 2>/dev/null ||
-                   git-rev-parse HEAD`
+        git_shaid=`$GIT rev-parse HEAD`
         if [ "x$git_shaid" = "x" ]; then
-            git_errors="${git_errors+${git_errors}; }error running 'git-rev-parse HEAD'"
+            git_errors="${git_errors+${git_errors}; }error running '$GIT rev-parse HEAD'"
+        fi
+        git_shaid_short=`$GIT rev-parse HEAD | $SED -n 's/^\(.\{8\}\).*/\1/p'`
+        if [ "x$git_shaid_short" = "x" ]; then
+            git_errors="${git_errors+${git_errors}; }error running '$GIT rev-parse HEAD'"
         fi
         # git-1.4 and probably earlier understand "git-symbolic-ref HEAD"
-        git_branch=`git-symbolic-ref HEAD | $SED -n 's|^refs/heads/||p'`
+        git_branch=`$GIT symbolic-ref HEAD | $SED -n 's|^refs/heads/||p'`
         if [ "x$git_branch" = "x" ]; then
             # This happens, is OK, and "(no branch)" is what "git branch" prints.
             git_branch="(no branch)"
@@ -224,8 +202,28 @@ if [ "x$git_repo_dir" != "x" ] && [ "x${abs_repo_dir}" = "x${abs_srcdir}/.git" ]
         git_dirty=yes
         # git-1.4 does not understand "git-diff-files --quiet"
         # git-1.4 does not understand "git-diff-index --cached --quiet HEAD"
-        if [ "x$(git-diff-files)" = "x" ] && [ "x$(git-diff-index --cached HEAD)" = "x" ]; then
+        if [ "x$($GIT diff-files)" = "x" ] && [ "x$($GIT diff-index --cached HEAD)" = "x" ]; then
             git_dirty=no
+        fi
+        # Grab the origin url, stripping out any credentials that might be in it
+        git_remote_url=`$GIT config --get remote.origin.url | $SED -nE 's/^(.*:\/\/)(.*\@)?(.*)$/\3/p'`
+        if [ "x$git_remote_url" = "x" ]; then
+            git_remote_url="(no remote)"
+        fi
+        # Grab the linear git revision number
+        git_build=`$GIT log --oneline | wc -l | $SED 's/^[ \t]*//'`
+        if [ "x$git_shaid" = "x" ]; then
+            git_errors="${git_errors+${git_errors}; }error running '$GIT log --oneline'"
+        fi
+        # Grab the "pretty" revision number
+        git_pretty_rev=`$GIT describe --dirty --broken --always --abbrev=8`
+        if [ "x$git_shaid" = "x" ]; then
+            git_errors="${git_errors+${git_errors}; }error running '$GIT describe'"
+        fi
+        # Grab the commit timestamp
+        git_timestamp=`$GIT show -s --format=%ct`
+        if [ "x$git_timestamp" = "x" ]; then
+            git_errors="${git_errors+${git_errors}; }error running '$GIT show -s --format=%ct'"
         fi
     fi
 fi
@@ -251,6 +249,20 @@ else
 fi
 echo ""
 
+if :; then # debug output
+cat<<EOF
+/* The following helps debug why we sometimes do not find ".git/":
+ * abs_repo_dir="${abs_repo_dir}" (should be "/path/to/.git")
+ * abs_srcdir="${abs_srcdir}" (absolute top source dir "/path/to")
+ * git_repo_dir="${git_repo_dir}" (usually ".git" or "/path/to/.git")
+ * PWD="${PWD}"
+ * srcdir="${srcdir}"
+ * working_dir="${working_dir}"
+ */
+
+EOF
+fi
+
 if [ "x$git_repo" = "xno" ]; then
     echo "/* No git repo found, probably building from dist tarball */"
     echo "#undef GIT_REPO"
@@ -259,12 +271,32 @@ else
     echo "#define GIT_REPO 1"
     echo ""
     if [ "x$git_found" = "xyes" ]; then
-        echo "/* Git SHA ID of last commit */"
+        echo "/* Full git SHA ID of last commit */"
         echo "#define GIT_SHAID \"${git_shaid}\""
+        echo ""
+
+        echo "/* Short form of the above */"
+        echo "#define GIT_SHAID_SHORT \"${git_shaid_short}\""
         echo ""
 
         echo "/* Branch this tree is on */"
         echo "#define GIT_BRANCH \"$git_branch\""
+        echo ""
+
+        echo "/* Remote URL this tree was cloned from */"
+        echo "#define GIT_REMOTE_URL \"$git_remote_url\""
+        echo ""
+
+        echo "/* Linear revision number from the repository */"
+        echo "#define GIT_BUILD \"$git_build\""
+        echo ""
+
+        echo "/* Pretty git revision string for presenting to the user */"
+        echo "#define GIT_PRETTY_REV \"$git_pretty_rev\""
+        echo ""
+
+        echo "/* Timestamp of the current commit */"
+        echo "#define GIT_TIMESTAMP UINT64_C($git_timestamp)"
         echo ""
 
         # Any uncommitted changes we should know about?
@@ -288,7 +320,7 @@ cat<<EOF
  */
 
 #ifdef GIT_DIRTY
-# define GIT_DIRTY_MSG " + changes"
+# define GIT_DIRTY_MSG "-dirty"
 #else /* !GIT_DIRTY */
 # define GIT_DIRTY_MSG ""
 #endif /* GIT_DIRTY */
@@ -311,6 +343,8 @@ cat<<EOF
 # else /* !GIT_NOT_FOUND */
 #  define GIT_MESSAGE \\
        GIT_DIST_MSG \\
+       "git branch " GIT_BRANCH ", " \\
+       "url " GIT_REMOTE_URL ", " \\
        "commit " GIT_SHAID GIT_DIRTY_MSG \\
        GIT_ERROR_MSG
 # endif /* GIT_NOT_FOUND */
@@ -357,19 +391,18 @@ then
     if [ -f "$outfile" ]; then
         if [ "x$keep_if_no_repo" = "xyes" ] && [ "x$git_repo" = "xno" ]; then
             "$quiet" || echo "$self: Not a git repo, keeping existing $outfile" >&2
-            rm -f "$outfilenew"
-        elif cmp "$outfile" "$outfilenew" > /dev/null; then
+            rm -f "$outfile.new"
+        elif cmp "$outfile" "$outfile.new" > /dev/null; then
             "$quiet" || echo "$self: Output is unchanged, keeping $outfile" >&2
-            rm -f "$outfilenew"
+            rm -f "$outfile.new"
         else
             echo "$self: Output has changed, updating $outfile" >&2
-            mv -f "$outfilenew" "$outfile"
+            mv -f "$outfile.new" "$outfile"
         fi
     else
         echo "$self: Output is new file, creating $outfile" >&2
-        mv -f "$outfilenew" "$outfile"
+        mv -f "$outfile.new" "$outfile"
     fi
-    rmdir "$newdir"
 fi
 
 # THE END.
