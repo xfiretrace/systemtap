@@ -1,14 +1,14 @@
 dnl configure.ac --- autoconf input file for systemtap
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([systemtap], 4.8, systemtap@sourceware.org, systemtap)
+AC_INIT([systemtap],[4.8],[systemtap@sourceware.org],[systemtap])
 dnl                  ^^^ see also NEWS, systemtap.spec, testsuite/configure.ac
 dnl                      doc/SystemTap_Beginners_Guide/en-US/Book_Info.xml
 
 dnl Get the target arch for libHelperSDT.so
 AC_CANONICAL_TARGET
 
-AC_PREREQ(2.63)
+AC_PREREQ([2.71])
 dnl We don't maintain a ChangeLog, which makes us non-GNU -> foreign.
 AM_INIT_AUTOMAKE([no-dist foreign])
 AM_MAINTAINER_MODE
@@ -203,7 +203,7 @@ AC_SUBST(PIECXXFLAGS)
 dnl Handle optional debuginfod support. If not specified by the user,
 dnl use it if present.
 AC_ARG_WITH([debuginfod],
-  AC_HELP_STRING([--with-debuginfod], [Enable debuginfo lookups with debuginfod (auto/yes/no)]),
+  AS_HELP_STRING([--with-debuginfod],[Enable debuginfo lookups with debuginfod (auto/yes/no)]),
                  [], [with_debuginfod=auto])
 AC_MSG_CHECKING([whether to use debuginfod])
 AC_MSG_RESULT([$with_debuginfod])
