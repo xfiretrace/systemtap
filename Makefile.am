@@ -435,7 +435,7 @@ install-uprobes:
 .PHONY: $(PHONIES)
 
 dist-gzip:
-	cd $(srcdir); git status | grep working.directory.clean || (echo "You should commit your changes before 'make rpm'.")
+	cd $(srcdir); git status | egrep 'working.(tree|directory).clean' || (echo "You should commit your changes before 'make rpm'.")
 	(cd $(srcdir); git archive --prefix=systemtap-$(VERSION)/ --format=tar HEAD) | gzip > systemtap-$(VERSION).tar.gz
 
 rpm: dist-gzip
