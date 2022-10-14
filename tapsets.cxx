@@ -1165,6 +1165,15 @@ query_symtab_func_info (func_info & fi, dwarf_query * q)
   q->dw.get_module_dwarf(false, false);
   entrypc -= q->dw.module_bias;
 
+  // PR29676.  We consult the symbol tables of both the elf and
+  // dwarf files. The 2 results can contain duplicates so
+  // check results before continuing to create new probe points
+  for(auto ddp_it = q->results.begin(); ddp_it != q->results.end(); ++ddp_it){
+    dwarf_derived_probe *ddp = dynamic_cast<dwarf_derived_probe *> (*ddp_it);
+    if(ddp && ddp->addr == entrypc)
+      return;
+  }
+
   // If there are already probes in this module, lets not duplicate.
   // This can come from other weak symbols/aliases or existing
   // matches from Dwarf DIE functions.  Try to add this entrypc to the
@@ -1247,7 +1256,7 @@ dwarf_query::handle_query_module()
   // in the symbol table but not in dwarf and minidebuginfo is
   // located in the gnu_debugdata section, alias_dupes checking
   // is done before adding any probe points
-  if (results.size()==0 && !pending_interrupts)
+  if(!pending_interrupts)
     query_module_symtab();
 }
 
