@@ -159,7 +159,10 @@ public:
   void version ();
   void usage (int exitcode);
   void check_options (int argc, char * const argv []);
-  static const char* morehelp;
+  // Mark morehelp as used, otherwise LTO might optimize
+  // this one out, and testcases such as at_var_mark.exp
+  // would miss it.
+  static const char* morehelp __attribute__ ((used));
 
   // NB: It is very important for all of the above (and below) fields
   // to be cleared in the systemtap_session ctor (session.cxx).
