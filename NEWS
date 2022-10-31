@@ -9,14 +9,14 @@
 
 - The kernel runtime now uses much less memory when the number of
   "possible CPUs" are way more than the online ones. For example,
-  VMWare guests usually have 128 "possible CPUs" while way less
+  VMWare guests usually have 128 "possible CPUs" while fewer
   CPUs are actually present or online in the guest system.
 
 - The memory allocation size is now irrelevant to the value of
   NR_CPUS of the current kernel. It is only subject to the number
   of "possible CPUs" or "online CPUs".
 
-- CPU hotplug is supported to the extend that there won't be any
+- CPU hotplug is supported to the extent that there won't be any
   kernel panics or memory corruptions.
 
 * What's new in version 4.7, 2022-05-02
