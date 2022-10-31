@@ -11,5 +11,5 @@ requires: python2-debuginfo
 scope: system-wide
 description: A python support tapset that displays backtraces and variable values
 test_support: stap -p2 pyexample.stp python2
-test_check: printenv;stap -p4  pyexample.stp python2
-test_installcheck: PYTHONPATH=$(PYEXECDIR) stap -g --suppress-time-limits -c '/usr/bin/python3 -m HelperSDT pyexample.py 35' pyexample.stp python2
+test_check: stap -p4 pyexample.stp python2
+test_installcheck: PYTHONPATH=$PYEXECDIR stap -g --suppress-time-limits -c '/usr/bin/python3 -m HelperSDT pyexample.py 35' pyexample.stp python2
