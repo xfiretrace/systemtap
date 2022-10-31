@@ -19,6 +19,11 @@
 - CPU hotplug is supported to the extent that there won't be any
   kernel panics or memory corruptions.
 
+- The bpf backend's embedded-code assembler has been improved to
+  support more conventional assembly syntax with named opcodes. The
+  opcode names are based on the iovisor bpf-docs documentation at
+  https://github.com/iovisor/bpf-docs/blob/master/eBPF.md
+
 * What's new in version 4.7, 2022-05-02
 
 - SystemTap now supports an additional method to sign modules on
