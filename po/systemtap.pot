@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: systemtap 4.7\n"
+"Project-Id-Version: systemtap 4.8\n"
 "Report-Msgid-Bugs-To: systemtap@sourceware.org\n"
-"POT-Creation-Date: 2022-05-02 10:29-0400\n"
+"POT-Creation-Date: 2022-10-31 11:02-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,426 +36,441 @@ msgstr ""
 msgid "register allocation failed due to insufficent BPF stack size"
 msgstr ""
 
-#: bpf-translate.cxx:467
+#: bpf-translate.cxx:475
 msgid "unhandled comparison operator"
 msgstr ""
 
-#: bpf-translate.cxx:719 bpf-translate.cxx:2267 bpf-translate.cxx:2807
-#: bpf-translate.cxx:3869
+#: bpf-translate.cxx:727 bpf-translate.cxx:2524 bpf-translate.cxx:3064
+#: bpf-translate.cxx:4126
 msgid "unknown array variable"
 msgstr ""
 
-#: bpf-translate.cxx:740 bpf-translate.cxx:2288 bpf-translate.cxx:2831
-#: bpf-translate.cxx:2903 bpf-translate.cxx:3891 bpf-translate.cxx:4056
+#: bpf-translate.cxx:748 bpf-translate.cxx:2545 bpf-translate.cxx:3088
+#: bpf-translate.cxx:3160 bpf-translate.cxx:4148 bpf-translate.cxx:4313
 msgid "unhandled index type"
 msgstr ""
 
-#: bpf-translate.cxx:768
+#: bpf-translate.cxx:776
 msgid "unhandled array type"
 msgstr ""
 
-#: bpf-translate.cxx:781 bpf-translate.cxx:2303
+#: bpf-translate.cxx:789 bpf-translate.cxx:2560
 msgid "unknown lvalue"
 msgstr ""
 
-#: bpf-translate.cxx:918
+#: bpf-translate.cxx:951
+#, c-format
+msgid "invalid bpf embeddedcode opcode '%s'"
+msgstr ""
+
+#: bpf-translate.cxx:983
 #, c-format
 msgid "invalid bpf embeddedcode operand '%s'"
 msgstr ""
 
-#: bpf-translate.cxx:1053
+#: bpf-translate.cxx:1009
+#, c-format
+msgid "invalid bpf embeddedcode operand '%s', expected [reg+off] or [reg-off]"
+msgstr ""
+
+#: bpf-translate.cxx:1080 bpf-translate.cxx:1150
+#, c-format
+msgid "numeric opcode '%x' given argument types for '%x'"
+msgstr ""
+
+#: bpf-translate.cxx:1171
+#, c-format
+msgid "invalid bpf embeddedcode syntax (opcode expects imm, found '%s')"
+msgstr ""
+
+#: bpf-translate.cxx:1181
+#, c-format
+msgid "invalid bpf embeddedcode syntax (opcode expects %s args, found %llu)"
+msgstr ""
+
+#: bpf-translate.cxx:1338
 #, c-format
 msgid "invalid bpf embeddedcode syntax (label expects 1 arg, found %llu)"
 msgstr ""
 
-#: bpf-translate.cxx:1060
+#: bpf-translate.cxx:1345
 #, c-format
 msgid "invalid bpf embeddedcode syntax (alloc expects 2 or 3 args, found %llu)"
 msgstr ""
 
-#: bpf-translate.cxx:1075
+#: bpf-translate.cxx:1360
 #, c-format
 msgid ""
 "invalid bpf embeddedcode syntax (alloc expects 'align' or 'noalign' as 3rd "
 "arg, found '%s'"
 msgstr ""
 
-#: bpf-translate.cxx:1084
+#: bpf-translate.cxx:1369
 #, c-format
 msgid ""
 "invalid bpf embeddedcode syntax (jump_to_catch expects 1 arg, found %llu)"
 msgstr ""
 
-#: bpf-translate.cxx:1091
+#: bpf-translate.cxx:1376
 #, c-format
 msgid ""
 "invalid bpf embeddedcode syntax (register_error expects 1 arg, found %llu)"
 msgstr ""
 
-#: bpf-translate.cxx:1098
+#: bpf-translate.cxx:1383
 #, c-format
 msgid ""
 "invalid bpf embeddedcode syntax (terminate does not take any args, found "
 "%llu)"
 msgstr ""
 
-#: bpf-translate.cxx:1104
+#: bpf-translate.cxx:1389
 #, c-format
 msgid ""
 "invalid bpf embeddedcode syntax (call expects at least 2 args, found %llu)"
 msgstr ""
 
-#: bpf-translate.cxx:1114
-#, c-format
-msgid "invalid bpf embeddedcode syntax (opcode expects 4 args, found %llu)"
-msgstr ""
-
-#: bpf-translate.cxx:1119
-#, c-format
-msgid "invalid bpf embeddedcode opcode '%s'"
-msgstr ""
-
-#: bpf-translate.cxx:1145
+#: bpf-translate.cxx:1402
 #, c-format
 msgid "unknown bpf embeddedcode operator '%s'"
 msgstr ""
 
-#: bpf-translate.cxx:1165
+#: bpf-translate.cxx:1422
 msgid "no return value outside function"
 msgstr ""
 
-#: bpf-translate.cxx:1213 bpf-translate.cxx:1236 bpf-translate.cxx:1247
-#: bpf-translate.cxx:1255
+#: bpf-translate.cxx:1470 bpf-translate.cxx:1493 bpf-translate.cxx:1504
+#: bpf-translate.cxx:1512
 #, c-format
 msgid "invalid bpf register '%s'"
 msgstr ""
 
-#: bpf-translate.cxx:1220
+#: bpf-translate.cxx:1477
 #, c-format
 msgid "invalid bpf argument %s (string literal not allowed here)"
 msgstr ""
 
-#: bpf-translate.cxx:1226
+#: bpf-translate.cxx:1483
 #, c-format
 msgid "BUG: improper string %s"
 msgstr ""
 
-#: bpf-translate.cxx:1252
+#: bpf-translate.cxx:1509
 #, c-format
 msgid "invalid bpf argument '%s'"
 msgstr ""
 
-#: bpf-translate.cxx:1281
+#: bpf-translate.cxx:1538
 msgid "invalid bpf code"
 msgstr ""
 
-#: bpf-translate.cxx:1357
+#: bpf-translate.cxx:1614
 msgid "invalid branch in bpf code"
 msgstr ""
 
-#: bpf-translate.cxx:1365
+#: bpf-translate.cxx:1622
 #, c-format
 msgid "unknown opcode '%d' in bpf code"
 msgstr ""
 
-#: bpf-translate.cxx:1373 bpf-translate.cxx:1382
+#: bpf-translate.cxx:1630 bpf-translate.cxx:1639
 #, c-format
 msgid "invalid register field '%s' in bpf code"
 msgstr ""
 
-#: bpf-translate.cxx:1387
+#: bpf-translate.cxx:1644
 msgid "invalid immediate field in bpf code"
 msgstr ""
 
-#: bpf-translate.cxx:1391
+#: bpf-translate.cxx:1648
 #, c-format
 msgid "offset field '%lld' out of range in bpf code"
 msgstr ""
 
-#: bpf-translate.cxx:1401
+#: bpf-translate.cxx:1658
 #, c-format
 msgid "undefined jump target '%s' in bpf code"
 msgstr ""
 
-#: bpf-translate.cxx:1404
+#: bpf-translate.cxx:1661
 #, c-format
 msgid "BUG: undefined fallthrough target '%s'"
 msgstr ""
 
-#: bpf-translate.cxx:1439
+#: bpf-translate.cxx:1696
 msgid "embeddedcode marked /* userspace */ in kernel bpf probe"
 msgstr ""
 
-#: bpf-translate.cxx:1519
+#: bpf-translate.cxx:1776
 msgid "BUG: bpf embeddedcode doesn't support fallthrough on final asm_stmt"
 msgstr ""
 
-#: bpf-translate.cxx:1635
+#: bpf-translate.cxx:1892
 #, c-format
 msgid "bpf embeddedcode '%s' expects format string, none provided"
 msgstr ""
 
-#: bpf-translate.cxx:1641
+#: bpf-translate.cxx:1898
 #, c-format
 msgid ""
 "bpf embeddedcode '%s' expects format string, but first parameter is not a "
 "string literal"
 msgstr ""
 
-#: bpf-translate.cxx:1649 bpf-translate.cxx:3794
+#: bpf-translate.cxx:1906 bpf-translate.cxx:4051
 msgid "Format string for print too long"
 msgstr ""
 
-#: bpf-translate.cxx:1655 bpf-translate.cxx:3722 translate.cxx:6325
+#: bpf-translate.cxx:1912 bpf-translate.cxx:3979 translate.cxx:6326
 #, c-format
 msgid "additional argument to print"
 msgid_plural "too many arguments to print (%zu)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: bpf-translate.cxx:1675
+#: bpf-translate.cxx:1932
 msgid ""
 "BUG: bpf embeddedcode non-helper 'call' operation only supports printf(),"
 "sprintf(),exit() for now"
 msgstr ""
 
-#: bpf-translate.cxx:1677
+#: bpf-translate.cxx:1934
 msgid ""
 "BUG: bpf embeddedcode non-helper 'call' operation only supports printf(),"
 "sprintf() for now"
 msgstr ""
 
-#: bpf-translate.cxx:1694
+#: bpf-translate.cxx:1951
 msgid "bpf embeddedcode unresolved function call"
 msgstr ""
 
-#: bpf-translate.cxx:1696
+#: bpf-translate.cxx:1953
 msgid "bpf embeddedcode unhandled function overloading"
 msgstr ""
 
-#: bpf-translate.cxx:1707 bpf-translate.cxx:3481
+#: bpf-translate.cxx:1964 bpf-translate.cxx:3738
 msgid "unhandled function recursion"
 msgstr ""
 
-#: bpf-translate.cxx:1715
+#: bpf-translate.cxx:1972
 #, c-format
 msgid "bpf embeddedcode call to function '%s' expected %zu arguments, got %zu"
 msgstr ""
 
-#: bpf-translate.cxx:1736
+#: bpf-translate.cxx:1993
 #, c-format
 msgid "BUG: bpf embeddedcode contains unexpected asm_stmt kind '%s'"
 msgstr ""
 
-#: bpf-translate.cxx:1788 bpf-translate.cxx:2118
+#: bpf-translate.cxx:2045 bpf-translate.cxx:2375
 msgid "unknown value"
 msgstr ""
 
-#: bpf-translate.cxx:1863 bpf-translate.cxx:1903
+#: bpf-translate.cxx:2120 bpf-translate.cxx:2160
 msgid "unsupported loop in bpf kernel probe"
 msgstr ""
 
-#: bpf-translate.cxx:1908
+#: bpf-translate.cxx:2165
 msgid "unsupported array slice in bpf foreach loop"
 msgstr ""
 
-#: bpf-translate.cxx:1922
+#: bpf-translate.cxx:2179
 msgid "unknown index"
 msgstr ""
 
-#: bpf-translate.cxx:1929
+#: bpf-translate.cxx:2186
 msgid "unknown type"
 msgstr ""
 
-#: bpf-translate.cxx:1956
+#: bpf-translate.cxx:2213
 msgid "unhandled foreach index type"
 msgstr ""
 
-#: bpf-translate.cxx:1979
+#: bpf-translate.cxx:2236
 msgid "unknown array"
 msgstr ""
 
-#: bpf-translate.cxx:1990
+#: bpf-translate.cxx:2247
 msgid "unknown stats array"
 msgstr ""
 
-#: bpf-translate.cxx:2009
+#: bpf-translate.cxx:2266
 msgid "unsupported sorted iteration on stat aggregate"
 msgstr ""
 
-#: bpf-translate.cxx:2101
+#: bpf-translate.cxx:2358
 msgid "unhandled foreach key type"
 msgstr ""
 
-#: bpf-translate.cxx:2114
+#: bpf-translate.cxx:2371
 msgid "unsupported value iteration on stat aggregate"
 msgstr ""
 
-#: bpf-translate.cxx:2154
+#: bpf-translate.cxx:2411
 msgid "unhandled foreach value type"
 msgstr ""
 
-#: bpf-translate.cxx:2170 translate.cxx:5015
+#: bpf-translate.cxx:2427 translate.cxx:5016
 msgid "cannot 'break' outside loop"
 msgstr ""
 
-#: bpf-translate.cxx:2178 translate.cxx:5028
+#: bpf-translate.cxx:2435 translate.cxx:5029
 msgid "cannot 'continue' outside loop"
 msgstr ""
 
-#: bpf-translate.cxx:2186
+#: bpf-translate.cxx:2443
 msgid "cannot 'return' outside function"
 msgstr ""
 
-#: bpf-translate.cxx:2197
+#: bpf-translate.cxx:2454
 msgid "bpf unhandled next statement in function"
 msgstr ""
 
-#: bpf-translate.cxx:2209
+#: bpf-translate.cxx:2466
 msgid "unimplemented delete of array"
 msgstr ""
 
-#: bpf-translate.cxx:2240 bpf-translate.cxx:2295
+#: bpf-translate.cxx:2497 bpf-translate.cxx:2552
 msgid "unsupported delete operation on statistics aggregate"
 msgstr ""
 
-#: bpf-translate.cxx:2349 stapregex-parse.cxx:138
+#: bpf-translate.cxx:2606 stapregex-parse.cxx:138
 msgid "octal escape sequence out of range"
 msgstr ""
 
-#: bpf-translate.cxx:2377
+#: bpf-translate.cxx:2634
 msgid "hex escape sequence out of range"
 msgstr ""
 
-#: bpf-translate.cxx:2404
+#: bpf-translate.cxx:2661
 msgid "string literal too long"
 msgstr ""
 
-#: bpf-translate.cxx:2449
+#: bpf-translate.cxx:2706
 msgid "unhandled binary operator"
 msgstr ""
 
-#: bpf-translate.cxx:2492
+#: bpf-translate.cxx:2749
 msgid "unhandled unary operator"
 msgstr ""
 
-#: bpf-translate.cxx:2504 bpf-translate.cxx:2522
+#: bpf-translate.cxx:2761 bpf-translate.cxx:2779
 msgid "unhandled crement operator"
 msgstr ""
 
-#: bpf-translate.cxx:2565
+#: bpf-translate.cxx:2822
 msgid "unsupported in bpf kernel probe"
 msgstr ""
 
-#: bpf-translate.cxx:2668
+#: bpf-translate.cxx:2925
 msgid "unhandled assignment operator"
 msgstr ""
 
-#: bpf-translate.cxx:2747 bpf-translate.cxx:2810
+#: bpf-translate.cxx:3004 bpf-translate.cxx:3067
 msgid "unhandled statistics variable"
 msgstr ""
 
-#: bpf-translate.cxx:2782
+#: bpf-translate.cxx:3039
 msgid "unhandled global variable type"
 msgstr ""
 
-#: bpf-translate.cxx:2795 bpf-translate.cxx:2880
+#: bpf-translate.cxx:3052 bpf-translate.cxx:3137
 msgid "unknown variable"
 msgstr ""
 
-#: bpf-translate.cxx:2865
+#: bpf-translate.cxx:3122
 msgid "unhandled arrayindex expression"
 msgstr ""
 
-#: bpf-translate.cxx:2910
+#: bpf-translate.cxx:3167
 msgid "unsupported array-in operation on statistics aggregate"
 msgstr ""
 
-#: bpf-translate.cxx:2943
+#: bpf-translate.cxx:3200
 msgid "unhandled operand type"
 msgstr ""
 
-#: bpf-translate.cxx:2974
+#: bpf-translate.cxx:3231
 msgid "unhandled deref size"
 msgstr ""
 
-#: bpf-translate.cxx:3158
+#: bpf-translate.cxx:3415
 msgid "unhandled register number"
 msgstr ""
 
-#: bpf-translate.cxx:3179
+#: bpf-translate.cxx:3436
 msgid "unhandled register size"
 msgstr ""
 
-#: bpf-translate.cxx:3475
+#: bpf-translate.cxx:3732
 msgid "unhandled function overloading"
 msgstr ""
 
-#: bpf-translate.cxx:3664
+#: bpf-translate.cxx:3921
 msgid "unsupported sprintf in bpf kernel probe"
 msgstr ""
 
-#: bpf-translate.cxx:3669
+#: bpf-translate.cxx:3926
 #, c-format
 msgid "additional argument to sprintf"
 msgid_plural "too many arguments to sprintf (%zu)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: bpf-translate.cxx:3698
+#: bpf-translate.cxx:3955
 #, c-format
 msgid "format string expected %zu args, got %zu"
 msgstr ""
 
-#: bpf-translate.cxx:3717
+#: bpf-translate.cxx:3974
 msgid "unhandled histogram print"
 msgstr ""
 
-#: bpf-translate.cxx:3736 bpf-translate.cxx:3777 translate.cxx:6238
+#: bpf-translate.cxx:3993 bpf-translate.cxx:4034 translate.cxx:6239
 msgid "cannot print a raw stats object"
 msgstr ""
 
-#: bpf-translate.cxx:3738 bpf-translate.cxx:3774 translate.cxx:6236
+#: bpf-translate.cxx:3995 bpf-translate.cxx:4031 translate.cxx:6237
 msgid "cannot print unknown expression type"
 msgstr ""
 
-#: bpf-translate.cxx:3817
+#: bpf-translate.cxx:4074
 msgid "unsupported extraction function in bpf kernel probe"
 msgstr ""
 
-#: bpf-translate.cxx:3834
+#: bpf-translate.cxx:4091
 msgid "unhandled stat op"
 msgstr ""
 
-#: bpf-translate.cxx:3847 translate.cxx:5800
+#: bpf-translate.cxx:4104 translate.cxx:5801
 msgid "unexpected aggregate of non-statistic"
 msgstr ""
 
-#: bpf-translate.cxx:3851
+#: bpf-translate.cxx:4108
 msgid "unknown statistics variable"
 msgstr ""
 
-#: bpf-translate.cxx:3853
+#: bpf-translate.cxx:4110
 msgid "not a statistics variable"
 msgstr ""
 
-#: bpf-translate.cxx:3897
+#: bpf-translate.cxx:4154
 msgid "unknown statistics value"
 msgstr ""
 
-#: bpf-translate.cxx:3919
+#: bpf-translate.cxx:4176
 msgid "unhandled hist op"
 msgstr ""
 
-#: bpf-translate.cxx:4036
+#: bpf-translate.cxx:4293
 msgid "unhandled scalar type"
 msgstr ""
 
-#: bpf-translate.cxx:4102
+#: bpf-translate.cxx:4359
 msgid "unhandled array element type"
 msgstr ""
 
-#: bpf-translate.cxx:5131
+#: bpf-translate.cxx:5389
 #, c-format
 msgid "bpf translation failure: %s"
 msgstr ""
@@ -821,16 +836,21 @@ msgstr ""
 msgid "Error in tmpdir cleanup"
 msgstr ""
 
-#: cscommon.cxx:339 stap-serverd.cxx:1823
+#: cscommon.cxx:323
+#, c-format
+msgid "Error creating server cert db path \"%s\""
+msgstr ""
+
+#: cscommon.cxx:351 stap-serverd.cxx:1823
 #, c-format
 msgid "Module signed with MOK, fingerprint \"%s\""
 msgstr ""
 
-#: cscommon.cxx:349
+#: cscommon.cxx:361
 msgid "Running sign-file failed\n"
 msgstr ""
 
-#: cscommon.cxx:350
+#: cscommon.cxx:362
 #, c-format
 msgid ""
 "There is no machine owner key (MOK) in common with this system.\n"
@@ -839,17 +859,17 @@ msgid ""
 "\t# sudo mokutil --import %s/moks/%s/signing_key.x509"
 msgstr ""
 
-#: cscommon.cxx:370
+#: cscommon.cxx:382
 #, c-format
 msgid "Could not open server MOK fingerprint directory %s: %s"
 msgstr ""
 
-#: cscommon.cxx:383
+#: cscommon.cxx:395
 #, c-format
 msgid "Could not find server MOK files in directory %s"
 msgstr ""
 
-#: cscommon.cxx:398
+#: cscommon.cxx:410
 #, c-format
 msgid ""
 "Server MOK directory name '%s' doesn't match fingerprint from certificate %s"
@@ -865,562 +885,567 @@ msgstr ""
 msgid "libdw failure (%s): "
 msgstr ""
 
-#: dwflpp.cxx:140
+#: dwflpp.cxx:150
 msgid "cannot find "
 msgstr ""
 
-#: dwflpp.cxx:250
+#: dwflpp.cxx:260
 #, c-format
 msgid "pattern '%s' matches module '%s'\n"
 msgstr ""
 
-#: dwflpp.cxx:253
+#: dwflpp.cxx:263
 #, c-format
 msgid "pattern '%s' does not match module '%s'\n"
 msgstr ""
 
-#: dwflpp.cxx:284
+#: dwflpp.cxx:294
 #, c-format
 msgid "pattern '%s' matches function '%s'\n"
 msgstr ""
 
-#: dwflpp.cxx:339 dwflpp.cxx:377
+#: dwflpp.cxx:349 dwflpp.cxx:387
 #, c-format
 msgid "missing %s kernel/module debuginfo [man warning::debuginfo] under '%s'"
 msgstr ""
 
-#: dwflpp.cxx:395
+#: dwflpp.cxx:405
 #, c-format
 msgid "missing process %s %s debuginfo"
 msgstr ""
 
-#: dwflpp.cxx:502 dwflpp.cxx:4067
+#: dwflpp.cxx:512 dwflpp.cxx:4136
 msgid "Getting symbols"
 msgstr ""
 
-#: dwflpp.cxx:724
+#: dwflpp.cxx:734
 #, c-format
 msgid "die parent cache %s:%s size %zu"
 msgstr ""
 
-#: dwflpp.cxx:984
+#: dwflpp.cxx:994
 #, c-format
 msgid "global alias cache %s:%s size %zu"
 msgstr ""
 
-#: dwflpp.cxx:1050
+#: dwflpp.cxx:1060
 #, c-format
 msgid "function cache %s:%s size %zu"
 msgstr ""
 
-#: dwflpp.cxx:1062
+#: dwflpp.cxx:1072
 #, c-format
 msgid "function cache %s:%s hit %s"
 msgstr ""
 
-#: dwflpp.cxx:1084 dwflpp.cxx:1102
+#: dwflpp.cxx:1094 dwflpp.cxx:1112
 #, c-format
 msgid "function cache %s:%s match %s vs %s"
 msgstr ""
 
-#: dwflpp.cxx:1136
+#: dwflpp.cxx:1146
 #, c-format
 msgid "module function cache %s size %zu"
 msgstr ""
 
-#: dwflpp.cxx:1149
+#: dwflpp.cxx:1159
 #, c-format
 msgid "module function cache %s hit %s"
 msgstr ""
 
-#: dwflpp.cxx:1358
+#: dwflpp.cxx:1368
 #, c-format
 msgid "module %s --ldd skipped: unsupported interpreter: %s"
 msgstr ""
 
-#: dwflpp.cxx:1375
+#: dwflpp.cxx:1385
 #, c-format
 msgid "library iteration on %s failed: %s"
 msgstr ""
 
-#: dwflpp.cxx:1404
+#: dwflpp.cxx:1414
 #, c-format
 msgid "Added -d '%s"
 msgstr ""
 
-#: dwflpp.cxx:1406
+#: dwflpp.cxx:1416
 #, c-format
 msgid "' due to '%s'"
 msgstr ""
 
-#: dwflpp.cxx:1635
+#: dwflpp.cxx:1645
 #, c-format
 msgid "found the following lines for %s:"
 msgstr ""
 
-#: dwflpp.cxx:1839
+#: dwflpp.cxx:1849
 #, c-format
 msgid "no line records for %s:%d [man error::dwarf]"
 msgstr ""
 
 #. TRANSLATORS: Here we are trying to advise what source file
 #. TRANSLATORS: to attempt.
-#: dwflpp.cxx:1845
+#: dwflpp.cxx:1855
 msgid " (try "
 msgstr ""
 
-#: dwflpp.cxx:1849
+#: dwflpp.cxx:1859
 msgid " or "
 msgstr ""
 
-#: dwflpp.cxx:2054
+#: dwflpp.cxx:2064
 #, c-format
 msgid ""
 "label '%s' at address %s (dieoffset: %s) is not contained by its scope "
 "'%s' (dieoffset: %s) -- bad debuginfo? [man error::dwarf]"
 msgstr ""
 
-#: dwflpp.cxx:2268
+#: dwflpp.cxx:2278
 #, c-format
 msgid ""
 "Callee \"%s\" in function \"%s\" is a tail call: .callee probe may not fire. "
 "Try placing the probe directly on the callee function instead."
 msgstr ""
 
-#: dwflpp.cxx:2341
+#: dwflpp.cxx:2351
 #, c-format
 msgid "selected source file '%s'\n"
 msgstr ""
 
-#: dwflpp.cxx:2378
+#: dwflpp.cxx:2388
 #, c-format
 msgid "aborting prologue search: no source lines found for cu '%s'\n"
 msgstr ""
 
-#: dwflpp.cxx:2392
+#: dwflpp.cxx:2402
 msgid "lines from dwarf_getsrclines() not sorted"
-msgstr ""
-
-#: dwflpp.cxx:2431
-#, c-format
-msgid "missing entrypc dwarf line record for function '%s'\n"
 msgstr ""
 
 #: dwflpp.cxx:2441
 #, c-format
+msgid "missing entrypc dwarf line record for function '%s'\n"
+msgstr ""
+
+#: dwflpp.cxx:2451
+#, c-format
 msgid "null entrypc dwarf line record for function '%s'\n"
 msgstr ""
 
-#: dwflpp.cxx:2449
+#: dwflpp.cxx:2459
 #, c-format
 msgid "searching for prologue of function '%s' %#<PRIx64>@%s:%d\n"
 msgstr ""
 
-#: dwflpp.cxx:2479
+#: dwflpp.cxx:2489
 #, c-format
 msgid "checking line record %#<PRIx64>@%s:%d%s\n"
 msgstr ""
 
-#: dwflpp.cxx:2520
+#: dwflpp.cxx:2530
 #, c-format
 msgid "prologue found function '%s'"
 msgstr ""
 
-#: dwflpp.cxx:2524
+#: dwflpp.cxx:2534
 msgid " (naked)"
 msgstr ""
 
-#: dwflpp.cxx:2528
+#: dwflpp.cxx:2538
 msgid " (tail-call?)"
 msgstr ""
 
-#: dwflpp.cxx:2531
+#: dwflpp.cxx:2541
 msgid " (marked)"
 msgstr ""
 
-#: dwflpp.cxx:2604
+#: dwflpp.cxx:2614
 #, c-format
 msgid ", ignored %s more"
 msgstr ""
 
-#: dwflpp.cxx:2613
+#: dwflpp.cxx:2623
 msgid " (skip comdat)"
 msgstr ""
 
-#: dwflpp.cxx:2618
+#: dwflpp.cxx:2628
 #, c-format
 msgid "entry-pc lookup (%s dieoffset: %s) = %#<PRIx64> (rc %d)"
 msgstr ""
 
-#: dwflpp.cxx:2844 dwflpp.cxx:2856
+#: dwflpp.cxx:2854 dwflpp.cxx:2866
 msgid "in"
 msgstr ""
 
-#: dwflpp.cxx:2848 dwflpp.cxx:2860
+#: dwflpp.cxx:2858 dwflpp.cxx:2870
 msgid "<no alternatives>"
 msgstr ""
 
-#: dwflpp.cxx:2849 dwflpp.cxx:2861
+#: dwflpp.cxx:2859 dwflpp.cxx:2871
 msgid "alternatives: "
 msgstr ""
 
-#: dwflpp.cxx:2839
+#: dwflpp.cxx:2849
 #, c-format
 msgid ""
 "unable to find local '%s', [man error::dwarf] dieoffset %s in %s, near pc %s "
 "%s %s %s (%s)"
 msgstr ""
 
-#: dwflpp.cxx:2852
+#: dwflpp.cxx:2862
 #, c-format
 msgid ""
 "unable to find global '%s', [man error::dwarf] dieoffset %s in %s, %s %s %s "
 "(%s)"
 msgstr ""
 
-#: dwflpp.cxx:2932 dwflpp.cxx:4208
+#: dwflpp.cxx:2942 dwflpp.cxx:4277
 #, c-format
 msgid "unable to get die scopes for '%s' in an inlined subroutine"
 msgstr ""
 
-#: dwflpp.cxx:2966
+#: dwflpp.cxx:2976
 msgid "alternative locations: "
 msgstr ""
 
-#: dwflpp.cxx:2984
+#: dwflpp.cxx:2994
 msgid "<no alternative locations>"
 msgstr ""
 
-#: dwflpp.cxx:2986
+#: dwflpp.cxx:2996
 #, c-format
 msgid "<error getting alternative locations: %s>"
 msgstr ""
 
-#: dwflpp.cxx:3018
+#: dwflpp.cxx:3028
 msgid "<unknown"
 msgstr ""
 
-#: dwflpp.cxx:3094
+#: dwflpp.cxx:3104
 msgid "unknown source"
 msgstr ""
 
-#: dwflpp.cxx:3107
+#: dwflpp.cxx:3117
 msgid "dieoffset: "
 msgstr ""
 
-#: dwflpp.cxx:3112
+#: dwflpp.cxx:3122
 msgid " from "
 msgstr ""
 
-#: dwflpp.cxx:3117
+#: dwflpp.cxx:3127
 msgid "unknown debug file for "
 msgstr ""
 
-#: dwflpp.cxx:3137
+#: dwflpp.cxx:3147
 msgid "function: "
 msgstr ""
 
-#: dwflpp.cxx:3163
+#: dwflpp.cxx:3173
 msgid "<unknown> at "
 msgstr ""
 
-#: dwflpp.cxx:3173 dwflpp.cxx:3190 dwflpp.cxx:3203
+#: dwflpp.cxx:3183 dwflpp.cxx:3200 dwflpp.cxx:3213
 msgid " at "
 msgstr ""
 
-#: dwflpp.cxx:3188
+#: dwflpp.cxx:3198
 msgid " inlined by "
 msgstr ""
 
-#: dwflpp.cxx:3254
+#: dwflpp.cxx:3264
 #, c-format
 msgid "not accessible at this address (pc: %s) [man error::dwarf]"
 msgstr ""
 
-#: dwflpp.cxx:3265
+#: dwflpp.cxx:3275
 #, c-format
 msgid ""
 "dwarf_getlocation_addr failed at this address (pc: %s) [man error::dwarf]"
 msgstr ""
 
-#: dwflpp.cxx:3267
+#: dwflpp.cxx:3277
 #, c-format
 msgid "dwarf_error: %s"
 msgstr ""
 
-#: dwflpp.cxx:3320
+#: dwflpp.cxx:3330
 #, c-format
 msgid "Type %s isn't a struct/class/union"
 msgstr ""
 
-#: dwflpp.cxx:3330
+#: dwflpp.cxx:3340
 #, c-format
 msgid "Type %s is empty"
 msgstr ""
 
-#: dwflpp.cxx:3334
+#: dwflpp.cxx:3344
 #, c-format
 msgid "Type %s: %s"
 msgstr ""
 
-#: dwflpp.cxx:3370
+#: dwflpp.cxx:3380
 #, c-format
 msgid "Couldn't obtain type attribute for anonymous member at %s:%d"
 msgstr ""
 
-#: dwflpp.cxx:3481
-#, c-format
-msgid "no location for field '%s':%s"
-msgstr ""
-
-#: dwflpp.cxx:3492
-#, c-format
-msgid "cannot get type of field: %s"
-msgstr ""
-
-#: dwflpp.cxx:3529
-#, c-format
-msgid "invalid access '%s' vs '%s'"
-msgstr ""
-
-#: dwflpp.cxx:3557
-#, c-format
-msgid "invalid access '%s' for array type"
-msgstr ""
-
-#: dwflpp.cxx:3569
-#, c-format
-msgid "invalid access '%s' for %s"
-msgstr ""
-
-#: dwflpp.cxx:3576
-#, c-format
-msgid "unresolved %s"
-msgstr ""
-
-#: dwflpp.cxx:3601
-#, c-format
-msgid "unable to find member '%s' for %s%s%s"
-msgstr ""
-
-#: dwflpp.cxx:3632
-#, c-format
-msgid "invalid access '%s' vs. %s"
-msgstr ""
-
-#: dwflpp.cxx:3637
-#, c-format
-msgid "cannot find type: %s"
-msgstr ""
-
-#: dwflpp.cxx:3641
-#, c-format
-msgid "%s: unexpected type tag %s"
-msgstr ""
-
-#: dwflpp.cxx:3662
-#, c-format
-msgid "cannot get type of pointee: %s"
-msgstr ""
-
-#: dwflpp.cxx:3676
+#: dwflpp.cxx:3497 dwflpp.cxx:3725 dwflpp.cxx:3737
 #, c-format
 msgid "cannot get bit field parameters: %s"
 msgstr ""
 
-#: dwflpp.cxx:3718
-msgid "cannot handle offset into register"
+#: dwflpp.cxx:3502
+#, c-format
+msgid "member_location=%<PRIu64>, bit_offset=%<PRIu64>, byte_size=%<PRIu64>\n"
 msgstr ""
 
-#: dwflpp.cxx:3725
-msgid "requested size larger than constant"
+#: dwflpp.cxx:3528
+#, c-format
+msgid "no location for field '%s':%s"
 msgstr ""
 
-#: dwflpp.cxx:3754
-msgid "unhandled constant size"
+#: dwflpp.cxx:3539
+#, c-format
+msgid "cannot get type of field: %s"
 msgstr ""
 
-#: dwflpp.cxx:3770
-msgid "noncontiguous location for base fetch"
+#: dwflpp.cxx:3576
+#, c-format
+msgid "invalid access '%s' vs '%s'"
 msgstr ""
 
-#: dwflpp.cxx:3775
-msgid "cannot handle offset into implicit pointer"
+#: dwflpp.cxx:3604
+#, c-format
+msgid "invalid access '%s' for array type"
 msgstr ""
 
-#: dwflpp.cxx:3783
-msgid "pointer optimized out"
+#: dwflpp.cxx:3616
+#, c-format
+msgid "invalid access '%s' for %s"
+msgstr ""
+
+#: dwflpp.cxx:3623
+#, c-format
+msgid "unresolved %s"
+msgstr ""
+
+#: dwflpp.cxx:3648
+#, c-format
+msgid "unable to find member '%s' for %s%s%s"
+msgstr ""
+
+#: dwflpp.cxx:3679
+#, c-format
+msgid "invalid access '%s' vs. %s"
+msgstr ""
+
+#: dwflpp.cxx:3684
+#, c-format
+msgid "cannot find type: %s"
+msgstr ""
+
+#: dwflpp.cxx:3688
+#, c-format
+msgid "%s: unexpected type tag %s"
+msgstr ""
+
+#: dwflpp.cxx:3709
+#, c-format
+msgid "cannot get type of pointee: %s"
 msgstr ""
 
 #: dwflpp.cxx:3786
+msgid "cannot handle offset into register"
+msgstr ""
+
+#: dwflpp.cxx:3793
+msgid "requested size larger than constant"
+msgstr ""
+
+#: dwflpp.cxx:3822
+msgid "unhandled constant size"
+msgstr ""
+
+#: dwflpp.cxx:3838
+msgid "noncontiguous location for base fetch"
+msgstr ""
+
+#: dwflpp.cxx:3843
+msgid "cannot handle offset into implicit pointer"
+msgstr ""
+
+#: dwflpp.cxx:3851
+msgid "pointer optimized out"
+msgstr ""
+
+#: dwflpp.cxx:3854
 msgid "location not available"
 msgstr ""
 
-#: dwflpp.cxx:3871
+#: dwflpp.cxx:3939
 msgid "cannot write to member address"
 msgstr ""
 
-#: dwflpp.cxx:3875
+#: dwflpp.cxx:3943
 msgid "cannot take the address of a bit field"
 msgstr ""
 
-#: dwflpp.cxx:3884
+#: dwflpp.cxx:3952
 msgid "cannot take address of object in register"
 msgstr ""
 
-#: dwflpp.cxx:3888
+#: dwflpp.cxx:3956
 msgid "cannot take address of noncontiguous object"
 msgstr ""
 
-#: dwflpp.cxx:3892
+#: dwflpp.cxx:3960
 msgid "cannot take address of computed value"
 msgstr ""
 
-#: dwflpp.cxx:3896
+#: dwflpp.cxx:3964
 msgid "cannot take address of constant value"
 msgstr ""
 
-#: dwflpp.cxx:3900
+#: dwflpp.cxx:3968
 msgid "cannot take address of unavailable value"
 msgstr ""
 
-#: dwflpp.cxx:3904
+#: dwflpp.cxx:3972
 msgid "cannot take address of implicit pointer"
 msgstr ""
 
-#: dwflpp.cxx:3921
+#: dwflpp.cxx:3989
 #, c-format
 msgid "unsupported type tag %s for %s"
 msgstr ""
 
-#: dwflpp.cxx:3953
+#: dwflpp.cxx:4021
 #, c-format
 msgid "'%s'%s is being accessed instead of a member%s"
 msgstr ""
 
-#: dwflpp.cxx:3978
+#: dwflpp.cxx:4046
 #, c-format
 msgid "unsupported type (mystery encoding %s for %s"
 msgstr ""
 
-#: dwflpp.cxx:3993 tapsets.cxx:3938
+#: dwflpp.cxx:4061 tapsets.cxx:3948
 #, c-format
 msgid "cannot get byte_size attribute for type %s: %s"
 msgstr ""
 
-#: dwflpp.cxx:4018
+#: dwflpp.cxx:4087
 msgid "cannot write to array address"
 msgstr ""
 
-#: dwflpp.cxx:4021
+#: dwflpp.cxx:4090
 msgid "cannot write to reference"
 msgstr ""
 
-#: dwflpp.cxx:4044
+#: dwflpp.cxx:4113
 #, c-format
 msgid "cannot get size for type %s: %s"
 msgstr ""
 
-#: dwflpp.cxx:4063
+#: dwflpp.cxx:4132
 #, c-format
 msgid "finding symtable address for %s\n"
 msgstr ""
 
-#: dwflpp.cxx:4088
+#: dwflpp.cxx:4157
 #, c-format
 msgid "found %s @%#<PRIx64>\n"
 msgstr ""
 
-#: dwflpp.cxx:4116
+#: dwflpp.cxx:4185
 #, c-format
 msgid ""
 "finding location for local '%s' near address %#<PRIx64>, module bias "
 "%#<PRIx64>\n"
 msgstr ""
 
-#: dwflpp.cxx:4120
+#: dwflpp.cxx:4189
 #, c-format
 msgid "finding location for global '%s' in CU '%s'\n"
 msgstr ""
 
-#: dwflpp.cxx:4144
+#: dwflpp.cxx:4213
 #, c-format
 msgid "failed to retrieve location attribute for '%s' [man error::dwarf]"
 msgstr ""
 
-#: dwflpp.cxx:4159 dwflpp.cxx:4235
+#: dwflpp.cxx:4228 dwflpp.cxx:4304
 #, c-format
 msgid "failed to retrieve type attribute for '%s' [man error::dwarf]"
 msgstr ""
 
-#: dwflpp.cxx:4253
+#: dwflpp.cxx:4322
 #, c-format
 msgid "literal_stmt_for_return: finding return value for %s (%s)\n"
 msgstr ""
 
-#: dwflpp.cxx:4261
+#: dwflpp.cxx:4330
 #, c-format
 msgid "failed to retrieve return value location for %s [man error::dwarf] (%s)"
 msgstr ""
 
-#: dwflpp.cxx:4266
+#: dwflpp.cxx:4335
 #, c-format
 msgid "function %s (%s) has no return value"
 msgstr ""
 
-#: dwflpp.cxx:4276 dwflpp.cxx:4300
+#: dwflpp.cxx:4345 dwflpp.cxx:4369
 #, c-format
 msgid ""
 "failed to retrieve return value type attribute for %s [man error::dwarf] (%s)"
 msgstr ""
 
-#: dwflpp.cxx:4317
+#: dwflpp.cxx:4386
 #, c-format
 msgid "literal_stmt_for_pointer: finding value for %s (%s)\n"
 msgstr ""
 
-#: dwflpp.cxx:4446
+#: dwflpp.cxx:4515
 msgid " - blocklisted"
 msgstr ""
 
-#: dwflpp.cxx:4451
+#: dwflpp.cxx:4520
 msgid " but not skipped (guru mode enabled)"
 msgstr ""
 
-#: dwflpp.cxx:4615 dwflpp.cxx:4664
+#: dwflpp.cxx:4684 dwflpp.cxx:4733
 msgid "blocklist regexps:"
 msgstr ""
 
-#: dwflpp.cxx:4623 dwflpp.cxx:4672
+#: dwflpp.cxx:4692 dwflpp.cxx:4741
 msgid "blocklist_func regcomp failed"
 msgstr ""
 
-#: dwflpp.cxx:4625 dwflpp.cxx:4674
+#: dwflpp.cxx:4694 dwflpp.cxx:4743
 msgid "blocklist_func_ret regcomp failed"
 msgstr ""
 
-#: dwflpp.cxx:4627 dwflpp.cxx:4676
+#: dwflpp.cxx:4696 dwflpp.cxx:4745
 msgid "blocklist_file regcomp failed"
 msgstr ""
 
-#: dwflpp.cxx:4629 dwflpp.cxx:4678
+#: dwflpp.cxx:4698 dwflpp.cxx:4747
 msgid "blocklist_section regcomp failed"
 msgstr ""
 
-#: dwflpp.cxx:4863
+#: dwflpp.cxx:4932
 msgid "not found cfa"
 msgstr ""
 
-#: dwflpp.cxx:4870
+#: dwflpp.cxx:4939
 #, c-format
 msgid "found cfa, info: %d [start: %#<PRIx64>, end: %#<PRIx64>, nops: %zu"
 msgstr ""
 
-#: dwflpp.cxx:4991
+#: dwflpp.cxx:5060
 msgid "retrying variable location-list lookup at address pc+5\n"
 msgstr ""
 
-#: dwflpp.cxx:5107
+#: dwflpp.cxx:5176
 #, c-format
 msgid "CU '%s' in module '%s' has valid locs"
 msgstr ""
@@ -2045,7 +2070,7 @@ msgstr ""
 msgid "Turning on DFA subexpressions because /* pragma:tagged_dfa */ seen"
 msgstr ""
 
-#: elaborate.cxx:7185 translate.cxx:4812
+#: elaborate.cxx:7185 translate.cxx:4813
 msgid "invalid operand of delete expression"
 msgstr ""
 
@@ -2469,7 +2494,7 @@ msgstr ""
 msgid "Build tree: \"%s\""
 msgstr ""
 
-#: main.cxx:1612
+#: main.cxx:1617
 msgid "ERROR: caught unknown exception!"
 msgstr ""
 
@@ -4501,12 +4526,12 @@ msgid ""
 "compile-server."
 msgstr ""
 
-#: session.h:507
+#: session.h:510
 #, c-format
 msgid "early exit requested, rc=%d"
 msgstr ""
 
-#: session.h:519
+#: session.h:522
 msgid "interrupt received"
 msgstr ""
 
@@ -4841,8 +4866,8 @@ msgid ""
 "                'never', or 'always'. Set to 'auto' by default.\n"
 "-M INTERVAL     Enable monitor mode.\n"
 "-d              Delete a module.  Only detached or unused modules\n"
-"                the user has permission to access will be deleted. Use \"*"
-"\"\n"
+"                the user has permission to access will be deleted. Use "
+"\"*\"\n"
 "                (quoted) to delete all unused modules.\n"
 "-R              Have staprun create a new name for the module before\n"
 "                inserting it. This allows the same module to be inserted\n"
@@ -5689,8 +5714,8 @@ msgstr ""
 
 #: tapset-itrace.cxx:326 tapset-itrace.cxx:341 tapset-mark.cxx:575
 #: tapset-netfilter.cxx:432 tapset-python.cxx:236 tapset-python.cxx:244
-#: tapsets.cxx:10992 tapset-timers.cxx:580 tapset-utrace.cxx:1320
-#: tapset-utrace.cxx:1334
+#: tapsets.cxx:11010 tapset-timers.cxx:580 tapset-utrace.cxx:1323
+#: tapset-utrace.cxx:1337
 #, c-format
 msgid "%s will be ignored by bpf backend"
 msgstr ""
@@ -5718,7 +5743,7 @@ msgid ""
 "expected"
 msgstr ""
 
-#: tapset-mark.cxx:452 translate.cxx:3367
+#: tapset-mark.cxx:452 translate.cxx:3364
 msgid "cannot expand unknown type"
 msgstr ""
 
@@ -5731,7 +5756,7 @@ msgstr ""
 msgid " cannot be opened: "
 msgstr ""
 
-#: tapset-mark.cxx:755 tapsets.cxx:8809 tapsets.cxx:8984
+#: tapset-mark.cxx:755 tapsets.cxx:8827 tapsets.cxx:9002
 #, c-format
 msgid "no match (similar mark: %s)"
 msgid_plural "no match (similar marks: %s)"
@@ -5841,7 +5866,7 @@ msgstr ""
 msgid "duplicate counter name"
 msgstr ""
 
-#: tapset-perfmon.cxx:362 tapsets.cxx:8655
+#: tapset-perfmon.cxx:362 tapsets.cxx:8673
 msgid "invalid -c command for unspecified process probe [man stapprobes]"
 msgstr ""
 
@@ -5962,7 +5987,7 @@ msgstr ""
 msgid "can't create python call mark probe"
 msgstr ""
 
-#: tapsets.cxx:759 tapsets.cxx:8825
+#: tapsets.cxx:759 tapsets.cxx:8843
 #, c-format
 msgid "cannot find executable '%s'"
 msgstr ""
@@ -5971,176 +5996,176 @@ msgstr ""
 msgid ".callees(N) only acceptable for N >= 1"
 msgstr ""
 
-#: tapsets.cxx:1349
+#: tapsets.cxx:1358
 #, c-format
 msgid "parse '%s'"
 msgstr ""
 
-#: tapsets.cxx:1405
+#: tapsets.cxx:1414
 #, c-format
 msgid "malformed specification '%s'"
 msgstr ""
 
-#: tapsets.cxx:1442 tapsets.cxx:9154
+#: tapsets.cxx:1451 tapsets.cxx:9172
 msgid "Couldn't get elf header"
 msgstr ""
 
-#: tapsets.cxx:1499
+#: tapsets.cxx:1508
 msgid "probe "
 msgstr ""
 
-#: tapsets.cxx:1501
+#: tapsets.cxx:1510
 msgid " kernel"
 msgstr ""
 
-#: tapsets.cxx:1503
+#: tapsets.cxx:1512
 msgid " module="
 msgstr ""
 
-#: tapsets.cxx:1505
+#: tapsets.cxx:1514
 msgid " process="
 msgstr ""
 
-#: tapsets.cxx:1549
+#: tapsets.cxx:1558
 #, c-format
 msgid "can't retrieve symbol table for function %s"
 msgstr ""
 
-#: tapsets.cxx:1579
+#: tapsets.cxx:1588
 #, c-format
 msgid "function %s is in blocklisted section"
 msgstr ""
 
-#: tapsets.cxx:1583
+#: tapsets.cxx:1592
 #, c-format
 msgid "kprobes function %s is blocklisted"
 msgstr ""
 
-#: tapsets.cxx:1587
+#: tapsets.cxx:1596
 #, c-format
 msgid "function %s return probe is blocklisted"
 msgstr ""
 
-#: tapsets.cxx:1591
+#: tapsets.cxx:1600
 #, c-format
 msgid "function %s is in blocklisted file"
 msgstr ""
 
-#: tapsets.cxx:1596
+#: tapsets.cxx:1605
 #, c-format
 msgid "function %s is blocklisted"
 msgstr ""
 
-#: tapsets.cxx:1899
+#: tapsets.cxx:1908
 #, c-format
 msgid "address %#<PRIx64> does not match the beginning of a statement"
 msgstr ""
 
-#: tapsets.cxx:1902
+#: tapsets.cxx:1911
 #, c-format
 msgid " (try %#<PRIx64>)"
 msgstr ""
 
-#: tapsets.cxx:1904
+#: tapsets.cxx:1913
 #, c-format
 msgid " (no line info found for '%s', in module '%s')"
 msgstr ""
 
-#: tapsets.cxx:2031
+#: tapsets.cxx:2040
 #, c-format
 msgid "querying entrypc %#<PRIx64> of instance of inline '%s'\n"
 msgstr ""
 
-#: tapsets.cxx:2102
+#: tapsets.cxx:2111
 #, c-format
 msgid "checking DIE (dieoffset: %#<PRIx64>) against scope address %#<PRIx64>\n"
 msgstr ""
 
-#: tapsets.cxx:2110
+#: tapsets.cxx:2119
 msgid "filtered DIE lands on srcfile\n"
 msgstr ""
 
-#: tapsets.cxx:2172
+#: tapsets.cxx:2181
 #, c-format
 msgid "selected inline instance of %s\n"
 msgstr ""
 
-#: tapsets.cxx:2195
+#: tapsets.cxx:2204
 #, c-format
 msgid "added to filtered_inlines (dieoffset: %#<PRIx64>)\n"
 msgstr ""
 
-#: tapsets.cxx:2220
+#: tapsets.cxx:2229
 #, c-format
 msgid "querying dwarf func in file %s count %zu (func dieoffset: %#<PRIx64>)\n"
 msgstr ""
 
-#: tapsets.cxx:2248
+#: tapsets.cxx:2257
 #, c-format
 msgid "checking instances of inline %s\n"
 msgstr ""
 
-#: tapsets.cxx:2260
+#: tapsets.cxx:2269
 #, c-format
 msgid "selected function %s\n"
 msgstr ""
 
-#: tapsets.cxx:2293
+#: tapsets.cxx:2302
 #, c-format
 msgid "%s = dwfl_module_addrinfo(entrypc=%p + %p)\n"
 msgstr ""
 
-#: tapsets.cxx:2298
+#: tapsets.cxx:2307
 #, c-format
 msgid "skipping partially-inlined instance %s at %p\n"
 msgstr ""
 
-#: tapsets.cxx:2304
+#: tapsets.cxx:2313
 #, c-format
 msgid "added to filtered_functions (dieoffset: %#<PRIx64>)\n"
 msgstr ""
 
-#: tapsets.cxx:2332
+#: tapsets.cxx:2341
 #, c-format
 msgid "focused on CU '%s', in module '%s'\n"
 msgstr ""
 
-#: tapsets.cxx:2424
+#: tapsets.cxx:2433
 msgid ""
 "For probing a particular line, use a .statement() probe, not .function()"
 msgstr ""
 
-#: tapsets.cxx:2556
+#: tapsets.cxx:2565
 #, c-format
 msgid "ELF machine %s|%s (code %d) mismatch with target %s in '%s'"
 msgstr ""
 
-#: tapsets.cxx:2563
+#: tapsets.cxx:2572
 #, c-format
 msgid ""
 "focused on module '%s' = [%#<PRIx64>-%#<PRIx64>, bias %#<PRIx64> file %s ELF "
 "machine %s|%s (code %d)\n"
 msgstr ""
 
-#: tapsets.cxx:2644
+#: tapsets.cxx:2653
 #, c-format
 msgid "focused on module '%s'\n"
 msgstr ""
 
-#: tapsets.cxx:2747
+#: tapsets.cxx:2756
 msgid "module="
 msgstr ""
 
-#: tapsets.cxx:2799
+#: tapsets.cxx:2808
 #, c-format
 msgid "plt entry=%s\n"
 msgstr ""
 
-#: tapsets.cxx:2855
+#: tapsets.cxx:2864
 msgid "deleting module_cache"
 msgstr ""
 
-#: tapsets.cxx:2977
+#: tapsets.cxx:2986
 #, c-format
 msgid ""
 "Only the following assign operator is implemented on target variables: %s"
@@ -6149,525 +6174,525 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: tapsets.cxx:3091
+#: tapsets.cxx:3100
 msgid "Resolving "
 msgstr ""
 
-#: tapsets.cxx:3152
+#: tapsets.cxx:3161
 msgid "need a clone of context-op function "
 msgstr ""
 
-#: tapsets.cxx:3163
+#: tapsets.cxx:3172
 msgid "reusing previous clone"
 msgstr ""
 
-#: tapsets.cxx:3202
+#: tapsets.cxx:3211
 msgid "clone: "
 msgstr ""
 
-#: tapsets.cxx:3314
+#: tapsets.cxx:3323
 msgid "cannot take address of pretty-printed variable"
 msgstr ""
 
-#: tapsets.cxx:3318
+#: tapsets.cxx:3327
 msgid "invalid target_symbol for pretty-print"
 msgstr ""
 
-#: tapsets.cxx:3921
+#: tapsets.cxx:3931
 msgid "no usable location for symbol [error::dwarf]"
 msgstr ""
 
-#: tapsets.cxx:4456
+#: tapsets.cxx:4466
 msgid "unknown type to save in kretprobe"
 msgstr ""
 
-#: tapsets.cxx:4605 tapsets.cxx:11307
+#: tapsets.cxx:4615 tapsets.cxx:11325
 msgid "variable location problem [man error::dwarf]: "
 msgstr ""
 
-#: tapsets.cxx:4658
+#: tapsets.cxx:4668
 msgid "write to target variable not permitted; need stap -g"
 msgstr ""
 
-#: tapsets.cxx:4671
+#: tapsets.cxx:4681
 msgid "write to target variable not permitted in .return probes"
 msgstr ""
 
-#: tapsets.cxx:4675
+#: tapsets.cxx:4685
 #, c-format
 msgid ""
 "confusing usage, value is captured as @entry(%s) in .return probe [man "
 "stapprobes] RETURN PROBES"
 msgstr ""
 
-#: tapsets.cxx:4684
+#: tapsets.cxx:4694
 msgid "cannot write to context variable"
 msgstr ""
 
-#: tapsets.cxx:4687 tapsets.cxx:6940 tapsets.cxx:11261
+#: tapsets.cxx:4697 tapsets.cxx:6958 tapsets.cxx:11279
 msgid "cannot take address of context variable"
 msgstr ""
 
-#: tapsets.cxx:4698
+#: tapsets.cxx:4708
 #, c-format
 msgid ""
 "debuginfo scope not found for module '%s', cannot resolve context variable "
 "[man error::dwarf]"
 msgstr ""
 
-#: tapsets.cxx:4736
+#: tapsets.cxx:4746
 #, c-format
 msgid "write at %p will have no effect"
 msgstr ""
 
-#: tapsets.cxx:4868
+#: tapsets.cxx:4886
 #, c-format
 msgid "perf counter '%s' not defined"
 msgstr ""
 
 #. TRANSLATORS: Here we're using a cached module.
-#: tapsets.cxx:5042
+#: tapsets.cxx:5060
 msgid "Pass 2: using cached "
 msgstr ""
 
-#: tapsets.cxx:5066
+#: tapsets.cxx:5084
 msgid "write to @cast context variable not permitted; need stap -g"
 msgstr ""
 
-#: tapsets.cxx:5157
+#: tapsets.cxx:5175
 msgid "write not permitted; need stap -g"
 msgstr ""
 
-#: tapsets.cxx:5162 tapsets.cxx:11196
+#: tapsets.cxx:5180 tapsets.cxx:11214
 msgid "cannot take address of tracepoint variable"
 msgstr ""
 
-#: tapsets.cxx:5165
+#: tapsets.cxx:5183
 msgid "internal error: no-op autocast encountered"
 msgstr ""
 
-#: tapsets.cxx:5319
+#: tapsets.cxx:5337
 msgid "write to @var variable not permitted; need stap -g"
 msgstr ""
 
-#: tapsets.cxx:5378
+#: tapsets.cxx:5396
 msgid ", in "
 msgstr ""
 
-#: tapsets.cxx:5376
+#: tapsets.cxx:5394
 #, c-format
 msgid "unable to find global '%s' in %s%s%s"
 msgstr ""
 
-#: tapsets.cxx:5479
+#: tapsets.cxx:5497
 msgid ""
 "process probes not available without kernel CONFIG_UTRACE or "
 "CONFIG_TRACEPOINTS/CONFIG_ARCH_SUPPORTS_UPROBES/CONFIG_UPROBES"
 msgstr ""
 
-#: tapsets.cxx:5546
+#: tapsets.cxx:5564
 msgid "missing relocation basis"
 msgstr ""
 
-#: tapsets.cxx:5548
+#: tapsets.cxx:5566
 msgid "inconsistent relocation address"
 msgstr ""
 
-#: tapsets.cxx:5558
+#: tapsets.cxx:5576
 #, c-format
 msgid "maxactive value out of range [0,%s]"
 msgstr ""
 
-#: tapsets.cxx:5576
+#: tapsets.cxx:5594
 #, c-format
 msgid ""
 "expanding .return vars at prologue_end (0x%s) rather than entrypc (0x%s)\n"
 msgstr ""
 
-#: tapsets.cxx:5748
+#: tapsets.cxx:5766
 #, c-format
 msgid "adding caller checks for callee %s\n"
 msgstr ""
 
-#: tapsets.cxx:5771
+#: tapsets.cxx:5789
 #, c-format
 msgid "adding caller check [u]stack(%d) == reloc(0x%s)\n"
 msgstr ""
 
-#: tapsets.cxx:5825
+#: tapsets.cxx:5843
 #, c-format
 msgid "saveargs: examining '%s' (dieoffset: %#<PRIx64>)\n"
 msgstr ""
 
-#: tapsets.cxx:5837
+#: tapsets.cxx:5855
 #, c-format
 msgid ""
 "saveargs: failed to retrieve type name for return value (dieoffset: %s)\n"
 msgstr ""
 
-#: tapsets.cxx:5865
+#: tapsets.cxx:5883
 #, c-format
 msgid "saveargs: failed to retrieve name for local (dieoffset: %s)\n"
 msgstr ""
 
-#: tapsets.cxx:5871
+#: tapsets.cxx:5889
 #, c-format
 msgid "saveargs: finding location for local '%s' (dieoffset: %s)\n"
 msgstr ""
 
-#: tapsets.cxx:5893
+#: tapsets.cxx:5911
 #, c-format
 msgid ""
 "saveargs: failed to resolve the location for local '%s' (dieoffset: %s)\n"
 msgstr ""
 
-#: tapsets.cxx:5904
+#: tapsets.cxx:5922
 #, c-format
 msgid ""
 "saveargs: local '%s' (dieoffset: %s) is not available at this address (%s)\n"
 msgstr ""
 
-#: tapsets.cxx:5918
+#: tapsets.cxx:5936
 #, c-format
 msgid "saveargs: failed to retrieve type name for local '%s' (dieoffset: %s)\n"
 msgstr ""
 
-#: tapsets.cxx:7019
+#: tapsets.cxx:7037
 msgid "target-symbol requires debuginfo"
 msgstr ""
 
-#: tapsets.cxx:7234
+#: tapsets.cxx:7252
 #, c-format
 msgid "unrecognized register '%s'"
 msgstr ""
 
-#: tapsets.cxx:7331
+#: tapsets.cxx:7349
 #, c-format
 msgid "unrecognized base register '%s'"
 msgstr ""
 
-#: tapsets.cxx:7336
+#: tapsets.cxx:7354
 #, c-format
 msgid "unrecognized index register '%s'"
 msgstr ""
 
-#: tapsets.cxx:7418
+#: tapsets.cxx:7436
 msgid "can't retrieve symbol table"
 msgstr ""
 
-#: tapsets.cxx:7552
+#: tapsets.cxx:7570
 #, c-format
 msgid "Can't parse SDT_V3 operand '%s' [man error::sdt]"
 msgstr ""
 
-#: tapsets.cxx:7556
+#: tapsets.cxx:7574
 #, c-format
 msgid ""
 "Downgrading SDT_V2 probe argument to dwarf, can't parse '%s' [man error::sdt]"
 msgstr ""
 
-#: tapsets.cxx:7563
+#: tapsets.cxx:7581
 msgid "SDT asm not understood, requires debuginfo [man error::sdt]"
 msgstr ""
 
 #. TRANSLATORS: We're mapping the operand to a new expression*.
-#: tapsets.cxx:7573
+#: tapsets.cxx:7591
 #, c-format
 msgid "mapped asm operand %s to "
 msgstr ""
 
-#: tapsets.cxx:7578
+#: tapsets.cxx:7596
 msgid "cannot take address of sdt variable"
 msgstr ""
 
-#: tapsets.cxx:7668
+#: tapsets.cxx:7686
 #, c-format
 msgid "unable to find plt variable '%s' (alternatives: %s)"
 msgstr ""
 
 #. TRANSLATORS: Describing what probe type (kprobe or uprobe) the probe
 #. TRANSLATORS: is matched to.
-#: tapsets.cxx:7786
+#: tapsets.cxx:7804
 #, c-format
 msgid "matched probe_name %s probe type "
 msgstr ""
 
-#: tapsets.cxx:8053 tapsets.cxx:8112
+#: tapsets.cxx:8071 tapsets.cxx:8130
 msgid " (provider "
 msgstr ""
 
-#: tapsets.cxx:8053
+#: tapsets.cxx:8071
 #, c-format
 msgid " saw .note.stapsdt %s%s "
 msgstr ""
 
-#: tapsets.cxx:8074
+#: tapsets.cxx:8092
 #, c-format
 msgid "got unknown probe_type : 0x%x"
 msgstr ""
 
-#: tapsets.cxx:8112
+#: tapsets.cxx:8130
 msgid "saw .probes "
 msgstr ""
 
-#: tapsets.cxx:8132
+#: tapsets.cxx:8150
 #, c-format
 msgid "looking for semaphore symbol %s "
 msgstr ""
 
-#: tapsets.cxx:8153
+#: tapsets.cxx:8171
 msgid ", found at 0x"
 msgstr ""
 
-#: tapsets.cxx:8158
+#: tapsets.cxx:8176
 msgid ", not found"
 msgstr ""
 
-#: tapsets.cxx:8209
+#: tapsets.cxx:8227
 msgid "probe_type == uprobe1, use statement addr: 0x"
 msgstr ""
 
-#: tapsets.cxx:8213
+#: tapsets.cxx:8231
 msgid "probe_type == uprobe2, use statement addr: 0x"
 msgstr ""
 
-#: tapsets.cxx:8217
+#: tapsets.cxx:8235
 msgid "probe_type == uprobe3, use statement addr: 0x"
 msgstr ""
 
-#: tapsets.cxx:8221
+#: tapsets.cxx:8239
 #, c-format
 msgid "probe_type == use_uprobe_no_dwarf, use label name: _stapprobe1_%s"
 msgstr ""
 
-#: tapsets.cxx:8444
+#: tapsets.cxx:8462
 #, c-format
 msgid "glob %s error (%d)"
 msgstr ""
 
-#: tapsets.cxx:8501
+#: tapsets.cxx:8519
 #, c-format
 msgid "Expanded library(\"%s\") to library(\"%s\")"
 msgstr ""
 
-#: tapsets.cxx:8530
+#: tapsets.cxx:8548
 #, c-format
 msgid ""
 "'%s' is not a needed library of '%s'. Specify the full path to squelch this "
 "warning."
 msgstr ""
 
-#: tapsets.cxx:8539
+#: tapsets.cxx:8557
 #, c-format
 msgid "no match (similar library: %s)"
 msgid_plural "no match (similar libraries: %s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: tapsets.cxx:8652
+#: tapsets.cxx:8670
 msgid "invalid -x pid for unspecified process probe [man stapprobes]"
 msgstr ""
 
-#: tapsets.cxx:8659
+#: tapsets.cxx:8677
 msgid ""
 "unspecified process probe is invalid without a -c COMMAND or -x PID [man "
 "stapprobes]"
 msgstr ""
 
-#: tapsets.cxx:8744 tapsets.cxx:8882
+#: tapsets.cxx:8762 tapsets.cxx:8900
 #, c-format
 msgid "Expanded process(\"%s\") to process(\"%s\")"
 msgstr ""
 
-#: tapsets.cxx:8782 tapsets.cxx:8794 tapsets.cxx:9083 tapsets.cxx:9095
-#: tapsets.cxx:10628
+#: tapsets.cxx:8800 tapsets.cxx:8812 tapsets.cxx:9101 tapsets.cxx:9113
+#: tapsets.cxx:10646
 #, c-format
 msgid "no match (similar function: %s)"
 msgid_plural "no match (similar functions: %s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: tapsets.cxx:8934
+#: tapsets.cxx:8952
 msgid "process return probes not available [man error::inode-uprobes]"
 msgstr ""
 
-#: tapsets.cxx:8954
+#: tapsets.cxx:8972
 #, c-format
 msgid "dwarf_builder::build for %s"
 msgstr ""
 
-#: tapsets.cxx:9002 tapsets.cxx:10651
+#: tapsets.cxx:9020 tapsets.cxx:10669
 msgid "absolute statement probe in unprivileged script; need stap -g"
 msgstr ""
 
-#: tapsets.cxx:9045
+#: tapsets.cxx:9063
 #, c-format
 msgid "cannot probe .return of %u inlined function %s"
 msgid_plural "cannot probe .return of %u inlined functions %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: tapsets.cxx:9051
+#: tapsets.cxx:9069
 #, c-format
 msgid "skipped .return probe of %u inlined function"
 msgid_plural "skipped .return probe of %u inlined functions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: tapsets.cxx:9311
+#: tapsets.cxx:9329
 msgid "Multiple 'sys_ni_syscall' symbols found.\n"
 msgstr ""
 
-#: tapsets.cxx:9346
+#: tapsets.cxx:9364
 msgid "Error: Cannot find vmlinux."
 msgstr ""
 
-#: tapsets.cxx:9570
+#: tapsets.cxx:9588
 msgid "absolute process probes not available [man error::inode-uprobes]"
 msgstr ""
 
-#: tapsets.cxx:9632
+#: tapsets.cxx:9650
 #, c-format
 msgid "Too many simultaneous uses of perf values (%d is greater than 16)"
 msgstr ""
 
-#: tapsets.cxx:10307
+#: tapsets.cxx:10325
 msgid "binary path required for BPF runtime"
 msgstr ""
 
-#: tapsets.cxx:10310
+#: tapsets.cxx:10328
 msgid "probe not compatible with BPF runtime"
 msgstr ""
 
-#: tapsets.cxx:11023
+#: tapsets.cxx:11041
 msgid "CONFIG_PERF_EVENTS not available on this kernel"
 msgstr ""
 
-#: tapsets.cxx:11026
+#: tapsets.cxx:11044
 msgid "CONFIG_HAVE_HW_BREAKPOINT not available on this kernel"
 msgstr ""
 
-#: tapsets.cxx:11032
+#: tapsets.cxx:11050
 msgid "kernel.data probes are not supported on arm64 kernels"
 msgstr ""
 
-#: tapsets.cxx:11172
+#: tapsets.cxx:11190
 msgid " (alternatives: "
 msgstr ""
 
-#: tapsets.cxx:11170
+#: tapsets.cxx:11188
 #, c-format
 msgid "unable to find tracepoint variable '%s'%s"
 msgstr ""
 
-#: tapsets.cxx:11187
+#: tapsets.cxx:11205
 #, c-format
 msgid "write to tracepoint variable '%s' not permitted; need stap -g"
 msgstr ""
 
-#: tapsets.cxx:11264
+#: tapsets.cxx:11282
 #, c-format
 msgid "write to tracepoint '%s' not permitted"
 msgstr ""
 
-#: tapsets.cxx:11540
+#: tapsets.cxx:11558
 #, c-format
 msgid "cannot resolve size of array %s for probe %s"
 msgstr ""
 
-#: tapsets.cxx:11554
+#: tapsets.cxx:11572
 #, c-format
 msgid "array %s for probe %s has unknown size"
 msgstr ""
 
-#: tapsets.cxx:11563
+#: tapsets.cxx:11581
 #, c-format
 msgid "cannot get byte size of type '%s' for tracepoint '%s'"
 msgstr ""
 
-#: tapsets.cxx:11603
+#: tapsets.cxx:11621
 #, c-format
 msgid "cannot get type of parameter '%s' of tracepoint '%s'"
 msgstr ""
 
-#: tapsets.cxx:11608
+#: tapsets.cxx:11626
 #, c-format
 msgid "cannot get declaration of parameter '%s' of tracepoint '%s'"
 msgstr ""
 
-#: tapsets.cxx:11629
+#: tapsets.cxx:11647
 #, c-format
 msgid "found parameter for tracepoint '%s': type:'%s' name:'%s' decl:'%s' %s"
 msgstr ""
 
-#: tapsets.cxx:11658 tapsets.cxx:11680
+#: tapsets.cxx:11676 tapsets.cxx:11698
 #, c-format
 msgid "cannot get offset attribute for variable '%s' of tracepoint '%s'"
 msgstr ""
 
-#: tapsets.cxx:12432
+#: tapsets.cxx:12450
 msgid "SYSTEM:TRACEPOINT syntax not supported with --compatible <= 2.6"
 msgstr ""
 
-#: tapsets.cxx:12441
+#: tapsets.cxx:12459
 msgid "invalid tracepoint string provided"
 msgstr ""
 
-#: tapsets.cxx:12568
+#: tapsets.cxx:12586
 #, c-format
 msgid "tracepoint %s is blocklisted on architecture %s"
 msgstr ""
 
-#: tapsets.cxx:12602
+#: tapsets.cxx:12620
 #, c-format
 msgid "Unable to resolve base type of %s for probe %s\n"
 msgstr ""
 
-#: tapsets.cxx:12676
+#: tapsets.cxx:12694
 msgid "tracepoint_builder releasing dwflpp"
 msgstr ""
 
-#: tapsets.cxx:12704
+#: tapsets.cxx:12722
 #, c-format
 msgid "Pass 2: getting a tracepoint query for %zu headers: "
 msgstr ""
 
-#: tapsets.cxx:12726
+#: tapsets.cxx:12744
 #, c-format
 msgid "Pass 2: using cached %s"
 msgstr ""
 
-#: tapsets.cxx:12951
+#: tapsets.cxx:12969
 #, c-format
 msgid "Ignoring inaccessible kernel source tree (DW_AT_comp_dir) at '%s'"
 msgstr ""
 
-#: tapsets.cxx:12956
+#: tapsets.cxx:12974
 #, c-format
 msgid "Ignoring duplicate kernel source tree (DW_AT_comp_dir) at '%s'"
 msgstr ""
 
-#: tapsets.cxx:12961
+#: tapsets.cxx:12979
 #, c-format
 msgid "Located kernel source tree (DW_AT_comp_dir) at '%s'"
 msgstr ""
 
-#: tapsets.cxx:12997
+#: tapsets.cxx:13015
 #, c-format
 msgid "Located kernel source tree at '%s'"
 msgstr ""
 
-#: tapsets.cxx:13046
+#: tapsets.cxx:13064
 msgid "Checking tracepoint glob "
 msgstr ""
 
-#: tapsets.cxx:13102
+#: tapsets.cxx:13120
 msgid ""
 "SYSTEM: new BPF TRACEPOINT behavior not supported by target kernel (or use --"
 "compatible=4.1 option)"
 msgstr ""
 
-#: tapsets.cxx:13125
+#: tapsets.cxx:13143
 #, c-format
 msgid "no match (similar tracepoint: %s)"
 msgid_plural "no match (similar tracepoints: %s)"
@@ -6794,443 +6819,443 @@ msgstr ""
 msgid "\"histogram index out of range\";"
 msgstr ""
 
-#: translate.cxx:546
+#: translate.cxx:543
 #, c-format
 msgid "unsupported local stats init for %s"
 msgstr ""
 
-#: translate.cxx:570
+#: translate.cxx:567
 #, c-format
 msgid "unsupported stats type for %s"
 msgstr ""
 
-#: translate.cxx:579
+#: translate.cxx:576
 #, c-format
 msgid "unsupported initializer for %s"
 msgstr ""
 
-#: translate.cxx:593
+#: translate.cxx:590
 #, c-format
 msgid "unsupported deallocator for %s"
 msgstr ""
 
-#: translate.cxx:737 translate.cxx:3307
+#: translate.cxx:734 translate.cxx:3304
 msgid "unknown type of map"
 msgstr ""
 
-#: translate.cxx:758
+#: translate.cxx:755
 msgid "index type mismatch"
 msgstr ""
 
-#: translate.cxx:804
+#: translate.cxx:801
 msgid "aggregating non-parallel map type"
 msgstr ""
 
-#: translate.cxx:812
+#: translate.cxx:809
 msgid "fetching aggregate of non-parallel map type"
 msgstr ""
 
-#: translate.cxx:830
+#: translate.cxx:827
 msgid "checking existence of an unsupported map type"
 msgstr ""
 
-#: translate.cxx:843
+#: translate.cxx:840
 msgid "getting a value from an unsupported map type"
 msgstr ""
 
-#: translate.cxx:854
+#: translate.cxx:851
 msgid "adding a value of an unsupported map type"
 msgstr ""
 
-#: translate.cxx:876
+#: translate.cxx:873
 msgid "setting a value of an unsupported map type"
 msgstr ""
 
-#: translate.cxx:904
+#: translate.cxx:901
 #, c-format
 msgid "unsupported local map init for %s"
 msgstr ""
 
-#: translate.cxx:969
+#: translate.cxx:966
 msgid "iterating over unknown reference type"
 msgstr ""
 
-#: translate.cxx:982
+#: translate.cxx:979
 msgid "inconsistent iterator type in itervar::start()"
 msgstr ""
 
-#: translate.cxx:993 translate.cxx:1005
+#: translate.cxx:990 translate.cxx:1002
 msgid "inconsistent iterator type in itervar::next()"
 msgstr ""
 
-#: translate.cxx:1008
+#: translate.cxx:1005
 msgid "deleting a value of an unsupported map type"
 msgstr ""
 
-#: translate.cxx:1027
+#: translate.cxx:1024
 msgid "illegal key type"
 msgstr ""
 
-#: translate.cxx:1034
+#: translate.cxx:1031
 msgid "inconsistent iterator value in itervar::get_value()"
 msgstr ""
 
-#: translate.cxx:1046
+#: translate.cxx:1043
 msgid "illegal value type"
 msgstr ""
 
-#: translate.cxx:1256
+#: translate.cxx:1253
 msgid "internal error translating printf"
 msgstr ""
 
-#: translate.cxx:2576
+#: translate.cxx:2573
 #, c-format
 msgid "variable %s for function %s will be passed by reference (char *)"
 msgstr ""
 
-#: translate.cxx:2609
+#: translate.cxx:2606
 #, c-format
 msgid "return value for function %s will be passed by reference (char *)"
 msgstr ""
 
-#: translate.cxx:2688 translate.cxx:2948
+#: translate.cxx:2685 translate.cxx:2945
 msgid "array locals not supported, missing global declaration?"
 msgstr ""
 
-#: translate.cxx:2851
+#: translate.cxx:2848
 #, c-format
 msgid "%s elided, duplicates %s\n"
 msgstr ""
 
-#: translate.cxx:2957
+#: translate.cxx:2954
 msgid "unsupported local variable type"
 msgstr ""
 
-#: translate.cxx:2966
+#: translate.cxx:2963
 #, c-format
 msgid "%d statements for probe %s"
 msgstr ""
 
-#: translate.cxx:3132
+#: translate.cxx:3129
 msgid " nothing"
 msgstr ""
 
-#: translate.cxx:3255 translate.cxx:3283
+#: translate.cxx:3252 translate.cxx:3280
 msgid "array type is neither string nor long"
 msgstr ""
 
-#: translate.cxx:3269
+#: translate.cxx:3266
 msgid "array key is neither string nor long"
 msgstr ""
 
-#: translate.cxx:3428 translate.cxx:3844
+#: translate.cxx:3429 translate.cxx:3845
 msgid "unresolved symbol: "
 msgstr ""
 
-#: translate.cxx:3521
+#: translate.cxx:3522
 msgid "unknown lvalue type in assignment"
 msgstr ""
 
-#: translate.cxx:3607 translate.cxx:3627
+#: translate.cxx:3608 translate.cxx:3628
 msgid " type unsupported"
 msgstr ""
 
-#: translate.cxx:3656
+#: translate.cxx:3657
 msgid "post assignment on strings not supported"
 msgstr ""
 
-#: translate.cxx:3670
+#: translate.cxx:3671
 #, c-format
 msgid "string assignment operator %s unsupported"
 msgstr ""
 
-#: translate.cxx:3713
+#: translate.cxx:3714
 msgid "unknown macop for assignment"
 msgstr ""
 
-#: translate.cxx:3718
+#: translate.cxx:3719
 msgid "invalid post-mode operator"
 msgstr ""
 
-#: translate.cxx:3755
+#: translate.cxx:3756
 msgid "assignment type not yet implemented"
 msgstr ""
 
-#: translate.cxx:3842
+#: translate.cxx:3843
 msgid "unresolved symbol"
 msgstr ""
 
-#: translate.cxx:3883
+#: translate.cxx:3884
 msgid "attempt to use scalar where map expected"
 msgstr ""
 
-#: translate.cxx:4325 translate.cxx:5520 translate.cxx:5532
+#: translate.cxx:4326 translate.cxx:5521 translate.cxx:5533
 msgid "expected numeric type"
 msgstr ""
 
-#: translate.cxx:4640 translate.cxx:5411 translate.cxx:5452
+#: translate.cxx:4641 translate.cxx:5412 translate.cxx:5453
 msgid "expected string types"
 msgstr ""
 
-#: translate.cxx:4648 translate.cxx:5130 translate.cxx:5197 translate.cxx:5226
-#: translate.cxx:5242 translate.cxx:5428
+#: translate.cxx:4649 translate.cxx:5131 translate.cxx:5198 translate.cxx:5227
+#: translate.cxx:5243 translate.cxx:5429
 msgid "expected numeric types"
 msgstr ""
 
-#: translate.cxx:4654 translate.cxx:4950 translate.cxx:5346 translate.cxx:5437
+#: translate.cxx:4655 translate.cxx:4951 translate.cxx:5347 translate.cxx:5438
 msgid "unexpected type"
 msgstr ""
 
-#: translate.cxx:4691 translate.cxx:5915
+#: translate.cxx:4692 translate.cxx:5916
 msgid "Invalid indexing of histogram"
 msgstr ""
 
-#: translate.cxx:4761
+#: translate.cxx:4762
 msgid "cannot 'return' from probe"
 msgstr ""
 
-#: translate.cxx:4766
+#: translate.cxx:4767
 msgid "unexpected lock pushdown in 'return'"
 msgstr ""
 
-#: translate.cxx:4771 translate.cxx:4777
+#: translate.cxx:4772 translate.cxx:4778
 msgid "return type mismatch"
 msgstr ""
 
-#: translate.cxx:4797
+#: translate.cxx:4798
 msgid "unexpected lock pushdown in 'next'"
 msgstr ""
 
-#: translate.cxx:4853
+#: translate.cxx:4854
 msgid "Cannot delete unknown expression type"
 msgstr ""
 
-#: translate.cxx:4983
+#: translate.cxx:4984
 msgid "cannot delete histogram bucket entries\n"
 msgstr ""
 
-#: translate.cxx:5110
+#: translate.cxx:5111
 msgid "expected numeric or string type"
 msgstr ""
 
-#: translate.cxx:5188
+#: translate.cxx:5189
 #, c-format
 msgid "operator %s not yet implemented"
 msgstr ""
 
-#: translate.cxx:5447
+#: translate.cxx:5448
 msgid "unexpected concatenation operator"
 msgstr ""
 
-#: translate.cxx:5470
+#: translate.cxx:5471
 msgid "expected numeric condition"
 msgstr ""
 
-#: translate.cxx:5475
+#: translate.cxx:5476
 msgid "expected matching types"
 msgstr ""
 
-#: translate.cxx:5493
+#: translate.cxx:5494
 msgid "non-number <<< expression"
 msgstr ""
 
-#: translate.cxx:5496
+#: translate.cxx:5497
 msgid "non-stats left operand to <<< expression"
 msgstr ""
 
-#: translate.cxx:5499
+#: translate.cxx:5500
 msgid "non-number right operand to <<< expression"
 msgstr ""
 
-#: translate.cxx:5505 translate.cxx:5507
+#: translate.cxx:5506 translate.cxx:5508
 msgid "type mismatch"
 msgstr ""
 
-#: translate.cxx:5546
+#: translate.cxx:5547
 msgid "invalid reference to array"
 msgstr ""
 
-#: translate.cxx:5632
+#: translate.cxx:5633
 msgid "need rvalue for assignment"
 msgstr ""
 
-#: translate.cxx:5644
+#: translate.cxx:5645
 msgid "unexpected reference to array"
 msgstr ""
 
-#: translate.cxx:5701
+#: translate.cxx:5702
 msgid "cannot translate general target-symbol expression"
 msgstr ""
 
-#: translate.cxx:5708
+#: translate.cxx:5709
 msgid "cannot translate general @var expression"
 msgstr ""
 
-#: translate.cxx:5715
+#: translate.cxx:5716
 msgid "cannot translate general @cast expression"
 msgstr ""
 
-#: translate.cxx:5722
+#: translate.cxx:5723
 msgid "cannot translate general dereference expression"
 msgstr ""
 
-#: translate.cxx:5729
+#: translate.cxx:5730
 msgid "cannot translate general @defined expression"
 msgstr ""
 
-#: translate.cxx:5736
+#: translate.cxx:5737
 msgid "cannot translate general @probewrite expression"
 msgstr ""
 
-#: translate.cxx:5743
+#: translate.cxx:5744
 msgid "cannot translate general @entry expression"
 msgstr ""
 
-#: translate.cxx:5750
+#: translate.cxx:5751
 msgid "cannot translate general @perf expression"
 msgstr ""
 
-#: translate.cxx:5771
+#: translate.cxx:5772
 msgid "invalid array reference"
 msgstr ""
 
-#: translate.cxx:5776
+#: translate.cxx:5777
 msgid "array index type mismatch"
 msgstr ""
 
-#: translate.cxx:5816
+#: translate.cxx:5817
 msgid "unexpected aggregate of non-arrayindex"
 msgstr ""
 
-#: translate.cxx:5863
+#: translate.cxx:5864
 msgid "statistic-valued array in rvalue context"
 msgstr ""
 
-#: translate.cxx:5960
+#: translate.cxx:5961
 msgid "unexpected reference to scalar"
 msgstr ""
 
-#: translate.cxx:6026
+#: translate.cxx:6027
 msgid "cannot assign to histogram buckets"
 msgstr ""
 
-#: translate.cxx:6044
+#: translate.cxx:6045
 msgid "invalid length argument list"
 msgstr ""
 
-#: translate.cxx:6049
+#: translate.cxx:6050
 msgid "function argument type mismatch"
 msgstr ""
 
-#: translate.cxx:6078
+#: translate.cxx:6079
 msgid "function actual argument evaluation"
 msgstr ""
 
-#: translate.cxx:6163
+#: translate.cxx:6164
 msgid "function return result evaluation"
 msgstr ""
 
-#: translate.cxx:6865
+#: translate.cxx:6866
 msgid "unexpected build-id reloc section "
 msgstr ""
 
-#: translate.cxx:6873
+#: translate.cxx:6874
 #, c-format
 msgid "Found build-id in %s, length %d, start at %#<PRIx64>"
 msgstr ""
 
-#: translate.cxx:7169
+#: translate.cxx:7170
 #, c-format
 msgid "libdwfl failure getting symbol table for %s: %s"
 msgstr ""
 
-#: translate.cxx:7232
+#: translate.cxx:7233
 #, c-format
 msgid "Found kernel _stext extra offset %#<PRIx64>"
 msgstr ""
 
-#: translate.cxx:7416
+#: translate.cxx:7417
 #, c-format
 msgid "skipping module %s %s table (too big: %zi > %zi)"
 msgstr ""
 
-#: translate.cxx:7420
+#: translate.cxx:7421
 #, c-format
 msgid "skipping module %s, section %s %s table (too big: %zi > %zi)"
 msgstr ""
 
-#: translate.cxx:7977
+#: translate.cxx:7978
 msgid "Searching for vdso candidates: "
 msgstr ""
 
-#: translate.cxx:7987
+#: translate.cxx:7988
 msgid "vdso candidate: "
 msgstr ""
 
-#: translate.cxx:8178
+#: translate.cxx:8179
 msgid "missing unwind/symbol data for module '"
 msgstr ""
 
-#: translate.cxx:8201
+#: translate.cxx:8202
 #, c-format
 msgid "identified max-nested function: %s (%d)"
 msgstr ""
 
-#: translate.cxx:8212
+#: translate.cxx:8213
 #, c-format
 msgid "identified recursive function: %s"
 msgstr ""
 
-#: translate.cxx:8229
+#: translate.cxx:8230
 #, c-format
 msgid ""
 "myproc-unprivileged tapset function called without is_myproc checking for "
 "pid %d (euid %d)"
 msgstr ""
 
-#: translate.cxx:8233
+#: translate.cxx:8234
 #, c-format
 msgid "read fault [man error::fault] at 0x%lx"
 msgstr ""
 
-#: translate.cxx:8235
+#: translate.cxx:8236
 #, c-format
 msgid "write fault [man error::fault] at 0x%lx"
 msgstr ""
 
-#: translate.cxx:8237
+#: translate.cxx:8238
 #, c-format
 msgid "divide by zero in DWARF operand (%s)"
 msgstr ""
 
-#: translate.cxx:8239
+#: translate.cxx:8240
 msgid "register access fault [man error::fault]"
 msgstr ""
 
-#: translate.cxx:8287
+#: translate.cxx:8288
 #, c-format
 msgid "ignoring extra parts of compat version: %s"
 msgstr ""
 
-#: translate.cxx:8291
+#: translate.cxx:8292
 #, c-format
 msgid "parse error in compatibility version: %s"
 msgstr ""
 
-#: translate.cxx:8294
+#: translate.cxx:8295
 #, c-format
 msgid "compatibility version out of range: %s"
 msgstr ""
 
-#: translate.cxx:8317
+#: translate.cxx:8318
 msgid " recursive"
 msgstr ""
 
-#: translate.cxx:8317
+#: translate.cxx:8318
 msgid " non-recursive"
 msgstr ""
 
-#: translate.cxx:8316
+#: translate.cxx:8317
 #, c-format
 msgid "function recursion-analysis: max-nesting %d %s"
 msgstr ""
