@@ -236,9 +236,6 @@ BuildRequires: python3
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
 %endif
-%if %{with_specific_python}
-BuildRequires: /usr/bin/pathfix.py
-%endif
 
 %if %{with_httpd}
 BuildRequires: libmicrohttpd-devel
@@ -822,7 +819,7 @@ done
 
 %if %{with_specific_python}
 # Some files got ambiguous python shebangs, we fix them after everything else is done
-pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}%{python3_sitearch} %{buildroot}%{_bindir}/*
+%py3_shebang_fix %{buildroot}%{python3_sitearch} %{buildroot}%{_bindir}/*
 %endif
 
 %pre runtime
