@@ -15,6 +15,13 @@
 #include "task_finder_map.c"
 #include "task_finder_vma.c"
 
+#ifndef VMA_ITERATOR
+#define VMA_ITERATOR(name, mm, addr) \
+	struct mm_struct *name = mm
+#define for_each_vma(vmi, vma) \
+	for (vma = vmi->mmap; vma; vma = vma->vm_next)
+#endif
+
 static LIST_HEAD(__stp_task_finder_list);
 
 struct stap_task_finder_target;
@@ -1241,12 +1248,14 @@ __stp_call_mmap_callbacks_for_task(struct stap_task_finder_target *tgt,
 		return;
 	}
 
-	// First find the number of file-based vmas.
-	vma = mm->mmap;
-	while (vma) {
-		if (vma->vm_file)
-			file_based_vmas++;
-		vma = vma->vm_next;
+	{
+		// Need surrounding {} because of VMA_ITERATOR variable
+		// First find the number of file-based vmas.
+		VMA_ITERATOR(vmi, mm, 0);
+		for_each_vma(vmi, vma) {
+			if (vma->vm_file)
+				file_based_vmas++;
+		}
 	}
 
 	// Now allocate an array to cache vma information in.
@@ -1255,9 +1264,9 @@ __stp_call_mmap_callbacks_for_task(struct stap_task_finder_target *tgt,
 					 * file_based_vmas);
 	if (vma_cache != NULL) {
 		// Loop through the vmas again, and cache needed information.
-		vma = mm->mmap;
+		VMA_ITERATOR(vmi, mm, 0);
 		vma_cache_p = vma_cache;
-		while (vma) {
+		for_each_vma(vmi,vma) {
 			if (vma->vm_file) {
 #ifdef STAPCONF_DPATH_PATH
 			    // Notice we're increasing the reference
@@ -1283,7 +1292,6 @@ __stp_call_mmap_callbacks_for_task(struct stap_task_finder_target *tgt,
 			    vma_cache_p->vm_flags = vma->vm_flags;
 			    vma_cache_p++;
 			}
-			vma = vma->vm_next;
 		}
 	}
 
