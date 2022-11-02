@@ -12605,7 +12605,7 @@ tracepoint_query::handle_query_type(Dwarf_Die * type)
   if (!dwarf_hasattr(type, DW_AT_name))
     return DWARF_CB_OK;
 
-  std::string name(dwarf_diename(type));
+  std::string name(dwarf_diename(type) ?: "<unknown type>");
 
   if (!dw.function_name_matches_pattern(name, "stapprobe_" + tracepoint)
       || startswith(name, "stapprobe_template_"))

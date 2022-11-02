@@ -1510,7 +1510,7 @@ max_fetch_size (Dwarf_Die *die)
   if (cu == NULL)
     throw SEMANTIC_ERROR(std::string("cannot determine compilation unit "
 				     "address size from ")
-			 + dwarf_diename (die)
+			 + (dwarf_diename (die) ?: "<anonymous>")
 			 + " " + dwarf_errmsg (-1));
 
   return address_size;

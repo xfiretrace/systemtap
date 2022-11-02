@@ -2892,7 +2892,7 @@ dwflpp::find_variable_and_frame_base (vector<Dwarf_Die>& scopes,
 	    // version is recent enough to not need this workaround if
 	    // we would see an imported unit.
 	    if (dwarf_tag (vardie) == DW_TAG_variable
-		&& strcmp (dwarf_diename (vardie), local.c_str ()) == 0
+		&& strcmp (dwarf_diename (vardie) ?: "<unknown>", local.c_str ()) == 0
 		&& (dwarf_attr_integrate (vardie, DW_AT_external, &attr_mem)
 		    != NULL)
 		&& ((dwarf_attr_integrate (vardie, DW_AT_const_value, &attr_mem)
