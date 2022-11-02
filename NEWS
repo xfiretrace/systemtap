@@ -1,5 +1,8 @@
 * What's new in version 4.8
 
+- DWARF-related probes (.function, .statement) now merge DWARF and
+  non-DWARF symbol-table based matches, rather than being either-or.
+
 - The python3 tapset was extended to support python3 3.9, 3.10, and 3.11.
   See stapprobes(3stap) for further details on probing python functions.
 
