@@ -149,8 +149,6 @@ static inline void _stp_stat_add (Stat st, int64_t val, int stat_op_count,
 				  int stat_op_max, int stat_op_variance)
 {
 	stat_data *sd = _stp_stat_per_cpu_ptr (st, STAT_GET_CPU());
-	if (unlikely(sd == NULL))
-		return;
 	STAT_LOCK(sd);
 	__stp_stat_add (&st->hist, sd, val, stat_op_count, stat_op_sum,
 	                stat_op_min, stat_op_max, stat_op_variance);
@@ -190,8 +188,6 @@ static stat_data *_stp_stat_get (Stat st, int clear)
 
 	for_each_possible_cpu(i) {
 		stat_data *sd = _stp_stat_per_cpu_ptr (st, i);
-		if (unlikely(sd == NULL))
-			continue;
 		STAT_LOCK(sd);
 		if (sd->count) {
 			agg->shift = sd->shift;
@@ -224,8 +220,6 @@ static stat_data *_stp_stat_get (Stat st, int clear)
 	 */
 	for_each_possible_cpu(i) {
 		sd = _stp_stat_per_cpu_ptr (st, i);
-		if (unlikely(sd == NULL))
-			continue;
 		STAT_LOCK(sd);
 		if (sd->count) {
 			S1 += sd->count * (sd->avg_s - agg->avg_s) * (sd->avg_s - agg->avg_s);
@@ -269,8 +263,6 @@ static void _stp_stat_clear (Stat st)
 
 	for_each_possible_cpu(i) {
 		stat_data *sd = _stp_stat_per_cpu_ptr (st, i);
-		if (unlikely(sd == NULL))
-			continue;
 		STAT_LOCK(sd);
 		_stp_stat_clear_data (st, sd);
 		STAT_UNLOCK(sd);
