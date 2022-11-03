@@ -38,7 +38,7 @@
            		<li><a href="keyword-index.html">By Keyword</a></li>
          	</ul>
 
-<p><em>For systemtap version 4.7.</em></p><h2>Best Examples</h2>
+<p><em>For systemtap version 4.8.</em></p><h2>Best Examples</h2>
 <ul>
 <li><a href="#general/helloworld.stp">general/helloworld.stp - SystemTap "Hello World" Program</a></li>
 <li><a href="#general/para-callgraph.stp">general/para-callgraph.stp - Callgraph Tracing with Arguments</a></li>
@@ -126,13 +126,14 @@ keywords: <a href="keyword-index.html#TRACE">TRACE</a> <a href="keyword-index.ht
 </li><li><a name="general/para-callgraph.stp"></a><a href="#general/para-callgraph.stp">&para;</a> <a href="general/para-callgraph.stp">general/para-callgraph.stp</a> - Callgraph Tracing with Arguments<br>
 keywords: <a href="keyword-index.html#_BEST">_BEST</a> <a href="keyword-index.html#TRACE">TRACE</a> <a href="keyword-index.html#CALLGRAPH">CALLGRAPH</a> <br>
 <p>Print a timed per-thread microsecond-timed callgraph, complete with function parameters and return values.  The first parameter names the function probe points to trace.  The optional second parameter names the probe points for trigger functions, which acts to enable tracing for only those functions that occur while the current thread is nested within the trigger.</p><p><i><a href="general/para-callgraph.txt">sample usage in general/para-callgraph.txt</i></font></p>
-</li><li><a name="general/py2example.stp"></a><a href="#general/py2example.stp">&para;</a> <a href="general/py2example.stp">general/py2example.stp</a> - SystemTap python 2 support tapset<br>
+</li><li><a name="general/pyexample.stp"></a><a href="#general/pyexample.stp">&para;</a> <a href="general/pyexample.stp">general/pyexample.stp</a> - SystemTap python 2 support tapset<br>
 keywords: <a href="keyword-index.html#SIMPLE">SIMPLE</a> <br>
-<p>A python support tapset that displays backtraces and variable values </p><p><font size="-2"><pre># stap -I tapset -c &#39;/usr/bin/python2 pyexample.py 35&#39; py2example.stp</pre></font></p>
-</li><li><a name="general/py3example.stp"></a><a href="#general/py3example.stp">&para;</a> <a href="general/py3example.stp">general/py3example.stp</a> - SystemTap python 3 support tapset<br>
+<p>A python support tapset that displays backtraces and variable values</p><p><font size="-2"><pre># PYTHONPATH=$PYEXECDIR stap -g --suppress-time-limits -c \
+&#39;/usr/bin/python3 -m HelperSDT pyexample.py 35&#39; pyexample.stp python2</pre></font></p>
+</li><li><a name="general/pyexample.stp"></a><a href="#general/pyexample.stp">&para;</a> <a href="general/pyexample.stp">general/pyexample.stp</a> - SystemTap python 3 support tapset<br>
 keywords: <a href="keyword-index.html#SIMPLE">SIMPLE</a> <br>
-<p>A python support tapset that displays backtraces and variable values</p><p><font size="-2"><pre># stap -g --suppress-time-limits -I tapset -c &#39;/usr/bin/python3 \
-pyexample.py 35&#39; py3example.stp</pre></font></p>
+<p>A python support tapset that displays backtraces and variable values</p><p><font size="-2"><pre># PYTHONPATH=$PYEXECDIR stap -g --suppress-time-limits -c \
+&#39;/usr/bin/python3 -m HelperSDT pyexample.py 35&#39; pyexample.stp python3</pre></font></p>
 </li><li><a name="general/regex.stp"></a><a href="#general/regex.stp">&para;</a> <a href="general/regex.stp">general/regex.stp</a> - Report opened files whose names match a given regex<br>
 keywords: <a href="keyword-index.html#REGEX">REGEX</a> <br>
 <p>Uses the regex functionality to detect opened files whose names match a pattern given on the command line. If no command line parameter is given, demonstrate by filtering for files that end with an extension showing them to be an archive.</p><p><font size="-2"><pre># stap regex.stp -T 1</pre></font></p>

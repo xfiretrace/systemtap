@@ -2,7 +2,7 @@ SYSTEMTAP EXAMPLES INDEX BY KEYWORD
 (see also index.txt)
 
 
-For systemtap version 4.7.
+For systemtap version 4.8.
 
 = _BEST =
 
@@ -3334,21 +3334,22 @@ keywords: simple guru
   # stap -g keyhack.stp -c 'sleep 5'
 
 
-general/py2example.stp - SystemTap python 2 support tapset
-keywords: simple
-
-  A python support tapset that displays backtraces and variable values 
-
-  # stap -I tapset -c '/usr/bin/python2 pyexample.py 35' py2example.stp
-
-
-general/py3example.stp - SystemTap python 3 support tapset
+general/pyexample.stp - SystemTap python 2 support tapset
 keywords: simple
 
   A python support tapset that displays backtraces and variable values
 
-  # stap -g --suppress-time-limits -I tapset -c '/usr/bin/python3 \
-  pyexample.py 35' py3example.stp
+  # PYTHONPATH=$PYEXECDIR stap -g --suppress-time-limits -c \
+  '/usr/bin/python3 -m HelperSDT pyexample.py 35' pyexample.stp python2
+
+
+general/pyexample.stp - SystemTap python 3 support tapset
+keywords: simple
+
+  A python support tapset that displays backtraces and variable values
+
+  # PYTHONPATH=$PYEXECDIR stap -g --suppress-time-limits -c \
+  '/usr/bin/python3 -m HelperSDT pyexample.py 35' pyexample.stp python3
 
 
 io/eatmydata.stp - disable fsync
