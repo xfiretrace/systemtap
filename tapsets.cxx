@@ -12373,15 +12373,14 @@ tracepoint_derived_probe_group::emit_module_init (systemtap_session &s)
   s.op->newline(-1) << "}";
   s.op->newline(-1) << "}";
 
-  // Modern kernels' tracepoint implementation makes use of SRCU and
-  // their tracepoint_synchronize_unregister() function calls
-  // synchronize_srcu(&tracepoint_srcu) right before calling synchronize_rcu().
-  // So it's safer to always call tracepoint_synchronize_unregister() to avoid
-  // any risks.
+  // This would be technically proper (on those autoconf-detectable
+  // kernels that include this function in tracepoint.h), however we
+  // already make several calls to synchronze_sched() during our
+  // shutdown processes.
 
-  s.op->newline() << "if (rc)";
-  s.op->newline(1) << "tracepoint_synchronize_unregister();";
-  s.op->indent(-1);
+  // s.op->newline() << "if (rc)";
+  // s.op->newline(1) << "tracepoint_synchronize_unregister();";
+  // s.op->indent(-1);
 }
 
 
@@ -12396,8 +12395,9 @@ tracepoint_derived_probe_group::emit_module_exit (systemtap_session& s)
   s.op->newline(1) << "stap_tracepoint_probes[i].unreg();";
   s.op->indent(-1);
 
-  // This is necessary: see above.
-  s.op->newline() << "tracepoint_synchronize_unregister();";
+  // Not necessary: see above.
+
+  // s.op->newline() << "tracepoint_synchronize_unregister();";
 }
 
 
