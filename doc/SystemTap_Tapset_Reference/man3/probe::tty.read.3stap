@@ -2,12 +2,12 @@
 .\"     Title: probe::tty.read
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2022
+.\"      Date: November 2022
 .\"    Manual: TTY Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::TTY\&.READ" "3stap" "May 2022" "SystemTap Tapset Reference" "TTY Tapset"
+.TH "PROBE::TTY\&.READ" "3stap" "November 2022" "SystemTap Tapset Reference" "TTY Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -41,6 +41,11 @@ tty\&.read
 the buffer that will receive the characters
 .RE
 .PP
+\fIfile_name\fR
+.RS 4
+the file name lreated to the tty
+.RE
+.PP
 \fInr\fR
 .RS 4
 The amount of characters to be read
@@ -49,11 +54,6 @@ The amount of characters to be read
 \fIdriver_name\fR
 .RS 4
 the driver name
-.RE
-.PP
-\fIfile_name\fR
-.RS 4
-the file name lreated to the tty
 .RE
 .SH SEE ALSO\n 
 .IR tapset::tty (3stap)

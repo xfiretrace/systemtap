@@ -406,6 +406,11 @@ same convenience variables.
     dirfd, dirfd_str, mode, mode_str, pathname, pathname_unquoted
 </entry></row>
 <row><entry>
+    faccessat2
+</entry><entry>
+    dirfd, dirfd_str, flags, flags_str, mode, mode_str, pathname, pathname_unquoted
+</entry></row>
+<row><entry>
     fadvise64
 </entry><entry>
     advice, advice_str, fd, len, offset
@@ -879,6 +884,11 @@ same convenience variables.
     memfd_create
 </entry><entry>
     flags, flags_str, uname, uname_unquoted
+</entry></row>
+<row><entry>
+    memfd_secret
+</entry><entry>
+    flags, flags_str
 </entry></row>
 <row><entry>
     migrate_pages

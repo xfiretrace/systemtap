@@ -2,12 +2,12 @@
 .\"     Title: probe::nfsd.dispatch
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2022
+.\"      Date: November 2022
 .\"    Manual: Network File Storage Tapsets
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::NFSD\&.DISPAT" "3stap" "May 2022" "SystemTap Tapset Reference" "Network File Storage Tapsets"
+.TH "PROBE::NFSD\&.DISPAT" "3stap" "November 2022" "SystemTap Tapset Reference" "Network File Storage Tapsets"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,14 +36,19 @@ nfsd\&.dispatch
 .fi
 .SH "VALUES"
 .PP
-\fIprog\fR
+\fIversion\fR
 .RS 4
-program number
+nfs version
 .RE
 .PP
 \fIproc\fR
 .RS 4
 procedure number
+.RE
+.PP
+\fIprog\fR
+.RS 4
+program number
 .RE
 .PP
 \fIproto\fR
@@ -59,11 +64,6 @@ the ip address of client
 \fIxid\fR
 .RS 4
 transmission id
-.RE
-.PP
-\fIversion\fR
-.RS 4
-nfs version
 .RE
 .SH SEE ALSO\n 
 .IR tapset::nfsd (3stap)

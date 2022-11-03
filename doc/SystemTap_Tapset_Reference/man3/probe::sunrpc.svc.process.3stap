@@ -2,12 +2,12 @@
 .\"     Title: probe::sunrpc.svc.process
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2022
+.\"      Date: November 2022
 .\"    Manual: Networking Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SUNRPC\&.SVC\" "3stap" "May 2022" "SystemTap Tapset Reference" "Networking Tapset"
+.TH "PROBE::SUNRPC\&.SVC\" "3stap" "November 2022" "SystemTap Tapset Reference" "Networking Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -41,6 +41,11 @@ sunrpc\&.svc\&.process
 the peer address where the request is from
 .RE
 .PP
+\fIrq_vers\fR
+.RS 4
+the program version in the request
+.RE
+.PP
 \fIrq_proc\fR
 .RS 4
 the procedure number in the request
@@ -59,11 +64,6 @@ the number of concurrent threads
 \fIsv_prog\fR
 .RS 4
 the number of the program
-.RE
-.PP
-\fIrq_vers\fR
-.RS 4
-the program version in the request
 .RE
 .PP
 \fIsv_name\fR

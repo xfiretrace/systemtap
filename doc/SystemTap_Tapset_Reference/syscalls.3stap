@@ -1,5 +1,5 @@
 ." -*- nroff -*-
-.TH TAPSET::SYSCALLS 3stap "May 2022" "Systemtap Tapset Reference"
+.TH TAPSET::SYSCALLS 3stap "November 2022" "Systemtap Tapset Reference"
 .SH NAME
 tapset::syscalls \- systemtap syscall tapset
 
@@ -320,6 +320,10 @@ status
 .TP
 .B syscall.faccessat
 dirfd, dirfd_str, mode, mode_str, pathname, pathname_unquoted
+.P
+.TP
+.B syscall.faccessat2
+dirfd, dirfd_str, flags, flags_str, mode, mode_str, pathname, pathname_unquoted
 .P
 .TP
 .B syscall.fadvise64
@@ -700,6 +704,10 @@ cmd, cmd_str, flags
 .TP
 .B syscall.memfd_create
 flags, flags_str, uname, uname_unquoted
+.P
+.TP
+.B syscall.memfd_secret
+flags, flags_str
 .P
 .TP
 .B syscall.migrate_pages

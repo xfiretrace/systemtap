@@ -2,12 +2,12 @@
 .\"     Title: probe::tcp.sendmsg
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2022
+.\"      Date: November 2022
 .\"    Manual: Networking Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::TCP\&.SENDMSG" "3stap" "May 2022" "SystemTap Tapset Reference" "Networking Tapset"
+.TH "PROBE::TCP\&.SENDMSG" "3stap" "November 2022" "SystemTap Tapset Reference" "Networking Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,9 +36,9 @@ tcp\&.sendmsg
 .fi
 .SH "VALUES"
 .PP
-\fIsock\fR
+\fIname\fR
 .RS 4
-Network socket
+Name of this probe
 .RE
 .PP
 \fIfamily\fR
@@ -51,9 +51,9 @@ IP address family
 Number of bytes to send
 .RE
 .PP
-\fIname\fR
+\fIsock\fR
 .RS 4
-Name of this probe
+Network socket
 .RE
 .SH "CONTEXT"
 .PP

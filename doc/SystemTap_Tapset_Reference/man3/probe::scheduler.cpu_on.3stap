@@ -2,12 +2,12 @@
 .\"     Title: probe::scheduler.cpu_on
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2022
+.\"      Date: November 2022
 .\"    Manual: Scheduler Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::SCHEDULER\&.C" "3stap" "May 2022" "SystemTap Tapset Reference" "Scheduler Tapset"
+.TH "PROBE::SCHEDULER\&.C" "3stap" "November 2022" "SystemTap Tapset Reference" "Scheduler Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,9 +36,9 @@ scheduler\&.cpu_on
 .fi
 .SH "VALUES"
 .PP
-\fIidle\fR
+\fIname\fR
 .RS 4
-\- boolean indicating whether current is the idle process
+name of the probe point
 .RE
 .PP
 \fItask_prev\fR
@@ -46,9 +46,9 @@ scheduler\&.cpu_on
 the process that was previously running on this cpu
 .RE
 .PP
-\fIname\fR
+\fIidle\fR
 .RS 4
-name of the probe point
+\- boolean indicating whether current is the idle process
 .RE
 .SH "CONTEXT"
 .PP

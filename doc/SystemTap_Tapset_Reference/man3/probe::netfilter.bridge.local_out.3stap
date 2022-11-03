@@ -2,12 +2,12 @@
 .\"     Title: probe::netfilter.bridge.local_out
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2022
+.\"      Date: November 2022
 .\"    Manual: Networking Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::NETFILTER\&.B" "3stap" "May 2022" "SystemTap Tapset Reference" "Networking Tapset"
+.TH "PROBE::NETFILTER\&.B" "3stap" "November 2022" "SystemTap Tapset Reference" "Networking Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,19 +36,39 @@ netfilter\&.bridge\&.local_out
 .fi
 .SH "VALUES"
 .PP
-\fIbr_htime\fR
+\fIbr_flags\fR
 .RS 4
-Hello time in 1/256 secs
+BPDU flags
 .RE
 .PP
-\fInf_repeat\fR
+\fIbr_msg\fR
 .RS 4
-Constant used to signify a \*(Aqrepeat\*(Aq verdict
+Message age in 1/256 secs
 .RE
 .PP
-\fInf_stolen\fR
+\fIbr_max\fR
 .RS 4
-Constant used to signify a \*(Aqstolen\*(Aq verdict
+Max age in 1/256 secs
+.RE
+.PP
+\fIllcproto_stp\fR
+.RS 4
+Constant used to signify Bridge Spanning Tree Protocol packet
+.RE
+.PP
+\fIprotocol\fR
+.RS 4
+Packet protocol
+.RE
+.PP
+\fInf_accept\fR
+.RS 4
+Constant used to signify an \*(Aqaccept\*(Aq verdict
+.RE
+.PP
+\fIindev\fR
+.RS 4
+Address of net_device representing input device, 0 if unknown
 .RE
 .PP
 \fIdata_hex\fR
@@ -56,19 +76,9 @@ Constant used to signify a \*(Aqstolen\*(Aq verdict
 A hexadecimal string representing the packet buffer contents
 .RE
 .PP
-\fIbr_prid\fR
+\fIoutdev\fR
 .RS 4
-Protocol identifier
-.RE
-.PP
-\fInf_drop\fR
-.RS 4
-Constant used to signify a \*(Aqdrop\*(Aq verdict
-.RE
-.PP
-\fInf_queue\fR
-.RS 4
-Constant used to signify a \*(Aqqueue\*(Aq verdict
+Address of net_device representing output device, 0 if unknown
 .RE
 .PP
 \fIbr_mac\fR
@@ -76,9 +86,14 @@ Constant used to signify a \*(Aqqueue\*(Aq verdict
 Bridge MAC address
 .RE
 .PP
-\fIoutdev\fR
+\fInf_stolen\fR
 .RS 4
-Address of net_device representing output device, 0 if unknown
+Constant used to signify a \*(Aqstolen\*(Aq verdict
+.RE
+.PP
+\fInf_repeat\fR
+.RS 4
+Constant used to signify a \*(Aqrepeat\*(Aq verdict
 .RE
 .PP
 \fIbr_poid\fR
@@ -86,24 +101,54 @@ Address of net_device representing output device, 0 if unknown
 Port identifier
 .RE
 .PP
+\fIbr_prid\fR
+.RS 4
+Protocol identifier
+.RE
+.PP
 \fIbr_vid\fR
 .RS 4
 Protocol version identifier
 .RE
 .PP
-\fIbr_flags\fR
+\fIbr_cost\fR
 .RS 4
-BPDU flags
+Total cost from transmitting bridge to root
 .RE
 .PP
-\fIllcpdu\fR
+\fIbr_htime\fR
 .RS 4
-Address of LLC Protocol Data Unit
+Hello time in 1/256 secs
 .RE
 .PP
-\fIprotocol\fR
+\fIbr_type\fR
 .RS 4
-Packet protocol
+BPDU type
+.RE
+.PP
+\fInf_drop\fR
+.RS 4
+Constant used to signify a \*(Aqdrop\*(Aq verdict
+.RE
+.PP
+\fIindev_name\fR
+.RS 4
+Name of network device packet was received on (if known)
+.RE
+.PP
+\fInf_queue\fR
+.RS 4
+Constant used to signify a \*(Aqqueue\*(Aq verdict
+.RE
+.PP
+\fIbr_fd\fR
+.RS 4
+Forward delay in 1/256 secs
+.RE
+.PP
+\fIlength\fR
+.RS 4
+The length of the packet buffer contents, in bytes
 .RE
 .PP
 \fIdata_str\fR
@@ -116,45 +161,19 @@ A string representing the packet buffer contents
 Address of bridge header
 .RE
 .PP
-\fIbr_max\fR
-.RS 4
-Max age in 1/256 secs
-.RE
-.PP
-\fIbr_type\fR
-.RS 4
-BPDU type
-.RE
-.PP
 \fIoutdev_name\fR
 .RS 4
 Name of network device packet will be routed to (if known)
 .RE
 .PP
-\fIindev\fR
+\fIllcpdu\fR
 .RS 4
-Address of net_device representing input device, 0 if unknown
+Address of LLC Protocol Data Unit
 .RE
 .PP
 \fInf_stop\fR
 .RS 4
 Constant used to signify a \*(Aqstop\*(Aq verdict
-.RE
-.PP
-\fIbr_cost\fR
-.RS 4
-Total cost from transmitting bridge to root
-.RE
-.PP
-\fIlength\fR
-.RS 4
-The length of the packet buffer contents, in bytes
-.RE
-.PP
-\fIpf\fR
-.RS 4
-Protocol family \-\- always
-\(lqbridge\(rq
 .RE
 .PP
 \fIbr_rid\fR
@@ -172,29 +191,10 @@ Identity of bridge
 Root bridge MAC address
 .RE
 .PP
-\fIbr_msg\fR
+\fIpf\fR
 .RS 4
-Message age in 1/256 secs
-.RE
-.PP
-\fIbr_fd\fR
-.RS 4
-Forward delay in 1/256 secs
-.RE
-.PP
-\fIllcproto_stp\fR
-.RS 4
-Constant used to signify Bridge Spanning Tree Protocol packet
-.RE
-.PP
-\fInf_accept\fR
-.RS 4
-Constant used to signify an \*(Aqaccept\*(Aq verdict
-.RE
-.PP
-\fIindev_name\fR
-.RS 4
-Name of network device packet was received on (if known)
+Protocol family \-\- always
+\(lqbridge\(rq
 .RE
 .SH SEE ALSO\n 
 .IR tapset::netfilter (3stap)

@@ -2,12 +2,12 @@
 .\"     Title: probe::udp.disconnect
 .\"    Author: 
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: May 2022
+.\"      Date: November 2022
 .\"    Manual: Networking Tapset
 .\"    Source: SystemTap Tapset Reference
 .\"  Language: English
 .\"
-.TH "PROBE::UDP\&.DISCONN" "3stap" "May 2022" "SystemTap Tapset Reference" "Networking Tapset"
+.TH "PROBE::UDP\&.DISCONN" "3stap" "November 2022" "SystemTap Tapset Reference" "Networking Tapset"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -41,11 +41,6 @@ udp\&.disconnect
 Flags (e\&.g\&. FIN, etc)
 .RE
 .PP
-\fIsaddr\fR
-.RS 4
-A string representing the source IP address
-.RE
-.PP
 \fIsport\fR
 .RS 4
 UDP source port
@@ -61,14 +56,19 @@ UDP destination port
 A string representing the destination IP address
 .RE
 .PP
-\fIfamily\fR
+\fIsaddr\fR
 .RS 4
-IP address family
+A string representing the source IP address
 .RE
 .PP
 \fIsock\fR
 .RS 4
 Network socket used by the process
+.RE
+.PP
+\fIfamily\fR
+.RS 4
+IP address family
 .RE
 .PP
 \fIname\fR
