@@ -730,7 +730,8 @@ stapiu_get_task_inode(struct task_struct *task)
 	vm_file = stap_find_exe_file(mm);
 	if (vm_file) {
 		if (vm_file->f_path.dentry)
-			inode = vm_file->f_path.dentry->d_inode;
+          //inode = vm_file->f_path.dentry->d_inode;
+          inode = d_real_inode(vm_file->f_path.dentry);
 		fput(vm_file);
 	}
 	return inode;
@@ -811,6 +812,7 @@ stapiu_mmap_found(struct stap_task_finder_target *tf_target,
   struct stapiu_process* p;
   int known_mapping_p;
   unsigned long flags;
+  struct inode *inode;  
 
   /*
   We need to verify that this file/mmap corresponds to the given stapiu_consumer.
@@ -921,11 +923,12 @@ stapiu_mmap_found(struct stap_task_finder_target *tf_target,
       _stp_warn("out of memory tracking solib %s in process %ld\n",
                 path, (long) task->tgid);
   }
-
+  //use inode_1 in the following function.
+  inode = d_real_inode(dentry);
   /* Check non-writable, executable sections for probes. */
   if ((vm_flags & VM_EXEC) && !(vm_flags & VM_WRITE))
     rc = stapiu_change_plus(c, task, addr, length,
-			     offset, vm_flags, dentry->d_inode);
+			     offset, vm_flags, inode);
 
   /* Check writeable sections for semaphores.
    * NB: They may have also been executable for the check above,

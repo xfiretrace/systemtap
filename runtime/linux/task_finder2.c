@@ -14,6 +14,8 @@
 #include "syscall.h"
 #include "task_finder_map.c"
 #include "task_finder_vma.c"
+#include "softfloat.c"
+
 
 #ifndef VMA_ITERATOR
 #define VMA_ITERATOR(name, mm, addr) \
@@ -888,6 +890,8 @@ __stp_utrace_attach_match_filename(struct task_struct *tsk,
 	struct list_head *tgt_node;
 	struct stap_task_finder_target *tgt;
 	uid_t tsk_euid;
+	char *rootfilename;
+	size_t rootfilenamelen;		
 
 #ifdef STAPCONF_TASK_UID
 	tsk_euid = tsk->euid;
@@ -899,6 +903,15 @@ __stp_utrace_attach_match_filename(struct task_struct *tsk,
 #endif
 #endif
 	filelen = strlen(filename);
+	rootfilename = _stp_kmalloc(PATH_MAX);
+	if (rootfilename == NULL) {
+			_stp_error("Unable to allocate space for path");
+			return;
+		}
+	sprintf(rootfilename, "/proc/%llu/root%s", (uint64_t)tsk->pid, filename);
+	rootfilenamelen = strlen(rootfilename);
+	dbug_task(2, "rootfilename : [%s] rootfilenamelen = [%ld]", rootfilename, rootfilenamelen);
+	
 	list_for_each(tgt_node, &__stp_task_finder_list) {
 		int rc;
 
@@ -914,10 +927,12 @@ __stp_utrace_attach_match_filename(struct task_struct *tsk,
                 /* procname-based target */
 		else if (tgt->pathlen > 0
 			 && (tgt->pathlen != filelen
-			     || strcmp(tgt->procname, filename) != 0))
+			     || strcmp(tgt->procname, filename) != 0)
+			 &&	(tgt->pathlen != rootfilenamelen
+				     || strcmp(tgt->procname, rootfilename) != 0) )
 		{
-			dbug_task(2, "target path NOT matched: [%s] != [%s]",
-			          tgt->procname, filename);
+			dbug_task(2, "target path NOT matched: [%s] != [%s] or [%s]",
+			          tgt->procname, filename, rootfilename);
 			continue;
 		}
 		/* Ignore pid-based target, they were handled at startup. */
@@ -1723,6 +1738,8 @@ stap_start_task_finder(void)
 		char *mmpath;
 		size_t mmpathlen;
 		struct list_head *tgt_node;
+		char *rootpath;
+		size_t rootpathlen;
 
 		/* If in stap -c/-x mode, skip over other processes. */
 		if (_stp_target && tsk->tgid != _stp_target)
@@ -1791,6 +1808,16 @@ stap_start_task_finder(void)
 #endif
 #endif
 		mmpathlen = strlen(mmpath);
+
+		rootpath = _stp_kmalloc(PATH_MAX);
+		if (rootpath == NULL) {
+				_stp_error("Unable to allocate space for path");
+				return ENOMEM;
+		}
+		sprintf(rootpath, "/proc/%llu/root%s", (uint64_t)tsk->pid, mmpath);
+		rootpathlen = strlen(rootpath);
+		dbug_task(2, "rootpath : [%s] rootpathlen = [%ld]", rootpath, rootpathlen);
+
 		list_for_each(tgt_node, &__stp_task_finder_list) {
 			struct stap_task_finder_target *tgt;
 
@@ -1802,10 +1829,12 @@ stap_start_task_finder(void)
 			/* procname-based target */
 			else if (tgt->build_id == 0 && tgt->pathlen > 0
 				 && (tgt->pathlen != mmpathlen
-				     || strcmp(tgt->procname, mmpath) != 0))
+				     || strcmp(tgt->procname, mmpath) != 0) 
+				 &&	(tgt->pathlen != rootpathlen
+				     || strcmp(tgt->procname, rootpath) != 0))
 			{
-				dbug_task(2, "target path not matched: [%s] != [%s]",
-					  tgt->procname, mmpath);
+				dbug_task(2, "target path not matched: [%s] != [%s] or [%s]",
+					  tgt->procname, mmpath, rootpath );
 				continue;
 			}
 			/* pid-based target */
