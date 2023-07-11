@@ -152,9 +152,16 @@ static int _stp_vma_mmap_cb(struct stap_task_finder_target *tgt,
 	const char *ori_path = NULL;
 	const char *name = ((dentry != NULL) ? (char *)dentry->d_name.name
 			    : NULL);
+	char *rootpath;
         
         if (path == NULL || *path == '\0') /* unknown? */
-                path = (char *)name; /* we'll copy this soon, in ..._add_vma_... */
+		path = (char *)name; /* we'll copy this soon, in ..._add_vma_... */
+	rootpath = _stp_kmalloc(PATH_MAX);
+	if (rootpath == NULL) {
+		_stp_error("Unable to allocate space for path");
+		return ENOMEM;
+	}	
+	sprintf(rootpath, "/proc/%llu/root%s", (uint64_t)tsk->pid, path);
 
 	dbug_task_vma(1,
 		  "mmap_cb: tsk %d:%d path %s, addr 0x%08lx, length 0x%08lx, offset 0x%lx, flags 0x%lx\n",
@@ -170,15 +177,16 @@ static int _stp_vma_mmap_cb(struct stap_task_finder_target *tgt,
 	if (path != NULL &&
 	    (stap_find_vma_map_info(tsk->group_leader, addr, NULL, NULL, NULL, &ori_path, NULL) != 0 ||
 	     strcmp(ori_path ?: "", path) != 0)) {
+                dbug_task_vma(1, "stap_find_vma_map_info : ori_path  %s path %s\n", ori_path, path);
 		for (i = 0; i < _stp_num_modules; i++) {
 			// PR20433: papering over possibility of NULL pointers
-			if (strcmp(path ?: "", _stp_modules[i]->path ?: "") == 0)
+			if (strcmp(path ?: "", _stp_modules[i]->path ?: "") == 0 || strcmp(rootpath ?: "", _stp_modules[i]->path ?: "") == 0)
 			{
 			  unsigned long vm_start = 0;
 			  unsigned long vm_end = 0;
 			  dbug_task_vma(1,
 				    "vm_cb: matched path %s to module (sec: %s)\n",
-				    path, _stp_modules[i]->sections[0].name);
+				    _stp_modules[i]->path, _stp_modules[i]->sections[0].name);
 			  module = _stp_modules[i];
 			  /* Make sure we really don't know about this module
 			     yet.  If we do know, we might want to extend
@@ -190,11 +198,11 @@ static int _stp_vma_mmap_cb(struct stap_task_finder_target *tgt,
 			  if (res == -ESRCH)
 			    res = stap_add_vma_map_info(tsk->group_leader,
 							addr, addr + length,
-							0, path, module);
+							0, _stp_modules[i]->path, module);
 			  else
 			    res = stap_add_vma_map_info(tsk->group_leader,
 							addr, addr + length,
-							addr - vm_start, path, module);
+							addr - vm_start, _stp_modules[i]->path, module);
 
 			  /* VMA entries are allocated dynamically, this is fine,
 			   * since we are in a task_finder callback, which is in
