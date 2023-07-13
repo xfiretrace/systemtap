@@ -45,7 +45,7 @@ Compatible with all current systemtap operations, see <https://github.com/xfiret
 
 ### Example
 
-* run with script 
+* Run with script
   
 ``` shell
     stap++ -e 'probe begin { println("hello world") exit() }'
