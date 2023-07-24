@@ -21,6 +21,7 @@ cd systemtap
 * Installation command dependencies
 
 ```shell
+sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list && apt update
 apt-get build-dep systemtap 
 ```
 
