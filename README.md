@@ -25,7 +25,7 @@ sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list && apt update
 apt-get build-dep systemtap 
 ```
 
-* Install the debuginfo dependency
+* Install the kernel debuginfo dependency
 
 For different versions of ubuntu, get the corresponding kernel version at <https://wiki.ubuntu.com/Debug%20Symbol%20Packages>.
 
