@@ -31,7 +31,7 @@ apt-get build-dep systemtap
 make && make install
 ```
 
-* Install the kernel debuginfo dependency
+### Install the kernel debuginfo dependency
 
 For different versions of ubuntu, get the corresponding kernel version at <https://wiki.ubuntu.com/Debug%20Symbol%20Packages>.
 
