@@ -62,7 +62,7 @@ Compatible with all current systemtap operations, see <https://github.com/xfiret
 
 ### How does it work
 
-* We extended  `systemtap` so that it can trace processes using `/proc/{PID}/root/Eexec_path` by improving the `Uprobe` inode and matching exec_path
+* We extended  `systemtap` so that it can trace processes using `/proc/{PID}/root/exec_path` by improving the `Uprobe` inode and matching exec_path
 
 You can only use `stap` like this
 
