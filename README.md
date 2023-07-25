@@ -24,6 +24,7 @@ cd systemtap
 sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list && apt update
 apt-get build-dep systemtap 
 ```
+
 * Compiling
 
 ```shell
@@ -39,7 +40,6 @@ For different versions of ubuntu, get the corresponding kernel version at <https
 apt-get install linux-image-$(uname -r)-dbgsym
 ```
 
-
 ## Get start with systemtap-container
 
 Compatible with all current systemtap operations, see <https://github.com/xfiretrace/stapxx>.
@@ -48,8 +48,8 @@ Compatible with all current systemtap operations, see <https://github.com/xfiret
 
 * You can trace processes like this
 
-```
-probe process("/proc/{PID}/root/exec_path").function("*")
+``` shell
+    stap -e 'probe process("/proc/{PID}/root/exec_path").function("*"){println("hello world")}'
 ```
 
 * Or Run with the script which stap++
@@ -66,13 +66,13 @@ probe process("/proc/{PID}/root/exec_path").function("*")
 
 You can only use `stap` like this
 
-```
-probe process("/proc/{PID}/root/exec_path").function("*")
+``` shell
+    probe process("/proc/{PID}/root/exec_path").function("*")
 ```
 
 Also, use `stapxx` which we adapt stap++ with container
 
-```shell
+``` shell
 
 root       11807   11438  0 Jun14 ?        00:00:01 nginx: master process /usr/local/openresty/nginx/sbin/nginx -p /usr/local/kong -c nginx.conf
 nobody     12956   11807  0 Jun14 ?        03:38:57 nginx: worker process
@@ -92,17 +92,18 @@ probe process("/proc/12956/root/usr/local/openresty/nginx/sbin/nginx").function(
     }
 }
 
-probe timer.s(1) {
+probe timer.s(1) 
+{
     printf("[%d] %d req/sec\n", gettimeofday_s(), count)
     count = 0
 }
 
-probe begin {
+probe begin 
+{
     warn(sprintf("Tracing process %d (/proc/12956/root/usr/local/openresty/nginx/sbin/nginx).\nHit Ctrl-C to end.\n", target()))
 }
 
 ````
-
 
 ## Change log
 
