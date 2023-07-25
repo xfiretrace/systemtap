@@ -49,7 +49,7 @@ Compatible with all current systemtap operations, see <https://github.com/xfiret
 * You can trace processes like this
 
 ```
-probe process("/proc/{PID}/root/Eexec_path}").function("*")
+probe process("/proc/{PID}/root/Eexec_path").function("*")
 ```
 
 * Or Run with the script which stap++
@@ -62,12 +62,12 @@ probe process("/proc/{PID}/root/Eexec_path}").function("*")
 
 ### How does it work
 
-* We extended  `systemtap` so that it can trace processes using `/proc/{PID}/root/Eexec_path}` by improving the `Uprobe` inode and matching exec_path
+* We extended  `systemtap` so that it can trace processes using `/proc/{PID}/root/Eexec_path` by improving the `Uprobe` inode and matching exec_path
 
 You can only use `stap` like this
 
 ```
-probe process("/proc/{PID}/root/Eexec_path}").function("*")
+probe process("/proc/{PID}/root/Eexec_path").function("*")
 ```
 
 Also, use `stapxx` which we adapt stap++ with container
