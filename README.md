@@ -24,6 +24,12 @@ cd systemtap
 sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list && apt update
 apt-get build-dep systemtap 
 ```
+* Compiling
+
+```shell
+./configure --prefix=/usr
+make && make install
+```
 
 * Install the kernel debuginfo dependency
 
@@ -33,12 +39,6 @@ For different versions of ubuntu, get the corresponding kernel version at <https
 apt-get install linux-image-$(uname -r)-dbgsym
 ```
 
-* Compiling
-
-```shell
-./configure --prefix=/usr
-make all
-```
 
 ## Get start with systemtap-container
 
